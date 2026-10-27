@@ -1,0 +1,68 @@
+/* back button (in workspace-head) */
+.back-btn {
+  width: 32px; height: 32px;
+  display: grid; place-items: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--stroke-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  margin-right: 10px;
+  transition: background var(--ease);
+}
+.back-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+/* google button */
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; height: 40px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--stroke-2);
+  background: var(--surface);
+  font-size: 13.5px; font-weight: 500;
+  color: var(--ink);
+  margin-top: 10px;
+  transition: background var(--ease);
+}
+.btn-google:hover { background: var(--surface-2); }
+.btn-google svg { flex: none; }
+
+/* auth divider */
+.auth-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0; font-size: 11px; color: var(--ink-3);
+}
+.auth-divider::before, .auth-divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--stroke);
+}
+
+/* loading shimmer */
+.loading-block {
+  height: 120px; border-radius: var(--r-md);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* offline banner */
+.offline-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 8px; text-align: center;
+  background: var(--rose); color: #fff;
+  font-size: 12px; font-weight: 500;
+}
+
+/* footer legal links are buttons */
+.public-footer ul button {
+  color: inherit; font-size: inherit; text-align: left;
+}
+.public-footer ul button:hover { color: var(--accent); }
+
+/* toast stacking on mobile */
+@media (max-width: 560px) {
+  .toast-stack { left: 12px; right: 12px; top: auto; bottom: 84px; }
+  .toast { max-width: none; }
+}
+
+/* scroll top on mobile nav tap */
+html { scroll-behavior: smooth; }
