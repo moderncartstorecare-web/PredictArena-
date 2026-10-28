@@ -416,7 +416,7 @@ function showDepositModal() {
               <div><div class="pm-text">Other UPI</div></div>
             </button>
           </div>
-          <input type="hidden" id="dep-method" value="paytm">
+          <input type="hidden" id="dm" value="paytm">
         </div>
 
         <div style="background:var(--surface-2); padding:10px; border-radius:8px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
@@ -435,7 +435,7 @@ function showDepositModal() {
 function selectPaymentMethod(btn) {
   document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  document.getElementById('dep-method').value = btn.dataset.method;
+  document.getElementById('dm').value = btn.dataset.method;
 }
 
 /* ---------------- SHARED FRAGMENTS ---------------- */
@@ -1318,7 +1318,7 @@ document.addEventListener("click", async ev => {
     }
 
     // Get the selected app (paytm, gpay, phonepe, upi)
-    const selectedApp = $("dep-method").value;
+    const selectedApp = $("dm").value; 
     if (!selectedApp) { $("dep-error").textContent = "Please select a payment app."; return; }
 
     const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -1336,8 +1336,6 @@ document.addEventListener("click", async ev => {
       });
     } catch(e) { console.error('Supabase insert failed', e); }
 
-    const selectedApp = $("dep-method").value; // Gets 'paytm', 'gpay', 'phonepe', or 'upi'
-
     ZapUPI.createOrder({
       zap_key: ZAPUPI_API_KEY, 
       order_id: orderId, 
@@ -1347,9 +1345,20 @@ document.addEventListener("click", async ev => {
       failed_url: currentUrl + '?status=failed&order_id=' + orderId,
       timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
     }, {
+      onResponse: function(paymentUrl) {
+        if (paymentUrl) window.open(paymentUrl, '_blank');
+        t.disabled = false;
+        t.textContent = 'Continue to pay';
+      },
+      onError: function(err) {
+        $("dep-error").textContent = err || "Payment failed to initialize.";
+        t.disabled = false;
+        t.textContent = 'Continue to pay';
+      }
+    });
     return;
   }
-
+   
   if (d.submitWithdraw !== undefined) {
     const amount = Number($("wd-amount").value);
     const method = $("wd-method").value;
@@ -1433,30 +1442,6 @@ async function checkPaymentReturn() {
   }
 }
 
-
-/* ---------------- PAYMENT METHOD SELECTION LOGIC ---------------- */
-document.addEventListener("click", function(e) {
-  const btn = e.target.closest(".pay-method-btn");
-  if (btn) {
-    // Remove active state from all buttons
-    document.querySelectorAll(".pay-method-btn").forEach(b => {
-      b.style.borderColor = "var(--stroke)";
-      b.style.background = "var(--surface)";
-    });
-    
-    // Add active state to clicked button
-    btn.style.borderColor = "var(--accent)";
-    btn.style.background = "var(--surface-2)";
-    
-    // Update hidden input value
-    const method = btn.dataset.method;
-    document.getElementById("dep-method").value = method;
-  }
-});
-
-/* ---------------- BOOT ---------------- */
-DB.onAuthChange(async (_event, session) => {
-   
 /* ---------------- BOOT ---------------- */
 DB.onAuthChange(async (_event, session) => {
   if (session?.user) {
