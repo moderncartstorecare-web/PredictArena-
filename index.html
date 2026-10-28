@@ -7,7 +7,7 @@
 <title>CricPulse | Cricket Predictions</title>
 <!-- 👇 ADD THIS LINE FOR FAVICON -->
 <!-- Rounded Favicon using Base64 -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CclipPath id='round'%3E%3Crect width='64' height='64' rx='14'/%3E%3C/clipPath%3E%3C/defs%3E%3Cimage href='data:image/jpeg;base64,PASTE_YOUR_LONG_BASE64_STRING_HERE' width='64' height='64' clip-path='url(%23round)'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="https://plain-apac-prod-public.komododecks.com/202610/28/TAJwRI6ghFFpzgKyXH45/image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -488,8 +488,12 @@ function shell() {
   const title = mt ? ttl(m) : (META[R] ? META[R][0] : "CricPulse"), sub = mt ? cl(m.c) + " · " + m.lg : (META[R] ? META[R][1] : "");
   const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
   const hasBack = ["match","ticket","support"].includes(R) || R=="help";
-  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand.replace('class="brand"','')}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
-<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : `<span class="mark mobo">${ic("cricket",16)}</span>`}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
+  
+  // Mobile Header Brand (using the image)
+  const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/28/TAJwRI6ghFFpzgKyXH45/image.jpg" style="width:24px;height:24px;border-radius:6px;object-fit:cover;"></div>`;
+
+  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
+<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
 <main class="pg">${VIEWS[R]()}</main></div></div>
 <nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
