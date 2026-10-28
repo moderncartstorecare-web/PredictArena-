@@ -3,6 +3,10 @@
    Depends on: supabase.js (window.DB), cdn supabase-js
    ================================================================= */
 
+/* ---------------- ZAPUPI CONFIG ---------------- */
+const ZAPUPI_API_KEY = 'zapce570e671e2f07f3bc9837566a44ec4c';
+const PRESET_AMOUNTS = [50, 100, 300, 500, 1000];
+
 /* ---------------- ICONS ---------------- */
 const P = {
   home:"M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10.5Z M9 22V12h6v10",
@@ -162,6 +166,7 @@ async function boot() {
   if (user) {
     await loadUserData(user);
   }
+  await checkPaymentReturn();
   render();
 }
 
@@ -358,7 +363,6 @@ function showWithdrawModal() {
         </div>
         <div class="form-error" id="wd-error"></div>
         <button class="btn btn-accent btn-block" data-submit-withdraw>Withdraw</button>
-        <p class="t3 fs11" style="text-align:center;margin-top:12px">Demo — no real money.</p>
       </div>
     </div>`;
 }
@@ -368,16 +372,29 @@ function showDepositModal() {
     <div class="modal-layer" data-dismiss-modal>
       <div class="modal-box">
         <h3 style="font-size:17px;margin-bottom:4px">Add funds</h3>
-        <p class="t3 fs12" style="margin-bottom:18px">Demo — no real payment is processed.</p>
-        <div class="field"><label>Amount</label>
-          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-            ${[100,500,1000,2000].map(v=>`<button class="chip" data-deposit-amount="${v}">₹${v}</button>`).join("")}
+        <p class="t3 fs12" style="margin-bottom:18px">Secure payment powered by ZapUPI.</p>
+        <div class="field"><label>Select Amount</label>
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+            ${PRESET_AMOUNTS.map(v=>`<button class="chip" data-deposit-amount="${v}">₹${v}</button>`).join("")}
           </div>
-          <input class="input" id="dep-amount" type="number" min="10" placeholder="Custom amount">
+          <input class="input" id="dep-amount" type="number" min="50" placeholder="Custom amount (Min ₹50)">
         </div>
+        
+        <div class="field">
+          <label>Payment Method</label>
+          <select class="input" id="dep-method">
+            <option value="zapupi">ZapUPI (UPI / Cards)</option>
+          </select>
+        </div>
+
+        <div style="background:var(--surface-2); padding:10px; border-radius:8px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
+          <span style="color:var(--accent);">${svg("shield",18)}</span>
+          <div class="fs12 t3"><b style="color:var(--ink)">Powered by ZapUPI integration</b><br>Secure UPI and card payments.</div>
+        </div>
+
         <div class="form-error" id="dep-error"></div>
-        <button class="btn btn-accent btn-block" data-submit-deposit>Add funds</button>
-        <p class="t3 fs11" style="text-align:center;margin-top:12px">Demo only.</p>
+        <button class="btn btn-accent btn-block" data-submit-deposit>Continue to pay</button>
+        <p class="t3 fs11" style="text-align:center;margin-top:12px">Min deposit ₹50</p>
       </div>
     </div>`;
 }
@@ -1250,17 +1267,54 @@ document.addEventListener("click", async ev => {
   if (d.depositAmount) {
     const input = $("dep-amount"); if (input) input.value = d.depositAmount; return;
   }
+  
+  // ZapUPI Deposit Logic
   if (d.submitDeposit !== undefined) {
     const amount = Number($("dep-amount").value);
-    if (!amount || amount < 10) { $("dep-error").textContent = "Minimum deposit is ₹10."; return; }
+    if (!amount || amount < 50) { $("dep-error").textContent = "Minimum deposit is ₹50."; return; }
+    
+    if (typeof ZapUPI === 'undefined') {
+      $("dep-error").textContent = "Payment gateway not loaded. Please refresh.";
+      return;
+    }
+
+    const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
+    const currentUrl = window.location.origin + window.location.pathname;
+    
+    t.disabled = true;
+    t.textContent = 'Creating payment...';
+
     try {
-      await DB.deposit(amount);
-      $("modal-layer").innerHTML = "";
-      toast(`${inr2(amount)} added.`, "wallet");
-      await loadUserData({ id: state.user.id, email: state.user.email, user_metadata: { display_name: state.user.name } });
-    } catch (e) { $("dep-error").textContent = e.message || "Failed"; }
+      await DB.client.from('payment_requests').insert({ 
+        user_id: state.user.id, 
+        txn_id: orderId, 
+        amount_inr: amount, 
+        status: 'pending' 
+      });
+    } catch(e) { console.error('Supabase insert failed', e); }
+
+    ZapUPI.createOrder({
+      zap_key: ZAPUPI_API_KEY, 
+      order_id: orderId, 
+      amount: amount.toString(),
+      success_url: currentUrl + '?status=success&order_id=' + orderId,
+      failed_url: currentUrl + '?status=failed&order_id=' + orderId,
+      timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
+    }, {
+      onResponse: function(paymentUrl) {
+        if (paymentUrl) window.open(paymentUrl, '_blank');
+        t.disabled = false;
+        t.textContent = 'Continue to pay';
+      },
+      onError: function(err) {
+        $("dep-error").textContent = err || "Payment failed to initialize.";
+        t.disabled = false;
+        t.textContent = 'Continue to pay';
+      }
+    });
     return;
   }
+
   if (d.submitWithdraw !== undefined) {
     const amount = Number($("wd-amount").value);
     const method = $("wd-method").value;
@@ -1301,6 +1355,48 @@ document.addEventListener("change", ev => {
 
 document.addEventListener("click", ev => { if (ev.target.classList.contains("modal-layer")) $("modal-layer").innerHTML = ""; });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape") $("modal-layer").innerHTML = ""; });
+
+/* ---------------- ZAPUPI RETURN HANDLER ---------------- */
+async function checkPaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+  const orderId = params.get('order_id');
+  
+  if (!orderId) return;
+
+  if (status === 'success') {
+    toast("Verifying payment...", "clock");
+    
+    setTimeout(async () => {
+      try {
+        const { data } = await DB.client.from('payment_requests')
+          .select('*')
+          .eq('txn_id', orderId)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (data) {
+          await DB.client.from('payment_requests').update({ status: 'approved' }).eq('txn_id', orderId);
+          await DB.deposit(data.amount_inr);
+          toast(`Payment successful! ₹${data.amount_inr} added.`, "wallet");
+          if (state.user) {
+            await loadUserData({ id: state.user.id, email: state.user.email, user_metadata: { display_name: state.user.name } });
+          }
+        }
+      } catch(e) {
+        console.error('Payment verification failed', e);
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 2000);
+    
+  } else if (status === 'failed') {
+    toast('Payment failed. Please try again.', 'xmark');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else if (status === 'timeout') {
+    toast('Payment timed out. Please try again.', 'xmark');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
 
 /* ---------------- BOOT ---------------- */
 DB.onAuthChange(async (_event, session) => {
