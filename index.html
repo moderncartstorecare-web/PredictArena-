@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1a5cff">
 <title>CricPulse | Cricket Predictions</title>
 <!-- 👇 ADD THIS LINE FOR FAVICON -->
-<link rel="icon" type="image/png" href="logo.png">
+<link rel="icon" type="image/png" href="https://plain-apac-prod-public.komododecks.com/202610/28/R8LDUeZq5LTdlrazMmTe/image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -319,7 +319,7 @@ const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b
 const ntf = L => L.length ? L.map(n => `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${esc(n.k)}</small></div></div>`).join("") : '<div class="empty">Nothing here yet.</div>';
 const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>${f[0]}${ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
 const wide = () => matchMedia("(min-width:900px)").matches;
-const brand = `<div class="brand"><img src="logo.png" alt="CricPulse Logo" style="width:32px; height:32px; object-fit:contain; border-radius: 8px; margin-right: 4px;">CricPulse</div>`;
+const brand = `<div class="brand"><img src="https://plain-apac-prod-public.komododecks.com/202610/28/R8LDUeZq5LTdlrazMmTe/image.jpg" alt="CricPulse" style="width:32px; height:32px; object-fit:contain; border-radius:8px; margin-right:6px;">CricPulse</div>`;
    
 /* ============== PUBLIC PAGES ============== */
 function landing() {
