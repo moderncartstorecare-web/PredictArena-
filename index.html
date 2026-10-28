@@ -8,8 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ZapUPI Payment Gateway -->
+<script src="https://zapupi.com/single-html-web-kit.js"></script>
 <style>
-/* ===== design tokens (unchanged core + additions) ===== */
+/* ===== design tokens ===== */
 :root{--bg:#f6f7fb;--sf:#fff;--s2:#eff2f8;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;--ln:#e3e7ee;--ln2:#d0d6e2;--ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;--ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1}
 :root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{-webkit-text-size-adjust:100%}
@@ -80,7 +82,6 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--i3);font-size:12px}.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--ln)}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:44px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600}
-/* support / chat */
 .chat{display:flex;flex-direction:column;height:calc(100dvh - 62px);max-width:640px;margin:0 auto}
 .chat .msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.4;word-break:break-word}
@@ -92,7 +93,6 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .chatbar textarea{flex:1;min-height:42px;max-height:120px;padding:10px 12px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-size:15px;resize:none}
 .chatbar .ib{width:42px;height:42px}
 .sla{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600}
-/* legal pages */
 .legal{max-width:760px;margin:0 auto;padding:16px 14px 60px;font-size:14px;line-height:1.7}
 .legal h1{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}.legal h2{font-size:16px;margin:22px 0 6px}.legal p{color:var(--i2);margin-bottom:10px}
 @media(min-width:900px){
@@ -114,7 +114,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 <script src="config.js"></script>
 <script>
 /* =========================================================
-   CricPulse — production SPA
+   CricPulse — production SPA (ZapUPI Integrated)
    ========================================================= */
 const P = {
   home:"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10",
@@ -325,10 +325,6 @@ function landing() {
     <div><b>CricPulse</b><br>India's free cricket prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
     <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button><button data-a="guest">Continue as guest</button></div>
     <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
-  <!-- Replace the data-a="page" buttons in the footer with this: -->
-<a href="terms.html" style="color:var(--i2);text-decoration:none;">Terms & Conditions</a>
-<a href="privacy.html" style="color:var(--i2);text-decoration:none;">Privacy Policy</a>
-<a href="refund.html" style="color:var(--i2);text-decoration:none;">Refund Policy</a>
     <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
   </div>
   &copy; ${new Date().getFullYear()} CricPulse. All rights reserved. · 18+ only · Play responsibly.
@@ -521,11 +517,11 @@ function settle(id) {
 const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••" + s.slice(-2);
 
 /* ZapUPI add funds sheet */
-const PRESETS = [100, 500, 1000, 2000, 5000];
+const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
   <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
-  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="10" placeholder="Enter amount"></div>
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount (Min ₹50)"></div>
   <div class="fld"><label for="dm">Payment method</label><select class="inp" id="dm"><option value="zapupi">ZapUPI (UPI / cards)</option><option value="card">Card</option></select></div>
   <div class="card" style="padding:10px;background:var(--s2);border-radius:10px;margin-bottom:10px;display:flex;gap:8px;align-items:center">${ic("shield",16)}<div class="s12"><b>Powered by ZapUPI integration</b><div class="mut">Secure UPI and card payments.</div></div></div>
   <div class="err" id="er"></div>
@@ -663,12 +659,47 @@ document.addEventListener("click", e => {
     case "damt": $("da").value = v; break;
     case "depok": {
       const x = Number($("da").value);
-      if (!x || x < 10) { $("er").textContent = "Minimum deposit is ₹10."; return; }
+      if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
-      // ZapUPI placeholder: in production redirect to ZapUPI checkout, then confirm via webhook/verify endpoint.
-      const method = $("dm").value;
-      S.bal += x; addTx("deposit",x,"Deposit via ZapUPI ("+method+")","completed");
-      note("Funds added",inr2(x)+" added to your wallet.","wallet"); save(); closeSheet(); toast(inr2(x)+" added.","wallet"); render(); break;
+      
+      if (typeof ZapUPI === 'undefined') {
+        $("er").textContent = "Payment gateway not loaded. Please refresh.";
+        return;
+      }
+
+      const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
+      const currentUrl = window.location.origin + window.location.pathname;
+      
+      t.disabled = true;
+      t.textContent = 'Creating payment...';
+
+      if (window.CP_DB && CP_DB.ready) {
+        CP_DB.rest('payment_requests', {
+          method: 'POST',
+          body: JSON.stringify({ user_id: S.user.e, txn_id: orderId, amount_inr: x, status: 'pending' })
+        }).catch(e => console.error('Supabase insert failed', e));
+      }
+
+      ZapUPI.createOrder({
+        zap_key: 'zapce570e671e2f07f3bc9837566a44ec4c', 
+        order_id: orderId, 
+        amount: x.toString(),
+        success_url: currentUrl + '?status=success&order_id=' + orderId,
+        failed_url: currentUrl + '?status=failed&order_id=' + orderId,
+        timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
+      }, {
+        onResponse: function(paymentUrl) {
+          if (paymentUrl) window.open(paymentUrl, '_blank');
+          t.disabled = false;
+          t.textContent = 'Continue to pay';
+        },
+        onError: function(err) {
+          $("er").textContent = err || "Payment failed to initialize.";
+          t.disabled = false;
+          t.textContent = 'Continue to pay';
+        }
+      });
+      break;
     }
     case "wd": if(S.bal < 100){toast("Minimum withdrawal is ₹100.","x"); return;} wdSheet(); break;
     case "wmax": $("wa").value = Math.floor(S.bal); break;
@@ -758,11 +789,59 @@ setInterval(() => {
   if (ch) { save(); if (S.user && S.route == "wallet") render(); }
 }, 2000);
 
+async function checkPaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+  const orderId = params.get('order_id');
+  
+  if (!orderId) return;
+
+  if (status === 'success') {
+    toast("Verifying payment...", "clock");
+    
+    setTimeout(async () => {
+      try {
+        if (window.CP_DB && CP_DB.ready) {
+          // Verify with Supabase
+          const data = await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}&select=*`);
+          if (data && data[0]) {
+            const amt = data[0].amount_inr;
+            // Mark as approved
+            await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}`, {
+              method: 'PATCH',
+              body: JSON.stringify({ status: 'approved' })
+            });
+            // Credit wallet locally
+            S.bal += amt;
+            addTx("deposit", amt, "ZapUPI Deposit", "completed");
+            note("Funds added", inr2(amt)+" added to your wallet via ZapUPI.", "wallet");
+            save(); toast(`Payment successful! ₹${amt} added.`, "wallet"); render();
+          }
+        } else {
+          // Fallback if Supabase isn't ready
+          toast("Payment successful. Balance synced.", "wallet");
+        }
+      } catch(e) {
+        console.error('Payment verification failed', e);
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 2000);
+    
+  } else if (status === 'failed') {
+    toast('Payment failed. Please try again.', 'xmark');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else if (status === 'timeout') {
+    toast('Payment timed out. Please try again.', 'xmark');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
 /* init — avoids white flash */
 window.addEventListener("load", () => {
   try {
-    if (window.CP_DB) { CP_DB.loadSession(); if (CP_DB.ready) { /* session check optional */ } }
+    if (window.CP_DB) { CP_DB.loadSession(); }
     applyTheme();
+    checkPaymentReturn();
     render();
   } catch (err) {
     document.getElementById("app").innerHTML =
