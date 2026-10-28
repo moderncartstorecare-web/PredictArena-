@@ -9,11 +9,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ===== design tokens (unchanged core + additions) ===== */
 :root{--bg:#f6f7fb;--sf:#fff;--s2:#eff2f8;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;--ln:#e3e7ee;--ln2:#d0d6e2;--ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;--ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1}
 :root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}input,select{font:inherit;color:inherit}svg{display:block;flex:none}h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}input,select,textarea{font:inherit;color:inherit}svg{display:block;flex:none}h1,h2,h3,p{margin:0}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:6px}
 .mut{color:var(--i3)}.t2{color:var(--i2)}.s12{font-size:12px}.s11{font-size:11px}.ok{color:var(--ok)}.no{color:var(--no)}.b{font-weight:600}.grow{flex:1;min-width:0}
 .row{display:flex;align-items:center;gap:10px}.bt{display:flex;justify-content:space-between;align-items:center;gap:10px}.col{display:flex;flex-direction:column}.stack>*+*{margin-top:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -23,6 +24,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .dot{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--no);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
 .card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:14px}.card h3{font-size:14px;font-weight:600;margin-bottom:8px}.card .bt h3{margin:0}
 .inp{width:100%;height:44px;padding:0 12px;background:var(--sf);border:1px solid var(--ln2);border-radius:10px;font-size:16px}.inp:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
+textarea.inp{height:auto;min-height:80px;padding:10px 12px;resize:vertical}
 .fld{margin-bottom:12px}.fld label{display:block;font-size:12px;font-weight:500;color:var(--i2);margin-bottom:4px}.err{min-height:18px;color:var(--no);font-size:12px;margin-bottom:6px}
 .pill{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:6px;font-size:11px;font-weight:600;background:var(--s2);color:var(--i2);white-space:nowrap}.pill.ok{background:var(--oks);color:var(--ok)}.pill.no{background:var(--nos);color:var(--no)}.pill.am{background:var(--ams);color:var(--am)}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:0 -14px 10px;padding:0 14px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
@@ -37,7 +39,6 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;flex:none}
 .av{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
 .sw{position:relative;width:42px;height:24px;flex:none}.sw input{position:absolute;inset:0;opacity:0;margin:0;z-index:1;cursor:pointer}.sw i{position:absolute;inset:0;border-radius:12px;background:var(--ln2);transition:background .15s}.sw i:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}.sw input:checked+i{background:var(--ac)}.sw input:checked+i:after{transform:translateX(18px)}
-/* app shell */
 .rail{display:none}.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln)}
 .top h1{font-size:17px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .sub{display:none;font-size:13px;color:var(--i3)}.dk{display:none}
 .wc{height:38px;padding:0 11px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;flex:none}
@@ -47,25 +48,21 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .pp{position:fixed;right:10px;top:calc(60px + env(safe-area-inset-top));width:min(340px,calc(100vw - 20px));background:var(--sf);border:1px solid var(--ln2);border-radius:14px;box-shadow:0 16px 40px -12px rgba(15,23,41,.3);z-index:70;overflow:hidden}
 .pp header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--ln);font-weight:600}
 .nt{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--ln)}.nt:last-child{border:0}.nt.u{background:var(--acs)}.nt i{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--s2);color:var(--ac);flex:none}.nt b{display:block;font-size:13px;font-weight:600}.nt small{display:block;color:var(--i2);font-size:12px}
-/* markets */
 .mk{padding:12px 14px;border-bottom:1px solid var(--ln)}.mk:last-child{border:0}.nm{font-weight:600;font-size:14px;line-height:1.35}.nm:hover{color:var(--ac)}
 .cd{font-size:12px;font-weight:600;color:var(--am);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.lvt{font-size:12px;font-weight:600;color:var(--ok);margin:2px 0 8px}
 .pks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pk{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:42px;padding:6px 12px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600;font-size:13px;min-width:0}
 .pk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pk b{font-size:12px;color:var(--i3)}.pk.on{border-color:var(--ac);background:var(--acs);color:var(--ac)}.pk.on b{color:var(--ac)}.pk:disabled{opacity:.6;cursor:default}
 .srch{position:relative;margin-bottom:10px}.srch svg{position:absolute;left:12px;top:13px;color:var(--i3)}.srch .inp{padding-left:36px}.slipd{display:none}
 .se{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--ln)}.sl{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
-/* match */
 .lay{display:grid;gap:10px}.sg{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:8px 0}.tm{text-align:center}.tm b{display:block;font-size:12px;font-weight:600;color:var(--i2)}.tm span{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}.tm small{display:block;font-size:11px;color:var(--i3)}
 .ex{text-align:center;font-size:12px;color:var(--i3);margin-bottom:6px}.lg div{padding:6px 0;border-top:1px solid var(--ln);font-size:12px;color:var(--i2)}
 .fm{display:flex;gap:4px}.fm span{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700}.fm .W{background:var(--oks);color:var(--ok)}.fm .L{background:var(--nos);color:var(--no)}
-/* wallet / rewards */
 .wbal{padding:18px;border-radius:16px;background:linear-gradient(135deg,#0f1729,#1c2a55);color:#fff}.wbal small{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;font-weight:600}.wbal h2{font-size:32px;font-weight:700;letter-spacing:-.03em;margin:2px 0}.wbal .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:#fff;flex:1}
 .cv{min-width:54px;height:44px;border-radius:10px;background:var(--ams);color:var(--am);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
 .code{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:4px 4px 4px 10px;border:1px dashed var(--ac);border-radius:8px;background:var(--s2);font-weight:600;font-size:12px;letter-spacing:.05em}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tile{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid var(--ln);border-radius:12px;font-weight:500}
 .ov{position:fixed;inset:0;z-index:100;background:rgba(9,12,18,.55);display:flex;align-items:flex-end;justify-content:center}.shx{background:var(--sf);width:100%;max-width:460px;max-height:90dvh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
 .tw{position:fixed;left:0;right:0;top:calc(62px + env(safe-area-inset-top));z-index:120;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}.ts{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:13px;display:flex;gap:8px;align-items:center;max-width:92vw;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-/* public */
 .pub{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln)}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:-.02em}.wrap{max-width:1000px;margin:0 auto;padding:0 14px}
 .hero{padding:18px 0 14px}.hero h1{font-size:28px;line-height:1.12;letter-spacing:-.03em;font-weight:700;margin:10px 0 8px}.hero h1 em{font-style:normal;color:var(--ac)}.hero p{color:var(--i2);font-size:14.5px;margin-bottom:14px}
@@ -77,9 +74,27 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .steps .ln{align-items:flex-start;justify-content:flex-start}.steps i{width:34px;height:34px;border-radius:9px;background:var(--acs);color:var(--ac);display:grid;place-items:center;flex:none}
 .cats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cats>div{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--ln);border-radius:12px;background:var(--sf)}.cats svg{color:var(--ac)}.cats b{display:block;font-size:13px}
 .foot{padding:16px 14px calc(26px + env(safe-area-inset-bottom));font-size:12px;color:var(--i3);border-top:1px solid var(--ln);background:var(--sf);line-height:1.7}
+.foot a,.foot button{color:var(--i2);text-decoration:none;display:block;padding:3px 0;font-weight:500}.foot a:hover,.foot button:hover{color:var(--ac)}
 .auth{display:grid;place-items:center;padding:18px 14px;min-height:calc(100dvh - 62px)}.auth .card{width:100%;max-width:400px;padding:20px}
 .tabs{display:flex;gap:2px;padding:3px;background:var(--s2);border-radius:10px;margin:14px 0}.tabs button{flex:1;height:32px;border-radius:8px;font-size:13px;font-weight:500;color:var(--i2);text-align:center}.tabs button.on{background:var(--sf);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 details p{color:var(--i2);font-size:13px;padding-bottom:10px}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--i3);font-size:12px}.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--ln)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:44px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600}
+/* support / chat */
+.chat{display:flex;flex-direction:column;height:calc(100dvh - 62px);max-width:640px;margin:0 auto}
+.chat .msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.4;word-break:break-word}
+.msg.me{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:4px}
+.msg.them{align-self:flex-start;background:var(--s2);border-bottom-left-radius:4px}
+.msg small{display:block;font-size:10px;opacity:.7;margin-top:3px}
+.msg img{max-width:100%;border-radius:8px;margin-top:6px;display:block}
+.chatbar{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);background:var(--sf);align-items:flex-end}
+.chatbar textarea{flex:1;min-height:42px;max-height:120px;padding:10px 12px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-size:15px;resize:none}
+.chatbar .ib{width:42px;height:42px}
+.sla{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600}
+/* legal pages */
+.legal{max-width:760px;margin:0 auto;padding:16px 14px 60px;font-size:14px;line-height:1.7}
+.legal h1{font-size:24px;letter-spacing:-.02em;margin-bottom:14px}.legal h2{font-size:16px;margin:22px 0 6px}.legal p{color:var(--i2);margin-bottom:10px}
 @media(min-width:900px){
 .app{display:grid;grid-template-columns:220px minmax(0,1fr)}.rail{display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:16px 12px;background:var(--sf);border-right:1px solid var(--ln);overflow:auto}
 .rl{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--i2)}.rl:hover{background:var(--s2)}.rl.on{background:var(--acs);color:var(--ac);font-weight:600}.rg{padding:14px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--i3)}
@@ -87,7 +102,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .pg{padding:20px 28px 60px}.chips{margin:0 0 12px;padding:0;flex-wrap:wrap}.lay2{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}.slipd{display:block;position:sticky;top:90px}
 .lay{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"a c" "d c";gap:16px;align-items:start}.lay .a{grid-area:a}.lay .c{grid-area:c;position:sticky;top:90px}.lay .d{grid-area:d}
 .pp{top:68px;right:28px}.shx{border-radius:18px}.ov{align-items:center}
-.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:44px 0}.hero h1{font-size:42px}.lb{margin:0}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.steps .ln{border:0}.cats{grid-template-columns:repeat(5,1fr)}.sec{padding:34px 0}.pub{padding:0 max(14px,calc((100vw - 1000px)/2));height:60px}}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:44px 0}.hero h1{font-size:42px}.lb{margin:0}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.steps .ln{border:0}.cats{grid-template-columns:repeat(5,1fr)}.sec{padding:34px 0}.pub{padding:0 max(14px,calc((100vw - 1000px)/2));height:60px}.chat{height:calc(100dvh - 60px)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -96,7 +111,11 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 <div id="sh"></div>
 <div class="tw" id="tw"></div>
 
+<script src="config.js"></script>
 <script>
+/* =========================================================
+   CricPulse — production SPA
+   ========================================================= */
 const P = {
   home:"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10",
   target:"M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0zM18 12A6 6 0 1 1 6 12a6 6 0 0 1 12 0zM14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0z",
@@ -129,9 +148,14 @@ const P = {
   exit:"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   help:"M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01",
   down:"M12 5v14M19 12l-7 7-7-7",
-  up:"M12 19V5M5 12l7-7 7 7"
+  up:"M12 19V5M5 12l7-7 7 7",
+  img:"M21 15V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10M21 15l-5-5L5 21M3 16l5-5 4 4",
+  send:"M22 2 11 13M22 2l-7 20-4-9-9-4z",
+  chat:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+  instagram:"M16 3H8a5 5 0 0 0-5 5v8a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5V8a5 5 0 0 0-5-5zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM17.5 6.5h.01",
+  dot:"M12 12h.01",
+  ext:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"
 };
-
 const ic = (n,s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
 const $ = i => document.getElementById(i);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -151,9 +175,14 @@ const MK = [
   {id:8,c:"indian",lg:"Economy",q:"Will Sensex close above last week's high?",A:["Y","Yes"],B:["N","No"],s:15000,w:46,oa:2.1,ob:1.85},
   {id:9,c:"esports",lg:"BGMI Pro Series",A:["TSM","Team Soul"],B:["GE","Godlike"],s:6400,w:53,oa:1.8,ob:2.1}
 ];
-
 const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
-const FAQ = [["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],["Are the rewards real?","Yes. Correct picks unlock sample coupons and credit your wallet balance."],["How are winners decided?","When a market closes, the official result is compared with your pick. Use Settle to simulate that step."],["How does the wallet work?","A correct pick adds funds (₹10 x the odds). You can add funds and withdraw your winnings to your bank."],["Is this gambling?","Yes, this is a skill-based prediction platform. Please play responsibly."]];
+const FAQ = [
+  ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
+  ["How does the wallet work?","A correct pick credits your wallet. You can add funds and withdraw your winnings to your bank."],
+  ["How are winners decided?","When a market closes, the official result is compared with your pick."],
+  ["How fast is support?","Our support team replies within 60 minutes in the in-app Support Center. You can also reach us on Instagram."],
+  ["Is this gambling?","This is a skill-based prediction platform. Please play responsibly and follow local laws."]
+];
 const VEN = ["","Wankhede Stadium, Mumbai","Capital Oval, New Delhi","Chinnaswamy Stadium, Bengaluru","Chepauk Ground, Chennai","Eden Gardens, Kolkata","Newlands, Cape Town","Official box office trackers","Official exchange closing data","Online final, India server"];
 const NM = ["Rohan Verma","Arjun Khan","Sameer Iyer","Tanmay Nair","Vikram Das","Kunal Rao","Imran Qureshi","Nikhil Joshi"];
 const RO = {cricket:["Top-order batter","Fast bowler"],football:["Striker","Midfielder"],kabaddi:["Raider","Defender"],esports:["Entry fragger","In-game leader"]};
@@ -167,30 +196,34 @@ const META = {
   ranks:["Leaderboard","See how you rank."],
   alerts:["Notifications","Activity on your account."],
   profile:["Profile","Details, preferences and security."],
-  help:["Help and terms","How the platform works."]
+  help:["Help and terms","How the platform works."],
+  support:["Support","We reply within 60 minutes."],
+  ticket:["Support chat","We reply within 60 minutes."],
+  about:["About us",""],
+  terms:["Terms & Conditions",""],
+  privacy:["Privacy Policy",""],
+  refund:["Refund Policy",""]
 };
-
 const RAIL = [
   ["Predict",[["home","Overview","home"],["markets","Markets","target"],["picks","My picks","list"]]],
   ["Money",[["wallet","Wallet","wallet"],["rewards","Coupons","gift"]]],
-  ["More",[["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["help","Help and terms","help"]]]
+  ["More",[["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]]]
 ];
 
-/* state */
-const KEY = "cricpulse_v2";
-const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk"];
+/* ---- state ---- */
+const KEY = "cricpulse_v3";
+const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk","tickets"];
 let S = {
   user:null, bal:0, xp:0, st:0, best:0, preds:[], cps:[], txs:[],
   nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, k:"Today"}],
   pf:{em:1,re:1,rw:1}, theme:"", chk:"", route:"home", pub:"land", au:"in",
-  cat:"all", q:"", slip:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0
+  cat:"all", q:"", slip:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0,
+  tickets:[], ticketOpen:null, authBusy:false
 };
-
 try {
   const r = JSON.parse(localStorage.getItem(KEY));
   if (r && Array.isArray(r.preds)) PERSIST.forEach(k => { if (r[k] !== undefined) S[k] = r[k]; });
 } catch(e) {}
-
 const save = () => { try { const o = {}; PERSIST.forEach(k => o[k] = S[k]); localStorage.setItem(KEY, JSON.stringify(o)); } catch(e) {} };
 const applyTheme = () => { document.documentElement.dataset.theme = S.theme || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"); };
 const isDark = () => document.documentElement.dataset.theme == "dark";
@@ -210,21 +243,13 @@ const addTx = (type,amount,n,status) => {
 };
 const sumTx = (type,st) => S.txs.filter(t => t.type == type && (!st || t.status == st)).reduce((a,t) => a + t.amount, 0);
 
-/* time */
 const T0 = Date.now();
 const left = m => Math.max(0, m.s - Math.floor((Date.now()-T0)/1000));
 const fmtT = s => { const h = Math.floor(s/3600), m = Math.floor(s%3600/60); return (h?h+"h ":"") + m + "m " + String(s%60).padStart(2,"0") + "s"; };
 const cdt = m => left(m) ? fmtT(left(m)) : "Closed";
 const seen = {};
 
-setInterval(() => {
-  document.querySelectorAll("[data-cd]").forEach(n => {
-    const m = mkt(n.dataset.cd); n.textContent = cdt(m);
-    if (!left(m) && !seen[m.id]) { seen[m.id]=1; if(S.user && (S.route=="markets" || S.route=="match")) render(); }
-  });
-}, 1000);
-
-/* live feed (simulated) */
+/* live feed */
 const LV = {};
 MK.forEach(m => {
   LV[m.id] = m.c == "cricket" ? {r:96+m.id*11, w:m.id%4, b:72+m.id*5, tg:180+m.id*5, lg:["Match in progress"]} :
@@ -234,7 +259,6 @@ MK.forEach(m => {
              {v:m.id==7 ? 248.6 : 78420.5, lg:["Tracker started"]};
 });
 const ov = b => Math.floor(b/6) + "." + b%6;
-
 function liveText(m) {
   const L = LV[m.id];
   if (m.q) return "Live · " + (m.id==7 ? "₹"+L.v.toFixed(1)+" crore so far" : "Sensex "+ni(L.v));
@@ -243,7 +267,6 @@ function liveText(m) {
   if (m.c == "kabaddi") return "Live · " + m.A[0] + " " + L.p[0] + " - " + L.p[1] + " " + m.B[0];
   return "Live · " + m.A[0] + " " + L.rd[0] + " - " + L.rd[1] + " " + m.B[0];
 }
-
 function liveBoard(m) {
   const L = LV[m.id], lg = `<div class="lg">${L.lg.map(x => `<div>${esc(x)}</div>`).join("")}</div>`;
   if (m.q) {
@@ -257,11 +280,437 @@ function liveBoard(m) {
   else { a = L.rd[0]; as = "rounds"; b = L.rd[1]; bs = "rounds"; ex = "Map 2, first to 13"; }
   return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>${a}</span><small>${as}</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>${b}</span><small>${bs}</small></div></div><div class="ex">${ex}</div>${lg}`;
 }
-
 const miniBoard = () => {
   const m = MK[0], L = LV[1];
   return `<div class="sg"><div class="tm"><b>${m.A[0]}</b><span>${L.r}/${L.w}</span><small>${ov(L.b)} ov</small></div><div class="mut s12">vs</div><div class="tm"><b>${m.B[0]}</b><span>-</span><small>Yet to bat</small></div></div>`;
 };
+
+/* ui helpers */
+const toast = (m,g="check") => {
+  const n = document.createElement("div"); n.className = "ts";
+  n.innerHTML = ic(g,14) + "<span>" + esc(m) + "</span>";
+  $("tw").appendChild(n); setTimeout(() => n.remove(), 2800);
+};
+const sheet = h => { $("sh").innerHTML = `<div class="ov"><div class="shx">${h}</div></div>`; };
+const closeSheet = () => { $("sh").innerHTML = ""; };
+const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class="chip${cur==k?" on":""}" data-a="${a}" data-v="${k}">${l}</button>`).join("")}</div>`;
+const stp = p => p.res == "w" ? '<span class="pill ok">Won</span>' : p.res == "l" ? '<span class="pill no">Lost</span>' : '<span class="pill">Pending</span>';
+const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("")}</div>`;
+const ntf = L => L.length ? L.map(n => `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${esc(n.k)}</small></div></div>`).join("") : '<div class="empty">Nothing here yet.</div>';
+const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>${f[0]}${ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
+const wide = () => matchMedia("(min-width:900px)").matches;
+const brand = `<div class="brand"><span class="mark">${ic("cricket",16)}</span>CricPulse</div>`;
+
+/* ============== PUBLIC PAGES ============== */
+function landing() {
+  const reg = 18420 + (S.user ? 1 : 0);
+  return `<header class="pub">${brand}<div class="row" style="gap:6px"><button class="btn sm" data-a="auth" data-v="in">Log in</button><button class="btn sm p" data-a="auth" data-v="up">Sign up</button></div></header>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <span class="tag">${ic("shield",12)} Real Predictions, Real Rewards</span>
+      <h1>Call the match. <em>Win real rewards.</em></h1>
+      <p>Pick the winner of cricket and other matches for free, follow live scores and track your results in your wallet.</p>
+      <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get started free</button><button class="btn grow" data-a="guest">Try as guest</button></div>
+      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
+    </div>
+    <div class="lb"><header><span>Live now, IPL Match 42</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
+  </section>
+  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket and more with live scores and crowd splits."],["lock","Lock your pick","One free pick per market before the countdown ends."],["wallet","Collect rewards","Correct picks add funds and unlock coupons."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>Questions</h2>${faqH(5)}</section>
+</div>
+<footer class="foot">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div><b>CricPulse</b><br>India's free cricket prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
+    <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button><button data-a="guest">Continue as guest</button></div>
+    <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
+    <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
+  </div>
+  &copy; ${new Date().getFullYear()} CricPulse. All rights reserved. · 18+ only · Play responsibly.
+</footer>`;
+}
+
+function authV() {
+  const up = S.au == "up";
+  return `<header class="pub">${brand}<button class="btn sm" data-a="home0">Back</button></header>
+  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. No card needed.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
+  ${up ? '<div class="fld"><label for="an">Full name</label><input class="inp" id="an" autocomplete="name"></div>' : ""}
+  <div class="fld"><label for="ae">Email</label><input class="inp" id="ae" type="email" autocomplete="email" inputmode="email"></div>
+  <div class="fld"><label for="ap">Password</label><input class="inp" id="ap" type="password" autocomplete="${up?"new-password":"current-password"}"></div>
+  <div class="err" id="er"></div>
+  <button class="btn p w" data-a="subm" ${S.authBusy?"disabled":""}>${S.authBusy?"Please wait…":(up?"Create account":"Log in")}</button>
+  <div class="divider">or</div>
+  <button class="gbtn" data-a="gmail"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</button>
+  <button class="btn w" style="margin-top:8px" data-a="guest">Continue as guest</button>
+  <p class="mut s11" style="text-align:center;margin-top:12px">By continuing, you agree to our Terms, Privacy and Refund policies. 18+ only.</p>
+  </div></div>`;
+}
+
+function legalPage(kind) {
+  const PAGES = {
+    terms:{title:"Terms & Conditions",body:`<p>CricPulse is a skill-based prediction platform. By using this site you agree to these terms, to play responsibly, and to follow the laws of your state regarding online gaming. You must be 18 or older.</p><p>Markets are free to enter. One pick per market. Picks lock at the countdown end and cannot be edited. Settlement uses the official result; void markets refund automatically.</p><p>Wallet funds are real. Deposits are credited on confirmation; withdrawals are reviewed and processed within 24 hours. Minimum withdrawal is ₹100.</p><p>We may suspend accounts for abuse, multi-accounting or attempts to manipulate settlement.</p>`},
+    privacy:{title:"Privacy Policy",body:`<p>We collect your email and display name to create your account, and transaction data to operate the wallet. We do not sell your data.</p><p>Authentication is handled by our identity provider; passwords are never stored by us. Support images are stored to resolve your tickets and are visible only to support staff.</p><p>You can request deletion of your account and data via the Support Center.</p>`},
+    refund:{title:"Refund Policy",body:`<p>If a market is abandoned, tied or voided, entries and any associated balance are refunded automatically to your wallet.</p><p>Deposits are final once credited. Withdrawals are processed within 24 hours; cancellations before processing return funds instantly to your wallet.</p><p>For disputes, open a ticket in the Support Center — we reply within 60 minutes.</p>`},
+    about:{title:"About CricPulse",body:`<p>CricPulse is India's free cricket prediction platform. We let fans call the match, follow live scores, and track results in a single wallet.</p><p>Entry is free across all markets. Correct picks earn wallet funds and coupons from partner brands. Our support team replies within 60 minutes.</p><p>Play responsibly. Only 18+ users are permitted.</p>`}
+  };
+  const p = PAGES[kind];
+  return `<header class="pub"><div class="row"><button class="ib" data-a="${S.user?"nav":"home0"}" data-v="help" aria-label="Back">${ic("back",18)}</button>${brand}</div></header>
+  <div class="legal"><h1>${p.title}</h1>${p.body}<p class="mut s12" style="margin-top:20px">Last updated ${new Date().toLocaleDateString("en-IN",{year:"numeric",month:"long"})}</p></div>`;
+}
+
+/* ============== APP VIEWS ============== */
+const mrow = m => {
+  const lk = S.preds.find(p => p.m == m.id), cls = !left(m), sel = S.slip[m.id];
+  return `<div class="mk"><div class="bt" style="align-items:flex-start"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)} · crowd ${m.w}/${100-m.w}</div><div class="lvt" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
+};
+const mlist = () => {
+  const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
+  return L.length ? `<div class="card" style="padding:0;overflow:hidden">${L.map(mrow).join("")}</div>` : '<div class="card empty">No markets match your search.</div>';
+};
+const slipBody = () => {
+  const ids = Object.keys(S.slip);
+  return (ids.length ? ids.map(id => { const m = mkt(id); return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Your pick: ${esc(full(m,S.slip[id]))}</span></div><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div>`; }).join("") : '<div class="empty">Tap an outcome to add it here.</div>') + `<div class="sl"><span class="t2">Entry fee</span><b class="ok">Free</b></div><div class="sl"><span class="t2">XP on lock</span><b>+${ids.length*10}</b></div><button class="btn p w" style="margin-top:8px" data-a="lockslip" ${ids.length?"":"disabled"}>${ic("lock",14)} Lock ${ids.length||""} pick${ids.length==1?"":"s"}</button>`;
+};
+const marketsV = () => {
+  const n = Object.keys(S.slip).length;
+  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">${ic("search",16)}<input class="inp" id="q" placeholder="Search teams or events" value="${esc(S.q)}"></div><div class="lay2"><div id="ml">${mlist()}</div><div class="card slipd" id="sd"><h3>Your slip</h3>${slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>${n} pick${n>1?"s":""} selected</b><div class="s11" style="opacity:.7">+${n*10} XP, free entry</div></div><button class="btn p sm" data-a="slipsheet">Review and lock</button></div>` : "");
+};
+function homeV() {
+  const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
+  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
+  const cs = CATS.map(c => { const d = S.preds.filter(p => p.res && mkt(p.m).c == c[0]), w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; }).join("");
+  return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
+<div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
+<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${[1,2,5].map(i => row(mkt(i))).join("")}</div>
+<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
+<div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
+<div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
+}
+function picksV() {
+  const f = S.pff, cnt = k => S.preds.filter(p => k=="all"||(k=="p"?!p.res:p.res==k)).length;
+  const L = S.preds.filter(p => f=="all"||(f=="p"?!p.res:p.res==f)).slice().reverse();
+  return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">${esc(full(m,p.p))} · ${(p.p=="A"?m.oa:m.ob).toFixed(2)}x${p.res=="w"?" · +"+inr(p.pay):""}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res?"":`<button class="btn sm" data-a="settle" data-v="${p.id}">Settle</button>`}</div></div>`; }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
+}
+function walletV() {
+  const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
+  return `<div class="stack"><div class="wbal"><small>Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
+<div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
+<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings"}[t.type]}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"?"no":"ok"}">${t.type=="withdraw"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
+<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
+}
+function rewardsV() {
+  const un = S.cps.filter(c => !c.cl).length;
+  return `<div class="stack">${kpi([["Available",un,"to claim"],["Claimed",S.cps.length-un,"codes saved"],["Tier",tier(),"Level "+lvl()],["XP",S.xp,"total"]])}
+<div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
+<details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
+}
+function ranksV() {
+  const W = [["Aarav Sharma",640,74],["Diya Menon",610,71],["Kabir Rao",540,68],["Meera Patel",470,65],["Rohan Thakur",390,61]];
+  const A = [["Aarav Sharma",3420,72],["Diya Menon",3310,70],["Kabir Rao",3180,67],["Meera Patel",2990,66],["Rohan Thakur",2860,62]];
+  const L = [...(S.rk=="w"?W:A),[S.user.n,S.xp,tally().p,1]].sort((a,b) => b[1]-a[1]);
+  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">${i+1}</b><div class="grow">${esc(r[0])}${r[3]?" (you)":""}</div><span class="mut s12">${r[2]}%</span><b style="min-width:48px;text-align:right">${r[1]} XP</b></div>`).join("")}</div>`;
+}
+const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
+function profileV() {
+  const u = S.user, t = tally();
+  const B = [["First pick","target",t.n>=1],["First win","award",t.w>=1],["3-win streak","flame",S.best>=3],["3 coupons","gift",S.cps.length>=3],["Level 3","star",lvl()>=3]];
+  const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
+  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)} · Level ${lvl()} ${tier()}</div></div></div></div>
+<div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
+<div class="card" style="padding:12px 14px 2px"><h3>Preferences</h3>${tg.map(([k,l,d]) => `<div class="ln"><div><b class="s12" style="display:block">${l}</b><span class="mut s12">${d}</span></div><label class="sw"><input type="checkbox" data-a="pref" data-v="${k}" ${S.pf[k]?"checked":""} aria-label="${l}"><i></i></label></div>`).join("")}<div class="ln"><b class="s12">Dark mode</b><label class="sw"><input type="checkbox" data-a="theme" ${isDark()?"checked":""} aria-label="Dark mode"><i></i></label></div></div>
+<details class="card"><summary>Badges${ic("chev",15)}</summary><div class="bd">${B.map(b => `<div class="ln" style="opacity:${b[2]?1:.45}"><div class="row">${ic(b[1],17)}<span>${b[0]}</span></div><span class="mut s12">${b[2]?"Earned":"Locked"}</span></div>`).join("")}</div></details>
+<div class="grid2"><button class="btn" data-a="support">${ic("chat",15)} Support</button><button class="btn" data-a="logout">${ic("exit",15)} Log out</button></div></div>`;
+}
+const helpV = () => `<div class="stack">${faqH()}
+<details class="card"><summary>Terms &amp; Conditions${ic("chev",15)}</summary><div class="bd"><p>CricPulse is a skill-based prediction platform. By using this site you agree to play responsibly and follow local laws regarding online gaming.</p><p>Full policy available on the <button class="btn sm" data-a="page" data-v="terms">Terms page</button>.</p></div></details>
+<details class="card"><summary>Privacy Policy${ic("chev",15)}</summary><div class="bd"><p>We collect your email and display name to create your account. We do not sell your data. <button class="btn sm" data-a="page" data-v="privacy">Read full policy</button></p></div></details>
+<details class="card"><summary>Refund Policy${ic("chev",15)}</summary><div class="bd"><p>If a match is abandoned or tied, your entry fee is refunded to your wallet instantly. <button class="btn sm" data-a="page" data-v="refund">Read full policy</button></p></div></details>
+<div class="grid2"><button class="btn p" data-a="support">${ic("chat",15)} Support Center</button><button class="btn" data-a="page" data-v="about">${ic("help",15)} About us</button></div></div>`;
+
+/* support center */
+function supportV() {
+  const open = S.tickets.filter(t => t.status != "closed").length;
+  const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
+  return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"60 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
+<div class="grid2"><button class="tile" data-a="newticket">${ic("chat",18)}<div><b>Create a ticket</b><div class="mut s11">Chat with our team</div></div></button><button class="tile" data-a="instagram">${ic("instagram",18)}<div><b>Instagram</b><div class="mut s11">@${esc(ig)}</div></div></button></div>
+<div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">${esc(t.subject)}</b><span class="mut s12">${t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
+<div class="card"><h3>Common questions</h3>${faqH(3)}</div></div>`;
+}
+function ticketV() {
+  const t = S.tickets.find(x => x.id == S.ticketOpen);
+  if (!t) return '<div class="card empty">Ticket not found.</div>';
+  return `<div class="chat"><div class="msgs" id="msgs">${t.msgs.map(m => `<div class="msg ${m.me?"me":"them"}">${m.img?`<img src="${esc(m.img)}" alt="attachment">`:""}${esc(m.text)}<small>${esc(m.at)}${m.me?"":" · Support"}</small></div>`).join("")}${t.status=="closed"?'<div class="msg them">This ticket is closed. Create a new one for further help.</div>':""}</div>
+  ${t.status=="closed"?`<div class="chatbar"><button class="btn p w" data-a="support">Back to Support</button></div>`:`<div class="chatbar"><label class="ib" for="img" title="Attach image">${ic("img",18)}<input id="img" type="file" accept="image/*" hidden data-a="upload"></label><textarea id="ti" placeholder="Type your message…" aria-label="Message"></textarea><button class="ib" data-a="sendmsg" style="background:var(--ac);border-color:var(--ac);color:#fff">${ic("send",17)}</button></div>`}</div>`;
+}
+
+/* match */
+function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
+function matchV() {
+  const m = mkt(S.mid), lk = S.preds.find(p => p.m == m.id), sel = S.slip[m.id], cls = !left(m);
+  const fa = form(m,0), fb = form(m,1), h = 2+m.id%3, n = 4200+m.id*1730, ro = RO[m.c] || [], op = wide() ? " open" : "";
+  const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
+  const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id]],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free"],["Reward","Funds, XP and a coupon"],["Participants",n.toLocaleString("en-IN")]];
+  return `<div class="lay"><div class="a card"><div class="bt"><h3>Live score</h3><span class="pill no">LIVE</span></div><div data-lb="${m.id}">${liveBoard(m)}</div><div class="mut s11" style="margin-top:6px">Live feed, updates every 3 seconds.</div></div>
+<div class="c card"><div class="bt" style="margin-bottom:10px"><h3>Your call</h3><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div>${lk ? `<div class="ln"><span class="t2">Your pick</span><b>${esc(full(m,lk.p))}</b></div><div class="ln"><span class="t2">Odds</span><b>${(lk.p=="A"?m.oa:m.ob).toFixed(2)}x</b></div><div class="ln"><span class="t2">Status</span>${stp(lk)}</div>${lk.res?"":`<button class="btn w" style="margin-top:8px" data-a="settle" data-v="${lk.id}">Settle result</button>`}` : `<div class="pks" style="margin-bottom:10px">${["A","B"].map(k => `<button class="pk${sel==k?" on":""}" data-a="mpick" data-v="${m.id}:${k}" ${cls?"disabled":""}><span>${esc(full(m,k))}</span><b>${(k=="A"?m.oa:m.ob).toFixed(2)}x</b></button>`).join("")}</div><button class="btn p w" data-a="lockm" data-v="${m.id}" ${sel&&!cls?"":"disabled"}>${ic("lock",14)} ${cls?"Market closed":"Lock pick, free"}</button>`}<div class="bar" style="margin-top:12px"><i style="width:${m.w}%"></i></div><div class="mut s12" style="margin-top:4px">Crowd: ${m.w}% ${esc(m.A[1])}, ${100-m.w}% ${esc(m.B[1])}</div></div>
+<div class="d stack"><details class="card"${op}><summary>Match details${ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
+${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>${m.id==7?"Resolves Yes if the film's reported net collection reaches ₹300 crore by Sunday 11:59 PM.":"Resolves Yes if Sensex closes above last week's highest closing value on Friday."}</p></div></details>` : `<details class="card"${op}><summary>Team comparison${ic("chev",15)}</summary><div class="bd"><div class="ln"><span>${esc(m.A[0])}</span>${fs(fa)}</div><div class="ln"><span>${esc(m.B[0])}</span>${fs(fb)}</div><div class="ln"><span class="t2">Last 6 meetings</span><b>${m.A[0]} ${h} - ${6-h} ${m.B[0]}</b></div>${[[m.A,0,2],[m.B,4,6]].map(([t,a,b]) => `<div class="ln"><div><b class="s12">${NM[(m.id+a)%8]}</b><div class="mut s12">${esc(t[1])}, ${ro[0]}</div></div><div style="text-align:right"><b class="s12">${NM[(m.id+b)%8]}</b><div class="mut s12">${ro[1]}</div></div></div>`).join("")}</div></details>`}
+<details class="card"><summary>Rules and settlement${ic("chev",15)}</summary><div class="bd"><p>One free pick per market. Picks close when the countdown ends and cannot change after locking. Settled against the official result; voided if abandoned or tied. A correct pick adds funds, 50 XP and a coupon.</p></div></details></div></div>`;
+}
+
+const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, support:supportV, ticket:ticketV, match:matchV};
+const MORE = ["rewards","ranks","alerts","profile","support","help"];
+
+function shell() {
+  const un = S.nts.filter(n => !n.r).length, R = S.route, mt = R == "match", m = mt ? mkt(S.mid) : null;
+  const title = mt ? ttl(m) : (META[R] ? META[R][0] : "CricPulse"), sub = mt ? cl(m.c) + " · " + m.lg : (META[R] ? META[R][1] : "");
+  const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
+  const hasBack = ["match","ticket","support"].includes(R) || R=="help";
+  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand.replace('class="brand"','')}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
+<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : `<span class="mark mobo">${ic("cricket",16)}</span>`}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
+${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
+<main class="pg">${VIEWS[R]()}</main></div></div>
+<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
+}
+
+function render() {
+  const r = $("app");
+  if (!S.user) {
+    if (["terms","privacy","refund","about","support"].includes(S.pub)) r.innerHTML = legalPage(S.pub);
+    else if (S.pub == "auth") r.innerHTML = authV();
+    else r.innerHTML = landing();
+  } else {
+    if (["terms","privacy","refund","about"].includes(S.route)) r.innerHTML = legalPage(S.route);
+    else r.innerHTML = shell();
+  }
+}
+
+/* ============== ACTIONS ============== */
+async function enter(u) {
+  u.n = (u.n||"").replace(/[<>"&]/g,"").trim().slice(0,30) || "Player";
+  u.e = (u.e||"").replace(/[<>"&]/g,"");
+  if (S.user === null && S.le && S.le != u.e) { Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{}}); }
+  S.le = u.e; S.user = u; S.route = "home"; S.pop = 0; save(); render(); scrollTo(0,0);
+}
+
+function lockPicks(ids) {
+  const ok = ids.filter(id => left(mkt(id)) > 0);
+  if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
+  if (!ok.length) { render(); return; }
+  ok.forEach(id => { S.preds.push({id:Date.now()+Number(id), m:Number(id), p:S.slip[id], res:null, pay:0}); delete S.slip[id]; });
+  S.xp += ok.length*10; note(ok.length+" pick"+(ok.length>1?"s":"")+" locked", "+"+ok.length*10+" XP. Results appear in My picks.","lock");
+  save(); closeSheet(); toast("Locked "+ok.length+" pick"+(ok.length>1?"s":"")+". +"+ok.length*10+" XP","lock"); render();
+}
+
+function settle(id) {
+  const p = S.preds.find(x => x.id == id); if (!p || p.res) return;
+  const m = mkt(p.m), win = Math.random()*100 < (p.p=="A"?m.w:100-m.w); let c = null;
+  if (win) {
+    p.res = "w"; S.st++; S.best = Math.max(S.best,S.st); S.xp += 50; p.pay = Math.round(10*(p.p=="A"?m.oa:m.ob)); S.bal += p.pay; addTx("win",p.pay,ttl(m),"completed");
+    const q = RW[Math.floor(Math.random()*RW.length)]; c = {v:q[0],t:q[1],code:q[2],cat:q[3],cl:0}; S.cps.push(c);
+    note("Pick correct", ttl(m)+". "+inr(p.pay)+" added and a reward unlocked.","award");
+  } else { p.res = "l"; S.st = 0; S.xp += 5; note("Pick incorrect", ttl(m)+". You earned 5 XP.","x"); }
+  save(); render();
+  sheet(`<h3 style="font-size:17px;margin-bottom:6px">${win?"Pick correct":"Pick incorrect"}</h3><p class="t2" style="margin-bottom:16px">${win?"You earned 50 XP and "+inr(p.pay)+" funds, and unlocked: <b>"+esc(c.t)+"</b>.":"You earned 5 XP for taking part. Try another market."}</p><button class="btn p w" data-a="sgo" data-v="${win?"rewards":"markets"}">${win?"Go to coupons":"Back to markets"}</button>`);
+}
+
+const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••" + s.slice(-2);
+
+/* ZapUPI add funds sheet */
+const PRESETS = [100, 500, 1000, 2000, 5000];
+function depSheet() {
+  sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
+  <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="10" placeholder="Enter amount"></div>
+  <div class="fld"><label for="dm">Payment method</label><select class="inp" id="dm"><option value="zapupi">ZapUPI (UPI / cards)</option><option value="card">Card</option></select></div>
+  <div class="card" style="padding:10px;background:var(--s2);border-radius:10px;margin-bottom:10px;display:flex;gap:8px;align-items:center">${ic("shield",16)}<div class="s12"><b>Powered by ZapUPI integration</b><div class="mut">Secure UPI and card payments.</div></div></div>
+  <div class="err" id="er"></div>
+  <button class="btn p w" data-a="depok">Continue to pay</button>`);
+}
+const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
+const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">${ic(g,18)}${l}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
+
+function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
+
+/* support helpers */
+function createTicket() {
+  const now = new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+  const t = { id: Date.now(), subject:"Support request", status:"open", updated:"Just now", msgs:[
+    {me:false, text:"Hi! This is CricPulse Support. We reply within "+(window.CP_CONFIG?.SUPPORT_REPLY_WINDOW||"60 minutes")+". How can we help?", at:now},
+    {me:true, text:"I need help with my account.", at:now}
+  ]};
+  S.tickets.push(t); S.ticketOpen = t.id; save(); S.route = "ticket"; render(); scrollTo(0,0);
+  setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+}
+
+/* one-click handlers */
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-a]");
+  if (!t) {
+    if (S.pop && !e.target.closest(".pp")) { S.pop = 0; render(); }
+    if (e.target.classList.contains("ov")) closeSheet();
+    return;
+  }
+  const a = t.dataset.a, v = t.dataset.v;
+  if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
+
+  switch(a) {
+    case "nav": S.route = v; S.pop = 0; closeSheet(); render(); scrollTo(0,0); break;
+    case "sgo": closeSheet(); S.route = v; render(); scrollTo(0,0); break;
+    case "back": S.pop = 0; closeSheet(); S.route = S.user ? "home" : "land"; render(); scrollTo(0,0); break;
+    case "page": S.pub = v; if (S.user) S.route = v; closeSheet(); render(); scrollTo(0,0); break;
+    case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
+    case "auth": S.pub = "auth"; S.au = v; render(); break;
+    case "gmail": {
+      if (window.CP_DB && CP_DB.ready) {
+        CP_DB.signInGoogle();
+      } else {
+        toast("Google sign-in needs Supabase credentials in config.js","shield");
+      }
+      break;
+    }
+    case "guest": enter({n:"Guest User", e:"guest@cricpulse.com"}); break;
+    case "subm": {
+      const em = $("ae").value.trim(), pw = $("ap").value, fn = $("an") ? $("an").value.trim() : "", er = $("er");
+      if (S.au == "up" && !fn) { er.textContent = "Enter your full name."; return; }
+      if (!/^\S+@\S+\.\S+$/.test(em)) { er.textContent = "Enter a valid email address."; return; }
+      if (pw.length < 6) { er.textContent = "Password must be at least 6 characters."; return; }
+      // real Supabase auth if configured; otherwise local account
+      if (window.CP_DB && CP_DB.ready) {
+        S.authBusy = true; render();
+        (async () => {
+          try {
+            if (S.au == "up") {
+              await CP_DB.signUp(em, pw, { display_name: fn || em.split("@")[0] });
+              toast("Account created. Please check your email if confirmation is on.","check");
+            } else {
+              const s = await CP_DB.signIn(em, pw);
+              CP_DB.setSession(s);
+            }
+            enter({n:fn || em.split("@")[0], e:em});
+          } catch (err) {
+            S.authBusy = false; render();
+            const er2 = $("er"); if (er2) er2.textContent = err.message || "Authentication failed.";
+          }
+        })();
+      } else {
+        enter({n:fn||em.split("@")[0], e:em});
+      }
+      break;
+    }
+    case "theme": S.theme = isDark() ? "light" : "dark"; applyTheme(); save(); closeSheet(); render(); break;
+    case "more": moreSheet(); break;
+    case "pop": S.pop = S.pop ? 0 : 1; render(); break;
+    case "readall": S.nts.forEach(n => n.r = 1); save(); render(); break;
+    case "cat": S.cat = v; render(); break;
+    case "pick": case "mpick": {
+      const [id,k] = v.split(":");
+      if (left(mkt(id)) <= 0) { toast("This market has closed.","clock"); return; }
+      if (a == "pick" && S.slip[id] == k) delete S.slip[id]; else S.slip[id] = k;
+      render(); break;
+    }
+    case "rm": delete S.slip[v]; render(); if (!Object.keys(S.slip).length) closeSheet(); else slipSheet(); break;
+    case "slipsheet": slipSheet(); break;
+    case "lockslip": lockPicks(Object.keys(S.slip)); break;
+    case "lockm": lockPicks([v]); break;
+    case "open": S.route = "match"; S.mid = Number(v); S.pop = 0; render(); scrollTo(0,0); break;
+    case "pff": S.pff = v; render(); break;
+    case "nf": S.nf = v; render(); break;
+    case "rk": S.rk = v; render(); break;
+    case "txf": S.txf = v; render(); break;
+    case "settle": settle(v); break;
+    case "claim": { const c = S.cps[Number(v)]; if (!c || c.cl) return; c.cl = 1; S.xp += 20; note("Reward claimed", c.t+". Code: "+c.code, "gift"); save(); toast("Reward claimed. Code ready.","gift"); render(); break; }
+    case "copy": try{navigator.clipboard.writeText(v)}catch(x){} toast("Code "+v+" copied","copy"); break;
+    case "chk": S.chk = new Date().toDateString(); S.xp += 10; note("Daily check-in","+10 XP","star"); save(); toast("Checked in. +10 XP","star"); render(); break;
+    case "pref": S.pf[v] = t.checked ? 1 : 0; save(); break;
+    case "saven": { const n = $("dn").value.replace(/[<>"&]/g,"").trim(); if (!n) { toast("Name cannot be empty.","x"); return; } S.user.n = n; save(); toast("Profile updated.","user"); render(); break; }
+    case "logout": {
+      try { localStorage.removeItem("cp_session"); } catch {}
+      if (window.CP_DB && CP_DB.ready) { CP_DB.auth("logout", null).catch(()=>{}); }
+      S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); render(); scrollTo(0,0); break;
+    }
+    case "support": S.route = "support"; render(); scrollTo(0,0); break;
+    case "newticket": createTicket(); break;
+    case "openticket": S.ticketOpen = Number(v); S.route = "ticket"; render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); break;
+    case "instagram": {
+      const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
+      window.open("https://instagram.com/" + ig, "_blank", "noopener");
+      break;
+    }
+    case "sendmsg": {
+      const ta = $("ti"), t2 = S.tickets.find(x => x.id == S.ticketOpen);
+      if (!ta || !t2 || t2.status == "closed") return;
+      const txt = ta.value.trim(); if (!txt) return;
+      t2.msgs.push({me:true, text:txt, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
+      t2.updated = "Just now"; ta.value = ""; save(); render();
+      setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+      // simulated support ack (real replies come from admin panel / Supabase)
+      setTimeout(() => {
+        const t3 = S.tickets.find(x => x.id == S.ticketOpen);
+        if (t3 && t3.status != "closed") {
+          t3.msgs.push({me:false, text:"Thanks for the message — our team will reply within "+(window.CP_CONFIG?.SUPPORT_REPLY_WINDOW||"60 minutes")+".", at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
+          t3.updated = "Just now"; save();
+          if (S.route == "ticket") { render(); const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }
+        }
+      }, 2500);
+      break;
+    }
+    case "dep": depSheet(); break;
+    case "damt": $("da").value = v; break;
+    case "depok": {
+      const x = Number($("da").value);
+      if (!x || x < 10) { $("er").textContent = "Minimum deposit is ₹10."; return; }
+      if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
+      // ZapUPI placeholder: in production redirect to ZapUPI checkout, then confirm via webhook/verify endpoint.
+      const method = $("dm").value;
+      S.bal += x; addTx("deposit",x,"Deposit via ZapUPI ("+method+")","completed");
+      note("Funds added",inr2(x)+" added to your wallet.","wallet"); save(); closeSheet(); toast(inr2(x)+" added.","wallet"); render(); break;
+    }
+    case "wd": if(S.bal < 100){toast("Minimum withdrawal is ₹100.","x"); return;} wdSheet(); break;
+    case "wmax": $("wa").value = Math.floor(S.bal); break;
+    case "wdok": {
+      const x = Number($("wa").value), d = $("wt").value.trim(), er = $("er");
+      if (!x || x < 100) { er.textContent = "Minimum withdrawal is ₹100."; return; }
+      if (x > S.bal) { er.textContent = "Amount exceeds your balance."; return; }
+      if (!d) { er.textContent = "Enter a destination."; return; }
+      S.bal -= x; addTx("withdraw",x,"To "+mask(d),"pending"); note("Withdrawal requested",inr2(x)+" is being processed.","wallet"); save(); closeSheet(); toast("Withdrawal requested.","wallet"); render(); break;
+    }
+    case "wcancel": {
+      const x = S.txs[Number(v)]; if (!x || x.status != "pending") return;
+      x.status = "cancelled"; S.bal += x.amount; note("Withdrawal cancelled",inr2(x.amount)+" returned to your wallet.","x"); save(); toast("Withdrawal cancelled.","x"); render(); break;
+    }
+  }
+});
+
+document.addEventListener("input", e => { if (e.target.id == "q") { S.q = e.target.value; $("ml").innerHTML = mlist(); } });
+document.addEventListener("keydown", e => {
+  if (e.key == "Escape") closeSheet();
+  if (e.key == "Enter" && ["ae","ap","an"].includes(e.target.id)) { e.preventDefault(); const b = document.querySelector('[data-a="subm"]'); if (b) b.click(); }
+});
+document.addEventListener("change", e => {
+  if (e.target.dataset.a == "upload" && e.target.files && e.target.files[0]) {
+    const f = e.target.files[0], t = S.tickets.find(x => x.id == S.ticketOpen);
+    if (!f.type.startsWith("image/")) { toast("Please select an image.","x"); return; }
+    if (f.size > 3*1024*1024) { toast("Image must be under 3 MB.","x"); return; }
+    const rd = new FileReader();
+    rd.onload = () => {
+      if (!t) return;
+      t.msgs.push({me:true, text:"", img:rd.result, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
+      t.updated = "Just now"; save(); render();
+      setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+    };
+    rd.readAsDataURL(f);
+    e.target.value = "";
+  }
+});
+
+/* timers */
+setInterval(() => {
+  document.querySelectorAll("[data-cd]").forEach(n => {
+    const m = mkt(n.dataset.cd); if (!m) return; n.textContent = cdt(m);
+    if (!left(m) && !seen[m.id]) { seen[m.id]=1; if(S.user && (S.route=="markets" || S.route=="match")) render(); }
+  });
+}, 1000);
 
 function tick() {
   MK.forEach(m => {
@@ -295,7 +744,6 @@ function tick() {
 }
 setInterval(tick, 3000);
 
-/* pending withdrawals complete */
 setInterval(() => {
   let ch = 0;
   S.txs.forEach(t => {
@@ -306,323 +754,20 @@ setInterval(() => {
   if (ch) { save(); if (S.user && S.route == "wallet") render(); }
 }, 2000);
 
-/* ui helpers */
-const toast = (m,g="check") => {
-  const n = document.createElement("div"); n.className = "ts";
-  n.innerHTML = ic(g,14) + "<span>" + esc(m) + "</span>";
-  $("tw").appendChild(n); setTimeout(() => n.remove(), 2800);
-};
-const sheet = h => { $("sh").innerHTML = `<div class="ov"><div class="shx">${h}</div></div>`; };
-const closeSheet = () => { $("sh").innerHTML = ""; };
-const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class="chip${cur==k?" on":""}" data-a="${a}" data-v="${k}">${l}</button>`).join("")}</div>`;
-const stp = p => p.res == "w" ? '<span class="pill ok">Won</span>' : p.res == "l" ? '<span class="pill no">Lost</span>' : '<span class="pill">Pending</span>';
-const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("")}</div>`;
-const ntf = L => L.length ? L.map(n => `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${esc(n.k)}</small></div></div>`).join("") : '<div class="empty">Nothing here yet.</div>';
-const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>${f[0]}${ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
-const wide = () => matchMedia("(min-width:900px)").matches;
-
-/* public */
-const brand = `<div class="brand"><span class="mark">${ic("cricket",16)}</span>CricPulse</div>`;
-
-function landing() {
-  const reg = 18420 + (S.user ? 1 : 0);
-  return `<header class="pub">${brand}<div class="row" style="gap:6px"><button class="btn sm" data-a="auth" data-v="in">Log in</button><button class="btn sm p" data-a="auth" data-v="up">Sign up</button></div></header>
-<div class="wrap">
-  <section class="hero">
-    <div>
-      <span class="tag">${ic("shield",12)} Real Predictions, Real Rewards</span>
-      <h1>Call the match. <em>Win real rewards.</em></h1>
-      <p>Pick the winner of cricket and other matches for free, follow live scores and track your results in your wallet.</p>
-      <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get started free</button><button class="btn grow" data-a="guest">Try the demo</button></div>
-      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
-    </div>
-    <div class="lb"><header><span>Live now, IPL Match 42</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
-  </section>
-  
-  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket and more with live scores and crowd splits."],["lock","Lock your pick","One free pick per market before the countdown ends."],["wallet","Collect rewards","Correct picks add funds and unlock coupons."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
-  
-  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
-  
-  <section class="sec"><h2>Questions</h2>${faqH(5)}</section>
-</div>
-<footer class="foot">
-  <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px">
-    <div>
-      <b>CricPulse</b><br>
-      India's free cricket prediction platform. Pick winners, follow live action, and withdraw your winnings.
-    </div>
-    <div>
-      <b>Platform</b><br>
-      <button class="mut" data-a="auth" data-v="in">Log in</button><br>
-      <button class="mut" data-a="auth" data-v="up">Create account</button>
-    </div>
-    <div>
-      <b>Legal</b><br>
-      <button class="mut" data-a="auth" data-v="in">Terms & Conditions</button><br>
-      <button class="mut" data-a="auth" data-v="in">Privacy Policy</button>
-    </div>
-  </div>
-  &copy; ${new Date().getFullYear()} CricPulse. All rights reserved.
-</footer>`;
-}
-
-function authV() {
-  const up = S.au == "up";
-  return `<header class="pub">${brand}<button class="btn sm" data-a="home0">Back</button></header>
-  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. No card needed.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
-  ${up ? '<div class="fld"><label for="an">Full name</label><input class="inp" id="an" autocomplete="name"></div>' : ""}
-  <div class="fld"><label for="ae">Email</label><input class="inp" id="ae" type="email" autocomplete="email"></div>
-  <div class="fld"><label for="ap">Password</label><input class="inp" id="ap" type="password" autocomplete="current-password"></div>
-  <div class="err" id="er"></div>
-  <button class="btn p w" data-a="subm">${up?"Create account":"Log in"}</button>
-  <button class="btn w" style="margin-top:8px" data-a="guest">Continue as guest</button>
-  <p class="mut s11" style="text-align:center;margin-top:12px">By continuing, you agree to our Terms & Privacy Policy.</p>
-  </div></div>`;
-}
-
-/* app views */
-const mrow = m => {
-  const lk = S.preds.find(p => p.m == m.id), cls = !left(m), sel = S.slip[m.id];
-  return `<div class="mk"><div class="bt" style="align-items:flex-start"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)} · crowd ${m.w}/${100-m.w}</div><div class="lvt" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
-};
-
-const mlist = () => {
-  const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
-  return L.length ? `<div class="card" style="padding:0;overflow:hidden">${L.map(mrow).join("")}</div>` : '<div class="card empty">No markets match your search.</div>';
-};
-
-const slipBody = () => {
-  const ids = Object.keys(S.slip);
-  return (ids.length ? ids.map(id => { const m = mkt(id); return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Your pick: ${esc(full(m,S.slip[id]))}</span></div><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div>`; }).join("") : '<div class="empty">Tap an outcome to add it here.</div>') + `<div class="sl"><span class="t2">Entry fee</span><b class="ok">Free</b></div><div class="sl"><span class="t2">XP on lock</span><b>+${ids.length*10}</b></div><button class="btn p w" style="margin-top:8px" data-a="lockslip" ${ids.length?"":"disabled"}>${ic("lock",14)} Lock ${ids.length||""} pick${ids.length==1?"":"s"}</button>`;
-};
-
-const marketsV = () => {
-  const n = Object.keys(S.slip).length;
-  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">${ic("search",16)}<input class="inp" id="q" placeholder="Search teams or events" value="${esc(S.q)}"></div><div class="lay2"><div id="ml">${mlist()}</div><div class="card slipd" id="sd"><h3>Your slip</h3>${slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>${n} pick${n>1?"s":""} selected</b><div class="s11" style="opacity:.7">+${n*10} XP, free entry</div></div><button class="btn p sm" data-a="slipsheet">Review and lock</button></div>` : "");
-};
-
-function homeV() {
-  const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
-  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
-  const cs = CATS.map(c => { const d = S.preds.filter(p => p.res && mkt(p.m).c == c[0]), w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; }).join("");
-  
-  return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
-<div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
-<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${[1,2,5].map(i => row(mkt(i))).join("")}</div>
-<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
-<div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
-<div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
-}
-
-function picksV() {
-  const f = S.pff, cnt = k => S.preds.filter(p => k=="all"||(k=="p"?!p.res:p.res==k)).length;
-  const L = S.preds.filter(p => f=="all"||(f=="p"?!p.res:p.res==f)).slice().reverse();
-  return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">${esc(full(m,p.p))} · ${(p.p=="A"?m.oa:m.ob).toFixed(2)}x${p.res=="w"?" · +"+inr(p.pay):""}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res?"":`<button class="btn sm" data-a="settle" data-v="${p.id}">Settle</button>`}</div></div>`; }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
-}
-
-function walletV() {
-  const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
-  return `<div class="stack"><div class="wbal"><small>Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
-<div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
-<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings"}[t.type]}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"?"no":"ok"}">${t.type=="withdraw"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
-<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
-}
-
-function rewardsV() {
-  const un = S.cps.filter(c => !c.cl).length;
-  return `<div class="stack">${kpi([["Available",un,"to claim"],["Claimed",S.cps.length-un,"codes saved"],["Tier",tier(),"Level "+lvl()],["XP",S.xp,"total"]])}
-<div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
-<details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
-}
-
-function ranksV() {
-  const W = [["Aarav Sharma",640,74],["Diya Menon",610,71],["Kabir Rao",540,68],["Meera Patel",470,65],["Rohan Thakur",390,61]];
-  const A = [["Aarav Sharma",3420,72],["Diya Menon",3310,70],["Kabir Rao",3180,67],["Meera Patel",2990,66],["Rohan Thakur",2860,62]];
-  const L = [...(S.rk=="w"?W:A),[S.user.n,S.xp,tally().p,1]].sort((a,b) => b[1]-a[1]);
-  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">${i+1}</b><div class="grow">${esc(r[0])}${r[3]?" (you)":""}</div><span class="mut s12">${r[2]}%</span><b style="min-width:48px;text-align:right">${r[1]} XP</b></div>`).join("")}</div>`;
-}
-
-const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
-
-function profileV() {
-  const u = S.user, t = tally();
-  const B = [["First pick","target",t.n>=1],["First win","award",t.w>=1],["3-win streak","flame",S.best>=3],["3 coupons","gift",S.cps.length>=3],["Level 3","star",lvl()>=3]];
-  const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
-  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)} · Level ${lvl()} ${tier()}</div></div></div></div>
-<div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
-<div class="card" style="padding:12px 14px 2px"><h3>Preferences</h3>${tg.map(([k,l,d]) => `<div class="ln"><div><b class="s12" style="display:block">${l}</b><span class="mut s12">${d}</span></div><label class="sw"><input type="checkbox" data-a="pref" data-v="${k}" ${S.pf[k]?"checked":""} aria-label="${l}"><i></i></label></div>`).join("")}<div class="ln"><b class="s12">Dark mode</b><label class="sw"><input type="checkbox" data-a="theme" ${isDark()?"checked":""} aria-label="Dark mode"><i></i></label></div></div>
-<details class="card"><summary>Badges${ic("chev",15)}</summary><div class="bd">${B.map(b => `<div class="ln" style="opacity:${b[2]?1:.45}"><div class="row">${ic(b[1],17)}<span>${b[0]}</span></div><span class="mut s12">${b[2]?"Earned":"Locked"}</span></div>`).join("")}</div></details>
-<details class="card"><summary>Security${ic("chev",15)}</summary><div class="bd"><div class="fld"><label for="p1">Current password</label><input class="inp" id="p1" type="password"></div><div class="fld"><label for="p2">New password</label><input class="inp" id="p2" type="password"></div><button class="btn" data-a="pw">Update password</button></div></details>
-<div class="grid2"><button class="btn" data-a="logout">${ic("exit",15)} Log out</button><button class="btn" data-a="reset">Reset demo</button></div></div>`;
-}
-
-const helpV = () => `<div class="stack">${faqH()}<details class="card"><summary>Terms & Conditions${ic("chev",15)}</summary><div class="bd"><p>CricPulse is a skill-based prediction platform. By using this site you agree to play responsibly and follow local laws regarding online gaming.</p><p>The wallet holds real funds. Deposits and withdrawals are processed securely. Minimum withdrawal is ₹100.</p><p>Data is stored securely. Online gaming rules in India vary by state; ensure you are eligible to play before depositing.</p></div></details>
-<details class="card"><summary>Privacy Policy${ic("chev",15)}</summary><div class="bd"><p>We collect your email and display name to create your account. We do not sell your data to third parties. All transaction data is encrypted and stored securely.</p></div></details>
-<details class="card"><summary>Refund Policy${ic("chev",15)}</summary><div class="bd"><p>If a match is abandoned or tied, your entry fee is refunded to your wallet instantly. Winnings are final once settled.</p></div></details>
-</div>`;
-
-function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
-
-function matchV() {
-  const m = mkt(S.mid), lk = S.preds.find(p => p.m == m.id), sel = S.slip[m.id], cls = !left(m);
-  const fa = form(m,0), fb = form(m,1), h = 2+m.id%3, n = 4200+m.id*1730, ro = RO[m.c] || [], op = wide() ? " open" : "";
-  const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
-  const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id]],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free"],["Reward","Funds, XP and a coupon"],["Participants",n.toLocaleString("en-IN")]];
-  
-  return `<div class="lay"><div class="a card"><div class="bt"><h3>Live score</h3><span class="pill no">LIVE</span></div><div data-lb="${m.id}">${liveBoard(m)}</div><div class="mut s11" style="margin-top:6px">Simulated feed, updates every 3 seconds.</div></div>
-<div class="c card"><div class="bt" style="margin-bottom:10px"><h3>Your call</h3><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div>${lk ? `<div class="ln"><span class="t2">Your pick</span><b>${esc(full(m,lk.p))}</b></div><div class="ln"><span class="t2">Odds</span><b>${(lk.p=="A"?m.oa:m.ob).toFixed(2)}x</b></div><div class="ln"><span class="t2">Status</span>${stp(lk)}</div>${lk.res?"":`<button class="btn w" style="margin-top:8px" data-a="settle" data-v="${lk.id}">Settle result (demo)</button>`}` : `<div class="pks" style="margin-bottom:10px">${["A","B"].map(k => `<button class="pk${sel==k?" on":""}" data-a="mpick" data-v="${m.id}:${k}" ${cls?"disabled":""}><span>${esc(full(m,k))}</span><b>${(k=="A"?m.oa:m.ob).toFixed(2)}x</b></button>`).join("")}</div><button class="btn p w" data-a="lockm" data-v="${m.id}" ${sel&&!cls?"":"disabled"}>${ic("lock",14)} ${cls?"Market closed":"Lock pick, free"}</button>`}<div class="bar" style="margin-top:12px"><i style="width:${m.w}%"></i></div><div class="mut s12" style="margin-top:4px">Crowd: ${m.w}% ${esc(m.A[1])}, ${100-m.w}% ${esc(m.B[1])}</div></div>
-<div class="d stack"><details class="card"${op}><summary>Match details${ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
-${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>${m.id==7?"Resolves Yes if the film's reported net collection reaches ₹300 crore by Sunday 11:59 PM.":"Resolves Yes if Sensex closes above last week's highest closing value on Friday."}</p></div></details>` : `<details class="card"${op}><summary>Team comparison${ic("chev",15)}</summary><div class="bd"><div class="ln"><span>${esc(m.A[0])}</span>${fs(fa)}</div><div class="ln"><span>${esc(m.B[0])}</span>${fs(fb)}</div><div class="ln"><span class="t2">Last 6 meetings</span><b>${m.A[0]} ${h} - ${6-h} ${m.B[0]}</b></div>${[[m.A,0,2],[m.B,4,6]].map(([t,a,b]) => `<div class="ln"><div><b class="s12">${NM[(m.id+a)%8]}</b><div class="mut s12">${esc(t[1])}, ${ro[0]}</div></div><div style="text-align:right"><b class="s12">${NM[(m.id+b)%8]}</b><div class="mut s12">${ro[1]}</div></div></div>`).join("")}</div></details>`}
-<details class="card"><summary>Rules and settlement${ic("chev",15)}</summary><div class="bd"><p>One free pick per market. Picks close when the countdown ends and cannot change after locking. Settled against the official result; voided if abandoned or tied. A correct pick adds funds, 50 XP and a coupon.</p></div></details></div></div>`;
-}
-
-const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, match:matchV};
-const MORE = ["rewards","ranks","alerts","profile","help"];
-
-function shell() {
-  const un = S.nts.filter(n => !n.r).length, R = S.route, mt = R == "match", m = mt ? mkt(S.mid) : null;
-  const title = mt ? ttl(m) : META[R][0], sub = mt ? cl(m.c) + " · " + m.lg : META[R][1];
-  const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
-  
-  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand.replace('class="brand"','')}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
-<div><header class="top">${mt ? `<button class="ib" data-a="nav" data-v="markets" aria-label="Back">${ic("back",18)}</button>` : `<span class="mark mobo">${ic("cricket",16)}</span>`}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
-${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
-<main class="pg">${VIEWS[R]()}</main></div></div>
-<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
-}
-
-function render() {
-  const r = $("app");
-  r.innerHTML = !S.user ? (S.pub == "auth" ? authV() : landing()) : shell();
-}
-
-/* actions */
-function enter(u) {
-  u.n = (u.n||"").replace(/[<>"&]/g,"").trim().slice(0,30) || "Player";
-  u.e = (u.e||"").replace(/[<>"&]/g,"");
-  if (S.user === null && S.le && S.le != u.e) { Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{}}); }
-  S.le = u.e; S.user = u; S.route = "home"; S.pop = 0; save(); render(); scrollTo(0,0);
-}
-
-function lockPicks(ids) {
-  const ok = ids.filter(id => left(mkt(id)) > 0);
-  if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
-  if (!ok.length) { render(); return; }
-  ok.forEach(id => { S.preds.push({id:Date.now()+Number(id), m:Number(id), p:S.slip[id], res:null, pay:0}); delete S.slip[id]; });
-  S.xp += ok.length*10; note(ok.length+" pick"+(ok.length>1?"s":"")+" locked", "+"+ok.length*10+" XP. Results appear in My picks.","lock");
-  save(); closeSheet(); toast("Locked "+ok.length+" pick"+(ok.length>1?"s":"")+". +"+ok.length*10+" XP","lock"); render();
-}
-
-function settle(id) {
-  const p = S.preds.find(x => x.id == id); if (!p || p.res) return;
-  const m = mkt(p.m), win = Math.random()*100 < (p.p=="A"?m.w:100-m.w); let c = null;
-  if (win) {
-    p.res = "w"; S.st++; S.best = Math.max(S.best,S.st); S.xp += 50; p.pay = Math.round(10*(p.p=="A"?m.oa:m.ob)); S.bal += p.pay; addTx("win",p.pay,ttl(m),"completed");
-    const q = RW[Math.floor(Math.random()*RW.length)]; c = {v:q[0],t:q[1],code:q[2],cat:q[3],cl:0}; S.cps.push(c);
-    note("Pick correct", ttl(m)+". "+inr(p.pay)+" added and a reward unlocked.","award");
-  } else { p.res = "l"; S.st = 0; S.xp += 5; note("Pick incorrect", ttl(m)+". You earned 5 XP.","x"); }
-  save(); render();
-  sheet(`<h3 style="font-size:17px;margin-bottom:6px">${win?"Pick correct":"Pick incorrect"}</h3><p class="t2" style="margin-bottom:16px">${win?"You earned 50 XP and "+inr(p.pay)+" funds, and unlocked: <b>"+esc(c.t)+"</b>.":"You earned 5 XP for taking part. Try another market."}</p><button class="btn p w" data-a="sgo" data-v="${win?"rewards":"markets"}">${win?"Go to coupons":"Back to markets"}</button>`);
-}
-
-const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••" + s.slice(-2);
-const depSheet = () => sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Funds are added instantly.</p><div class="chips" style="margin:0 0 10px;padding:0">${[100,500,1000,2000].map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div><div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="10" placeholder="Enter amount"></div><div class="fld"><label for="dm">Method</label><select class="inp" id="dm"><option>UPI</option><option>Card</option><option>Net banking</option></select></div><div class="err" id="er"></div><button class="btn p w" data-a="depok">Add funds</button>`);
-const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
-const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">${ic(g,18)}${l}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
-
-document.addEventListener("click", e => {
-  const t = e.target.closest("[data-a]");
-  if (!t) {
-    if (S.pop && !e.target.closest(".pp")) { S.pop = 0; render(); }
-    if (e.target.classList.contains("ov")) closeSheet();
-    return;
-  }
-  const a = t.dataset.a, v = t.dataset.v;
-  if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
-  
-  switch(a) {
-    case "nav": S.route = v; S.pop = 0; closeSheet(); render(); scrollTo(0,0); break;
-    case "sgo": closeSheet(); S.route = v; render(); scrollTo(0,0); break;
-    case "auth": S.pub = "auth"; S.au = v; render(); break;
-    case "home0": S.pub = "land"; render(); break;
-    case "guest": enter({n:"Guest User", e:"guest@cricpulse.com"}); break;
-    case "subm": {
-      const em = $("ae").value.trim(), pw = $("ap").value, fn = $("an") ? $("an").value.trim() : "", er = $("er");
-      if (S.au == "up" && !fn) { er.textContent = "Enter your full name."; return; }
-      if (!/^\S+@\S+\.\S+$/.test(em)) { er.textContent = "Enter a valid email address."; return; }
-      if (pw.length < 6) { er.textContent = "Password must be at least 6 characters."; return; }
-      enter({n:fn||em.split("@")[0], e:em}); break;
-    }
-    case "theme": S.theme = isDark() ? "light" : "dark"; applyTheme(); save(); closeSheet(); render(); break;
-    case "more": moreSheet(); break;
-    case "pop": S.pop = S.pop ? 0 : 1; render(); break;
-    case "readall": S.nts.forEach(n => n.r = 1); save(); render(); break;
-    case "cat": S.cat = v; render(); break;
-    case "pick": case "mpick": {
-      const [id,k] = v.split(":");
-      if (left(mkt(id)) <= 0) { toast("This market has closed.","clock"); return; }
-      if (a == "pick" && S.slip[id] == k) delete S.slip[id]; else S.slip[id] = k;
-      render(); break;
-    }
-    case "rm": delete S.slip[v]; render(); if (!Object.keys(S.slip).length) closeSheet(); else slipSheet(); break;
-    case "slipsheet": slipSheet(); break;
-    case "lockslip": lockPicks(Object.keys(S.slip)); break;
-    case "lockm": lockPicks([v]); break;
-    case "open": S.route = "match"; S.mid = Number(v); S.pop = 0; render(); scrollTo(0,0); break;
-    case "pff": S.pff = v; render(); break;
-    case "nf": S.nf = v; render(); break;
-    case "rk": S.rk = v; render(); break;
-    case "txf": S.txf = v; render(); break;
-    case "settle": settle(v); break;
-    case "claim": {
-      const c = S.cps[Number(v)]; if (!c || c.cl) return;
-      c.cl = 1; S.xp += 20; note("Reward claimed", c.t+". Code: "+c.code, "gift"); save(); toast("Reward claimed. Code ready.","gift"); render(); break;
-    }
-    case "copy": try{navigator.clipboard.writeText(v)}catch(x){} toast("Code "+v+" copied","copy"); break;
-    case "chk": S.chk = new Date().toDateString(); S.xp += 10; note("Daily check-in","+10 XP","star"); save(); toast("Checked in. +10 XP","star"); render(); break;
-    case "pref": S.pf[v] = t.checked ? 1 : 0; save(); break;
-    case "saven": {
-      const n = $("dn").value.replace(/[<>"&]/g,"").trim();
-      if (!n) { toast("Name cannot be empty.","x"); return; }
-      S.user.n = n; save(); toast("Profile updated.","user"); render(); break;
-    }
-    case "pw": if(!$("p1").value || $("p2").value.length<6){toast("Enter current and new password (6+ characters).","x");return} $("p1").value=$("p2").value=""; toast("Password updated.","shield"); break;
-    case "logout": S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); render(); scrollTo(0,0); break;
-    case "reset": Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{},chk:""}); save(); toast("Data reset."); render(); break;
-    case "dep": depSheet(); break;
-    case "damt": $("da").value = v; break;
-    case "depok": {
-      const x = Number($("da").value);
-      if (!x || x < 10) { $("er").textContent = "Minimum deposit is ₹10."; return; }
-      if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
-      S.bal += x; addTx("deposit",x,"Deposit via "+$("dm").value,"completed"); note("Funds added",inr2(x)+" added to your wallet.","wallet"); save(); closeSheet(); toast(inr2(x)+" added.","wallet"); render(); break;
-    }
-    case "wd": if(S.bal < 100){toast("Minimum withdrawal is ₹100.","x"); return;} wdSheet(); break;
-    case "wmax": $("wa").value = Math.floor(S.bal); break;
-    case "wdok": {
-      const x = Number($("wa").value), d = $("wt").value.trim(), er = $("er");
-      if (!x || x < 100) { er.textContent = "Minimum withdrawal is ₹100."; return; }
-      if (x > S.bal) { er.textContent = "Amount exceeds your balance."; return; }
-      if (!d) { er.textContent = "Enter a destination."; return; }
-      S.bal -= x; addTx("withdraw",x,"To "+mask(d),"pending"); note("Withdrawal requested",inr2(x)+" is being processed.","wallet"); save(); closeSheet(); toast("Withdrawal requested.","wallet"); render(); break;
-    }
-    case "wcancel": {
-      const x = S.txs[Number(v)]; if (!x || x.status != "pending") return;
-      x.status = "cancelled"; S.bal += x.amount; note("Withdrawal cancelled",inr2(x.amount)+" returned to your wallet.","x"); save(); toast("Withdrawal cancelled.","x"); render(); break;
-    }
+/* init — avoids white flash */
+window.addEventListener("load", () => {
+  try {
+    if (window.CP_DB) { CP_DB.loadSession(); if (CP_DB.ready) { /* session check optional */ } }
+    applyTheme();
+    render();
+  } catch (err) {
+    document.getElementById("app").innerHTML =
+      '<div style="padding:40px 20px;font:15px/1.6 Inter,system-ui;color:#0f1729">' +
+      "<b>CricPulse</b><br>Something went wrong while loading. Please refresh." +
+      "</div>";
+    console.error(err);
   }
 });
-
-function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
-
-document.addEventListener("input", e => { if (e.target.id == "q") { S.q = e.target.value; $("ml").innerHTML = mlist(); } });
-document.addEventListener("keydown", e => {
-  if (e.key == "Escape") closeSheet();
-  if (e.key == "Enter" && ["ae","ap","an"].includes(e.target.id)) { const b = document.querySelector('[data-a="subm"]'); if (b) b.click(); }
-});
-
-applyTheme();
-render();
 </script>
 </body>
 </html>
