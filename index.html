@@ -236,7 +236,7 @@ const KEY = "cricpulse_v3";
 const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk","tickets"];
 let S = {
   user:null, bal:0, xp:0, st:0, best:0, preds:[], cps:[], txs:[],
-  nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, k:"Today"}],
+  nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, ts:Date.now()}],
   pf:{em:1,re:1,rw:1}, theme:"", chk:"", route:"home", pub:"land", au:"in",
   cat:"all", q:"", slip:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0,
   tickets:[], ticketOpen:null, authBusy:false
@@ -257,7 +257,10 @@ const lbl = (m,k) => m.q ? m[k][1] : m[k][0];
 const full = (m,k) => m[k][1];
 
 const tally = () => { const d = S.preds.filter(p => p.res), w = d.filter(p => p.res == "w").length; return {n:S.preds.length, d:d.length, w, p: d.length ? Math.round(w/d.length*100) : 0}; };
-const note = (t,d,i) => { S.nts.unshift({t,d,i:i||"bell",r:0,k:"Just now"}); S.nts = S.nts.slice(0,30); };
+const note = (t,d,i) => { 
+  S.nts.unshift({t,d,i:i||"bell",r:0,ts:Date.now()}); 
+  S.nts = S.nts.slice(0,30); 
+};
 const addTx = (type,amount,n,status) => {
   const d = new Date();
   S.txs.push({type, amount, n, status, ts:Date.now(), date:d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"}) + ", " + d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
@@ -317,7 +320,18 @@ const closeSheet = () => { $("sh").innerHTML = ""; };
 const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class="chip${cur==k?" on":""}" data-a="${a}" data-v="${k}">${l}</button>`).join("")}</div>`;
 const stp = p => p.res == "w" ? '<span class="pill ok">Won</span>' : p.res == "l" ? '<span class="pill no">Lost</span>' : '<span class="pill">Pending</span>';
 const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("")}</div>`;
-const ntf = L => L.length ? L.map(n => `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${esc(n.k)}</small></div></div>`).join("") : '<div class="empty">Nothing here yet.</div>';
+const ntf = L => L.length ? L.map(n => {
+  // Calculate relative time
+  let timeStr = n.k || "";
+  if (n.ts) {
+    const diff = Math.floor((Date.now() - n.ts) / 1000);
+    if (diff < 60) timeStr = "Just now";
+    else if (diff < 3600) timeStr = Math.floor(diff / 60) + "m ago";
+    else if (diff < 86400) timeStr = Math.floor(diff / 3600) + "h ago";
+    else timeStr = Math.floor(diff / 86400) + "d ago";
+  }
+  return `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${timeStr}</small></div></div>`;
+}).join("") : '<div class="empty">Nothing here yet.</div>';
 const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>${f[0]}${ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
 const wide = () => matchMedia("(min-width:900px)").matches;
 const brand = `<div class="brand"><img src="https://plain-apac-prod-public.komododecks.com/202610/28/TAJwRI6ghFFpzgKyXH45/image.jpg" alt="CricPulse" style="width:32px; height:32px; object-fit:contain; border-radius:8px; margin-right:6px;">CricPulse</div>`;
