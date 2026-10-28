@@ -383,30 +383,40 @@ function showDepositModal() {
         
         <div class="field">
           <label>Payment Method</label>
-          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:12px;">
+          <div class="pay-method-grid">
             <!-- Paytm -->
-            <button class="pay-method-btn" data-method="paytm" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
-              <div style="width:24px; height:24px; background:#00b9f1; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">P</div>
-              <span style="font-size:13px; font-weight:600; color:var(--ink);">Paytm</span>
+            <button class="pay-method-btn selected" data-method="paytm" onclick="selectPaymentMethod(this)">
+              <div class="pm-icon" style="background:#00baf2;color:#fff;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.5 15h-3v-3h3v3zm0-4.5h-3v-3h3v3z"/></svg>
+              </div>
+              <div><div class="pm-text">Paytm</div></div>
             </button>
+            
             <!-- Google Pay -->
-            <button class="pay-method-btn" data-method="gpay" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
-              <div style="width:24px; height:24px; background:#fff; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#4285F4; box-shadow:0 1px 3px rgba(0,0,0,0.1);">G</div>
-              <span style="font-size:13px; font-weight:600; color:var(--ink);">Google Pay</span>
+            <button class="pay-method-btn" data-method="gpay" onclick="selectPaymentMethod(this)">
+              <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);">
+                <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3c-7.5 0-14 4.2-17.7 11.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-2.1 14.1-5.5l-6.5-5.5C29.6 35.6 26.9 37 24 37c-5.3 0-9.7-3.4-11.3-8l-6.6 5.1C9.9 40.7 16.4 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.5 5.5C41.5 35.9 45 30.5 45 24c0-1.4-.1-2.5-.4-3.5z"/></svg>
+              </div>
+              <div><div class="pm-text">Google Pay</div></div>
             </button>
+
             <!-- PhonePe -->
-            <button class="pay-method-btn" data-method="phonepe" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
-              <div style="width:24px; height:24px; background:#5f259f; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">P</div>
-              <span style="font-size:13px; font-weight:600; color:var(--ink);">PhonePe</span>
+            <button class="pay-method-btn" data-method="phonepe" onclick="selectPaymentMethod(this)">
+              <div class="pm-icon" style="background:#5f259f;color:#fff;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              </div>
+              <div><div class="pm-text">PhonePe</div></div>
             </button>
+
             <!-- Other UPI -->
-            <button class="pay-method-btn" data-method="upi" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
-              <div style="width:24px; height:24px; background:#f1f5f9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#64748b;">U</div>
-              <span style="font-size:13px; font-weight:600; color:var(--ink);">Other UPI</span>
+            <button class="pay-method-btn" data-method="upi" onclick="selectPaymentMethod(this)">
+              <div class="pm-icon" style="background:var(--s2);color:var(--i2);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div><div class="pm-text">Other UPI</div></div>
             </button>
           </div>
-          <!-- Hidden input to store the selected method -->
-          <input type="hidden" id="dep-method" value="zapupi">
+          <input type="hidden" id="dep-method" value="paytm">
         </div>
 
         <div style="background:var(--surface-2); padding:10px; border-radius:8px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
@@ -419,6 +429,13 @@ function showDepositModal() {
         <p class="t3 fs11" style="text-align:center;margin-top:12px">Min deposit ₹50</p>
       </div>
     </div>`;
+}
+
+// Function to handle visual selection
+function selectPaymentMethod(btn) {
+  document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('dep-method').value = btn.dataset.method;
 }
 
 /* ---------------- SHARED FRAGMENTS ---------------- */
@@ -1319,12 +1336,13 @@ document.addEventListener("click", async ev => {
       });
     } catch(e) { console.error('Supabase insert failed', e); }
 
+    const selectedApp = $("dep-method").value; // Gets 'paytm', 'gpay', 'phonepe', or 'upi'
+
     ZapUPI.createOrder({
       zap_key: ZAPUPI_API_KEY, 
       order_id: orderId, 
       amount: amount.toString(),
-      // ZapUPI parameter to force specific app
-      preferred_app: selectedApp === 'upi' ? null : selectedApp, 
+      preferred_app: selectedApp === 'upi' ? null : selectedApp, // 👈 Tells ZapUPI to open specific app
       success_url: currentUrl + '?status=success&order_id=' + orderId,
       failed_url: currentUrl + '?status=failed&order_id=' + orderId,
       timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
