@@ -1,11 +1,11 @@
 // config.js — loaded by both index.html and admin.html
 // Replace placeholders with real credentials.
 window.CP_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
-  ZAPUPI_MERCHANT_ID: "YOUR-ZAPUPI-MERCHANT-ID",
+  SUPABASE_URL: "https://hmiyhdekyqpzkxqiukvb.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd",
+  ZAPUPI_MERCHANT_ID: "zapce570e671e2f07f3bc9837566a44ec4c",
   ZAPUPI_ENDPOINT: "https://api.zapupi.com/v1/payments", // placeholder
-  ADMIN_EMAILS: ["admin@cricpulse.com"], // fallback admin check client-side (real check via RLS)
+  ADMIN_EMAILS: ["moderncartstore.care@gmail.com"], // fallback admin check client-side (real check via RLS)
   SUPPORT_REPLY_WINDOW: "60 minutes",
   INSTAGRAM_HANDLE: "cricpulse.official"
 };
