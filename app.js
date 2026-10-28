@@ -373,6 +373,7 @@ function showDepositModal() {
       <div class="modal-box">
         <h3 style="font-size:17px;margin-bottom:4px">Add funds</h3>
         <p class="t3 fs12" style="margin-bottom:18px">Secure payment powered by ZapUPI.</p>
+        
         <div class="field"><label>Select Amount</label>
           <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
             ${PRESET_AMOUNTS.map(v=>`<button class="chip" data-deposit-amount="${v}">₹${v}</button>`).join("")}
@@ -382,9 +383,30 @@ function showDepositModal() {
         
         <div class="field">
           <label>Payment Method</label>
-          <select class="input" id="dep-method">
-            <option value="zapupi">ZapUPI (UPI / Cards)</option>
-          </select>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:12px;">
+            <!-- Paytm -->
+            <button class="pay-method-btn" data-method="paytm" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
+              <div style="width:24px; height:24px; background:#00b9f1; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">P</div>
+              <span style="font-size:13px; font-weight:600; color:var(--ink);">Paytm</span>
+            </button>
+            <!-- Google Pay -->
+            <button class="pay-method-btn" data-method="gpay" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
+              <div style="width:24px; height:24px; background:#fff; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#4285F4; box-shadow:0 1px 3px rgba(0,0,0,0.1);">G</div>
+              <span style="font-size:13px; font-weight:600; color:var(--ink);">Google Pay</span>
+            </button>
+            <!-- PhonePe -->
+            <button class="pay-method-btn" data-method="phonepe" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
+              <div style="width:24px; height:24px; background:#5f259f; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">P</div>
+              <span style="font-size:13px; font-weight:600; color:var(--ink);">PhonePe</span>
+            </button>
+            <!-- Other UPI -->
+            <button class="pay-method-btn" data-method="upi" style="padding:12px; border:1px solid var(--stroke); border-radius:10px; display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--surface); transition:0.2s;">
+              <div style="width:24px; height:24px; background:#f1f5f9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#64748b;">U</div>
+              <span style="font-size:13px; font-weight:600; color:var(--ink);">Other UPI</span>
+            </button>
+          </div>
+          <!-- Hidden input to store the selected method -->
+          <input type="hidden" id="dep-method" value="zapupi">
         </div>
 
         <div style="background:var(--surface-2); padding:10px; border-radius:8px; margin-bottom:14px; display:flex; gap:8px; align-items:center;">
@@ -1278,11 +1300,15 @@ document.addEventListener("click", async ev => {
       return;
     }
 
+    // Get the selected app (paytm, gpay, phonepe, upi)
+    const selectedApp = $("dep-method").value;
+    if (!selectedApp) { $("dep-error").textContent = "Please select a payment app."; return; }
+
     const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
     const currentUrl = window.location.origin + window.location.pathname;
     
     t.disabled = true;
-    t.textContent = 'Creating payment...';
+    t.textContent = 'Opening app...';
 
     try {
       await DB.client.from('payment_requests').insert({ 
@@ -1297,21 +1323,12 @@ document.addEventListener("click", async ev => {
       zap_key: ZAPUPI_API_KEY, 
       order_id: orderId, 
       amount: amount.toString(),
+      // ZapUPI parameter to force specific app
+      preferred_app: selectedApp === 'upi' ? null : selectedApp, 
       success_url: currentUrl + '?status=success&order_id=' + orderId,
       failed_url: currentUrl + '?status=failed&order_id=' + orderId,
       timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
     }, {
-      onResponse: function(paymentUrl) {
-        if (paymentUrl) window.open(paymentUrl, '_blank');
-        t.disabled = false;
-        t.textContent = 'Continue to pay';
-      },
-      onError: function(err) {
-        $("dep-error").textContent = err || "Payment failed to initialize.";
-        t.disabled = false;
-        t.textContent = 'Continue to pay';
-      }
-    });
     return;
   }
 
@@ -1398,6 +1415,30 @@ async function checkPaymentReturn() {
   }
 }
 
+
+/* ---------------- PAYMENT METHOD SELECTION LOGIC ---------------- */
+document.addEventListener("click", function(e) {
+  const btn = e.target.closest(".pay-method-btn");
+  if (btn) {
+    // Remove active state from all buttons
+    document.querySelectorAll(".pay-method-btn").forEach(b => {
+      b.style.borderColor = "var(--stroke)";
+      b.style.background = "var(--surface)";
+    });
+    
+    // Add active state to clicked button
+    btn.style.borderColor = "var(--accent)";
+    btn.style.background = "var(--surface-2)";
+    
+    // Update hidden input value
+    const method = btn.dataset.method;
+    document.getElementById("dep-method").value = method;
+  }
+});
+
+/* ---------------- BOOT ---------------- */
+DB.onAuthChange(async (_event, session) => {
+   
 /* ---------------- BOOT ---------------- */
 DB.onAuthChange(async (_event, session) => {
   if (session?.user) {
