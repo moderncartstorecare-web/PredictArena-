@@ -104,6 +104,16 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .pp{top:68px;right:28px}.shx{border-radius:18px}.ov{align-items:center}
 .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:44px 0}.hero h1{font-size:42px}.lb{margin:0}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.steps .ln{border:0}.cats{grid-template-columns:repeat(5,1fr)}.sec{padding:34px 0}.pub{padding:0 max(14px,calc((100vw - 1000px)/2));height:60px}.chat{height:calc(100dvh - 60px)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== PAYMENT METHODS UI ===== */
+.pay-method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.pay-method-btn{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid var(--ln2);background:var(--sf);cursor:pointer;transition:all .15s ease;text-align:left;position:relative;}
+.pay-method-btn:hover{border-color:var(--i3);}
+.pay-method-btn.selected{border-color:var(--ac);background:var(--acs);box-shadow:0 0 0 1px var(--ac);}
+.pay-method-btn .pm-icon{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;flex:none;}
+.pay-method-btn .pm-text{font-weight:600;font-size:13px;line-height:1.2;}
+.pay-method-btn .pm-sub{font-size:10.5px;color:var(--i3);font-weight:500;}
+.pay-method-btn.selected .pm-text{color:var(--ac);}
 </style>
 </head>
 <body>
