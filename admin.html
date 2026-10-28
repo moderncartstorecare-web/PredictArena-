@@ -3,187 +3,157 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1020">
-<title>CricPulse Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>PredictX Admin – Control Panel (Educational Demo)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 <style>
-:root{--bg:#0b1020;--ink:#eef2ff;--i2:#9aa6c3;--i3:#5d6b8a;--ln:rgba(255,255,255,.08);--ln2:rgba(255,255,255,.14);--ac:#5b8cff;--ac2:#8aaaff;--ok:#3ddc97;--no:#fb6a82;--am:#fbbf24;--sf:rgba(255,255,255,.04);--sf2:rgba(255,255,255,.07);--blur:blur(18px)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:radial-gradient(1200px 800px at 10% -10%,#16203f 0,#0b1020 55%) fixed;color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;min-height:100dvh}
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}input,select,textarea{font:inherit;color:inherit}svg{display:block;flex:none}h1,h2,h3,p{margin:0}
-.mut{color:var(--i2)}.s12{font-size:12px}.s11{font-size:11px}.ok{color:var(--ok)}.no{color:var(--no)}.am{color:var(--am)}
-.row{display:flex;align-items:center;gap:10px}.bt{display:flex;justify-content:space-between;align-items:center;gap:10px}.grow{flex:1;min-width:0}
-.glass{background:var(--sf);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--ln);border-radius:16px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf2);font-weight:600;font-size:13px;color:var(--ink);white-space:nowrap}
-.btn.p{background:linear-gradient(135deg,#4f7cff,#7b5cff);border-color:transparent}.btn.ok{background:rgba(61,220,151,.15);border-color:rgba(61,220,151,.3);color:var(--ok)}
-.btn.no{background:rgba(251,106,130,.15);border-color:rgba(251,106,130,.3);color:var(--no)}
-.btn.sm{height:30px;padding:0 10px;font-size:12px;border-radius:8px}.btn:disabled{opacity:.4;cursor:not-allowed}
-.pill{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;font-size:10.5px;font-weight:600;background:var(--sf2);color:var(--i2);white-space:nowrap}
-.pill.ok{background:rgba(61,220,151,.14);color:var(--ok)}.pill.no{background:rgba(251,106,130,.14);color:var(--no)}.pill.am{background:rgba(251,191,36,.14);color:var(--am)}
-.inp{width:100%;height:42px;padding:0 12px;background:rgba(255,255,255,.05);border:1px solid var(--ln2);border-radius:10px;font-size:14px;color:var(--ink)}.inp:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px rgba(91,140,255,.2)}
-textarea.inp{height:auto;min-height:84px;padding:10px 12px;resize:vertical}
-.shell{display:grid;grid-template-columns:1fr;min-height:100dvh}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:rgba(11,16,32,.65);backdrop-filter:var(--blur);border-bottom:1px solid var(--ln)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em}
-.logo{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#4f7cff,#7b5cff);color:#fff}
-.main{padding:16px 16px 80px;max-width:1200px}
-.tabs{display:flex;gap:4px;overflow-x:auto;margin:0 -16px 14px;padding:0 16px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--ln2);background:var(--sf);color:var(--i2);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px}.tab.on{background:linear-gradient(135deg,#4f7cff,#7b5cff);border-color:transparent;color:#fff}
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.kpi{padding:14px}.kpi small{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--i2)}.kpi b{display:block;font-size:24px;font-weight:700;letter-spacing:-.02em;margin:2px 0}.kpi span{font-size:11px;color:var(--i3)}
-.card{padding:14px}.card h3{font-size:14px;font-weight:600;margin-bottom:10px}
-table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--i3);font-weight:700;padding:8px 6px;border-bottom:1px solid var(--ln)}
-td{padding:10px 6px;border-bottom:1px solid var(--ln);vertical-align:middle}tr:last-child td{border:0}
-.empty{padding:28px 10px;text-align:center;color:var(--i3);font-size:13px}
-.empty b{display:block;color:var(--ink);font-size:14px;margin-bottom:4px}
-.chatwrap{display:grid;grid-template-columns:1fr;gap:10px}.ticket-list{max-height:320px;overflow:auto}
-.tk{padding:10px;border:1px solid var(--ln);border-radius:10px;margin-bottom:8px;width:100%;background:var(--sf)}.tk.on{border-color:var(--ac);background:rgba(91,140,255,.08)}
-.msgs{height:340px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:rgba(0,0,0,.15);border-radius:12px;border:1px solid var(--ln)}
-.msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.4;word-break:break-word}
-.msg.me{align-self:flex-end;background:linear-gradient(135deg,#4f7cff,#7b5cff);color:#fff;border-bottom-right-radius:4px}
-.msg.them{align-self:flex-start;background:var(--sf2);border-bottom-left-radius:4px}
-.msg small{display:block;font-size:10px;opacity:.65;margin-top:3px}.msg img{max-width:100%;border-radius:8px;margin-top:6px}
-.chatbar{display:flex;gap:8px;margin-top:10px}.chatbar input{flex:1}
-.login{display:grid;place-items:center;min-height:100dvh;padding:20px}.login .glass{width:100%;max-width:380px;padding:22px}
-.footnote{padding:16px 4px;font-size:11px;color:var(--i3);text-align:center}
-@media(min-width:860px){.shell{grid-template-columns:220px minmax(0,1fr)}.side{display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;padding:16px 12px;border-right:1px solid var(--ln);background:rgba(255,255,255,.02);backdrop-filter:var(--blur)}.topbar{display:none}.main{padding:24px 28px}.tabs{display:none}.side .tab{width:100%;justify-content:flex-start;height:38px;border:0;background:none;color:var(--i2);margin-bottom:4px}.side .tab.on{background:rgba(91,140,255,.16);color:#cfe0ff;border:0}.kpis{grid-template-columns:repeat(4,1fr)}.chatwrap{grid-template-columns:280px minmax(0,1fr)}.ticket-list{max-height:520px}.msgs{height:440px}}
+:root{--bg:#f4f5f7;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e5ea;--pr:#2347c5;--prs:#eaeffd;--ok:#0f8a5f;--oks:#e4f4ed;--bad:#c8323c;--bads:#fbe9ea;--wa:#a16207;--was:#fdf3dc;--sb:#0f172a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#131a2e;--tx:#e8ecf6;--mu:#8b96b3;--bd:#232c47;--prs:#1b2850;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#080c18;--pr:#5b7cf5}}
+:root[data-theme="dark"]{--bg:#0b1020;--card:#131a2e;--tx:#e8ecf6;--mu:#8b96b3;--bd:#232c47;--prs:#1b2850;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#080c18;--pr:#5b7cf5}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:50}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+svg.lucide{width:16px;height:16px;stroke-width:1.9;flex:none}
+small{color:var(--mu);font-size:12px}h3{margin:0 0 12px;font-size:15px;font-weight:600}h1{margin:0;font-size:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;background:var(--pr);color:#fff;white-space:nowrap}
+.btn:hover{opacity:.9}.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.btn.s{padding:5px 10px;font-size:12px}.btn.r{background:var(--bads);color:var(--bad)}.btn.k{background:var(--oks);color:var(--ok)}.btn.w{width:100%}.btn[disabled]{opacity:.45;pointer-events:none}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:16px}
+.in{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 12px;background:var(--card);outline:0}.in:focus{border-color:var(--pr)}
+label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bottom:12px}label.f .in{margin-top:4px;color:var(--tx)}
+#lg{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--sb)}
+#lg form{background:var(--card);border-radius:12px;padding:30px;width:100%;max-width:380px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}.brand span{width:32px;height:32px;border-radius:8px;background:var(--pr);display:grid;place-items:center;color:#fff}
+#app{display:flex;min-height:100vh}
+.sb{width:230px;background:var(--sb);color:#aab4cf;padding:20px 12px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sb .brand{color:#fff;padding:0 10px 18px}.sb h6{margin:14px 10px 4px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#6b7694;font-weight:600}
+.nv{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:7px;font-weight:500;color:inherit;width:100%;text-align:left}
+.nv:hover{background:rgba(255,255,255,.06);color:#fff}.nv.on{background:rgba(255,255,255,.12);color:#fff}
+.cn{margin-left:auto;background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;font-weight:600}
+.main{flex:1;min-width:0}
+.tp{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:6}
+.sp{flex:1}.av{width:34px;height:34px;border-radius:50%;background:var(--pr);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+.ib{width:36px;height:36px;border-radius:8px;border:1px solid var(--bd);display:grid;place-items:center;position:relative}
+.pg{padding:24px;max-width:1240px;margin:0 auto;animation:fi .2s}@keyframes fi{from{opacity:0}}
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}.g4 .card{margin:0;padding:14px 16px}.g4 b{display:block;font-size:21px;font-weight:700;margin-top:2px}
+.cols{display:grid;grid-template-columns:3fr 2fr;gap:16px}@media(max-width:1000px){.cols{grid-template-columns:1fr}}
+.big{font-size:32px;font-weight:700;line-height:1.1}.mk{transition:filter .15s}.bl{filter:blur(7px);user-select:none}
+.erow{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between}
+.src{display:flex;gap:26px;flex-wrap:wrap}.src b{display:block;font-size:16px}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--prs);color:var(--pr);white-space:nowrap}.chip.ok{background:var(--oks);color:var(--ok)}.chip.no{background:var(--bads);color:var(--bad)}.chip.wa{background:var(--was);color:var(--wa)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}td{padding:10px;border-bottom:1px solid var(--bd);vertical-align:middle}tr:last-child td{border:0}.ac{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.tb2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.tb2 .in{max-width:260px}
+.tabs{display:flex;gap:6px}.tabs button{padding:7px 14px;border:1px solid var(--bd);border-radius:7px;background:var(--card);font-weight:500}.tabs .on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.ls{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}.ls:last-child{border:0}.ls>div:last-child{flex:1}.ls small{display:block}
+.ico{width:34px;height:34px;border-radius:8px;background:var(--prs);color:var(--pr);display:grid;place-items:center;flex:none}
+.kv{display:grid;grid-template-columns:130px 1fr}.kv>*{padding:8px 0;border-bottom:1px solid var(--bd)}.kv>:nth-child(odd){color:var(--mu)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.ov{position:fixed;inset:0;background:rgba(8,12,24,.55);display:grid;place-items:center;z-index:60;padding:16px;animation:fi .15s;overflow-y:auto}.md{background:var(--card);border-radius:12px;padding:24px;max-width:480px;width:100%}.md h3{font-size:17px}
+.toast{position:fixed;right:20px;top:calc(18px + env(safe-area-inset-top,0px));background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:8px;font-weight:500;z-index:80;display:flex;gap:9px;align-items:center;animation:fi .2s}
+.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--bd);border-radius:9px;padding:11px 12px;margin-bottom:8px;cursor:pointer}.opt:has(input:checked){border-color:var(--pr);background:var(--prs)}
+@media(max-width:860px){.sb{position:static;height:auto;width:100%;flex-direction:row;overflow-x:auto;padding:8px}.sb h6,.sb .brand,.sb>small{display:none}.nv{width:auto;white-space:nowrap}#app{flex-direction:column}.pg{padding:14px}.tp{padding:10px 14px}.fg{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div id="root"><div class="login"><div class="glass" style="text-align:center"><div class="logo" style="margin:0 auto 10px">✦</div><b>Loading admin…</b></div></div></div>
-<script src="config.js"></script>
+<div id="root"></div>
 <script>
-const $ = i => document.getElementById(i);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
-const inr2 = n => "₹" + Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const ic = (p,s=16) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>`;
-const I = {
-  grid:"M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",
-  users:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
-  cash:"M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z",
-  chat:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
-  send:"M22 2 11 13M22 2l-7 20-4-9-9-4z",
-  mega:"m3 11 18-5v12L3 14v-3zM11.6 16.8a3 3 0 1 1-5.8-1.6",
-  out:"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
-  check:"M20 6 9 17l-5-5",
-  x:"M18 6 6 18M6 6l12 12",
-  bolt:"M13 2 3 14h9l-1 8 10-12h-9z",
-  shield:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
-};
-
-/* demo data store for admin (real app uses Supabase; empty states shown when no rows) */
-const AKEY = "cricpulse_admin_v1";
-let A = { route:"dashboard", users:[], withdrawals:[], tickets:[], openTicket:null, sent:[] };
-try { const r = JSON.parse(localStorage.getItem(AKEY)); if (r) A = { ...A, ...r }; } catch{}
-const saveA = () => { try { localStorage.setItem(AKEY, JSON.stringify(A)); } catch{} };
-const authed = () => {
-  try { return sessionStorage.getItem("cp_admin") == "1"; } catch { return false; }
-};
-
-function loginV() {
-  return `<div class="login"><div class="glass">
-    <div class="row" style="margin-bottom:14px"><span class="logo">${ic(I.shield,17)}</span><div><b>CricPulse Admin</b><div class="mut s11">Secure console</div></div></div>
-    <div class="s12 mut" style="margin-bottom:10px">Sign in with your admin account to continue.</div>
-    <div style="margin-bottom:10px"><input class="inp" id="aem" type="email" placeholder="Admin email" autocomplete="email"></div>
-    <div style="margin-bottom:10px"><input class="inp" id="apw" type="password" placeholder="Password" autocomplete="current-password"></div>
-    <div class="s11 no" id="aerr" style="min-height:16px;margin-bottom:6px"></div>
-    <button class="btn p" style="width:100%" onclick="adminLogin()">Sign in</button>
-    <div class="s11 mut" style="margin-top:10px">Admin access is restricted. Use your registered admin email.</div>
-  </div></div>`;
-}
-
-function nav() {
-  const tabs = [["dashboard","Dashboard",I.grid],["users","Users",I.users],["withdrawals","Withdrawals",I.cash],["support","Support Inbox",I.chat],["broadcast","Broadcast",I.mega]];
-  return `<aside class="side"><div class="brand" style="padding:4px 8px 14px"><span class="logo">${ic(I.bolt,17)}</span><div><div>CricPulse</div><div class="mut s11">Admin console</div></div></div>${tabs.map(([k,l,icn]) => `<button class="tab${A.route==k?" on":""}" data-r="${k}">${ic(icn,15)}${l}</button>`).join("")}<div style="margin-top:auto;padding:10px 8px;border-top:1px solid var(--ln)"><button class="tab" onclick="adminLogout()">${ic(I.out,15)}Sign out</button></div></aside>`;
-}
-
-function topbar() {
-  return `<header class="topbar"><span class="logo">${ic(I.bolt,16)}</span><b style="flex:1">CricPulse Admin</b><button class="btn sm" onclick="adminLogout()">Sign out</button></header>
-  <div class="tabs">${[["dashboard","Dashboard"],["users","Users"],["withdrawals","Withdrawals"],["support","Support"],["broadcast","Broadcast"]].map(([k,l]) => `<button class="tab${A.route==k?" on":""}" data-r="${k}">${l}</button>`).join("")}</div>`;
-}
-
-function kpiCard(label, value, sub) { return `<div class="glass kpi"><small>${label}</small><b>${value}</b><span>${sub||""}</span></div>`; }
-
-function dashboardV() {
-  const dep = A.withdrawals.filter(w => w.status=="completed").reduce((a,w)=>a+w.amount,0);
-  const wd  = A.withdrawals.filter(w => w.status=="approved").reduce((a,w)=>a+w.amount,0);
-  const pend = A.withdrawals.filter(w => w.status=="pending").length;
-  return `<div class="kpis">
-    ${kpiCard("Total users", A.users.length, A.users.length ? "Registered accounts" : "No data yet")}
-    ${kpiCard("Deposits", inr(dep), A.users.length ? "Completed" : "No data yet")}
-    ${kpiCard("Withdrawals", inr(wd), pend ? pend+" pending approval" : "No data yet")}
-    ${kpiCard("Open tickets", A.tickets.filter(t=>t.status!="closed").length, "Support inbox")}
-  </div>
-  <div class="glass card"><div class="bt"><h3>Recent activity</h3><span class="pill">Live</span></div>
-  ${A.withdrawals.length || A.tickets.length ? `<table><thead><tr><th>Type</th><th>Detail</th><th>Amount</th><th>Status</th></tr></thead><tbody>
-    ${A.withdrawals.slice(-5).reverse().map(w=>`<tr><td>Withdrawal</td><td>${esc(w.who||"—")}</td><td>${inr(w.amount)}</td><td><span class="pill ${w.status=="pending"?"am":w.status=="approved"?"ok":"no"}">${esc(w.status)}</span></td></tr>`).join("")}
-  </tbody></table>` : `<div class="empty"><b>No data</b>Users, deposits and withdrawal activity will appear here.</div>`}</div>`;
-}
-function usersV() {
-  return `<div class="glass card"><div class="bt"><h3>Registered users</h3><span class="pill">${A.users.length}</span></div>
-  ${A.users.length ? `<table><thead><tr><th>Name</th><th>Email</th><th>Wallet</th><th>Joined</th></tr></thead><tbody>${A.users.map(u=>`<tr><td>${esc(u.name)}</td><td class="mut">${esc(u.email)}</td><td>${inr(u.balance)}</td><td class="mut">${esc(u.joined||"—")}</td></tr>`).join("")}</tbody></table>` : `<div class="empty"><b>No data</b>Registered users will appear here.</div>`}</div>`;
-}
-function withdrawalsV() {
-  return `<div class="glass card"><div class="bt"><h3>Withdrawal requests</h3><span class="pill">${A.withdrawals.length}</span></div>
-  ${A.withdrawals.length ? `<table><thead><tr><th>User</th><th>Amount</th><th>Destination</th><th>Status</th><th></th></tr></thead><tbody>${A.withdrawals.map((w,i)=>`<tr><td>${esc(w.who||"—")}</td><td><b>${inr(w.amount)}</b></td><td class="mut">${esc(w.dest||"—")}</td><td><span class="pill ${w.status=="pending"?"am":w.status=="approved"?"ok":"no"}">${esc(w.status)}</span></td><td style="text-align:right">${w.status=="pending"?`<button class="btn sm ok" onclick="decide(${i},'approved')">${ic(I.check,13)} Approve</button> <button class="btn sm no" onclick="decide(${i},'rejected')">${ic(I.x,13)} Reject</button>`:""}</td></tr>`).join("")}</tbody></table>` : `<div class="empty"><b>No data</b>Withdrawal requests will appear here for approval.</div>`}</div>`;
-}
-function supportV() {
-  if (!A.tickets.length) return `<div class="glass card"><div class="bt"><h3>Support inbox</h3><span class="pill">0</span></div><div class="empty"><b>No data</b>User support tickets will appear here. Replies are visible to users in-app.</div></div>`;
-  const t = A.tickets.find(x=>x.id==A.openTicket) || A.tickets[A.tickets.length-1];
-  return `<div class="glass card"><div class="bt"><h3>Support inbox</h3><span class="pill">${A.tickets.filter(x=>x.status!="closed").length} open</span></div>
-  <div class="chatwrap"><div class="ticket-list">${A.tickets.slice().reverse().map(x=>`<button class="tk${x.id==t.id?" on":""}" data-t="${x.id}"><div class="bt"><b class="s12">${esc(x.subject)}</b><span class="pill ${x.status=="closed"?"":"ok"}">${x.status=="closed"?"Closed":"Open"}</span></div><div class="mut s11">${esc(x.who||"User")} · ${x.msgs.length} msg</div></button>`).join("")}</div>
-  <div><div class="msgs" id="amsgs">${t.msgs.map(m=>`<div class="msg ${m.me?"me":"them"}">${m.img?`<img src="${esc(m.img)}" alt="">`:""}${esc(m.text)}<small>${m.me?"Admin":"User"} · ${esc(m.at)}</small></div>`).join("")}</div>
-  <div class="chatbar"><input class="inp" id="areply" placeholder="Reply to user…"><button class="btn p" onclick="sendReply()">${ic(I.send,14)} Send</button></div></div></div></div>`;
-}
-function broadcastV() {
-  return `<div class="glass card"><h3>Broadcast push notification</h3><div class="s12 mut" style="margin-bottom:10px">Send a notification to all registered users.</div>
-  <div style="margin-bottom:10px"><label class="s12 mut">Title</label><input class="inp" id="bTitle" placeholder="e.g. New markets are live"></div>
-  <div style="margin-bottom:10px"><label class="s12 mut">Message</label><textarea class="inp" id="bMsg" placeholder="Write the notification message…"></textarea></div>
-  <button class="btn p" onclick="sendBroadcast()">${ic(I.mega,14)} Send to all users</button>
-  ${A.sent.length ? `<div style="margin-top:16px"><h3>Sent</h3>${A.sent.slice().reverse().map(s=>`<div class="tk"><b class="s12">${esc(s.title)}</b><div class="mut s12">${esc(s.msg)}</div><div class="s11 mut">${esc(s.at)}</div></div>`).join("")}</div>` : ""}</div>`;
-}
-
-function render() {
-  const root = $("root");
-  if (!authed()) { root.innerHTML = loginV(); return; }
-  const main = A.route=="dashboard"?dashboardV():A.route=="users"?usersV():A.route=="withdrawals"?withdrawalsV():A.route=="support"?supportV():broadcastV();
-  root.innerHTML = `<div class="shell">${nav()}<div><div style="padding:0 16px">${topbar()}</div><main class="main">${main}<div class="footnote">CricPulse Admin · Restricted access · ${new Date().getFullYear()}</div></main></div></div>`;
-}
-
-/* actions */
-window.adminLogin = function() {
-  const em = $("aem").value.trim(), pw = $("apw").value;
-  const allowed = (window.CP_CONFIG?.ADMIN_EMAILS) || ["admin@cricpulse.com"];
-  if (!/^\S+@\S+\.\S+$/.test(em)) { $("aerr").textContent = "Enter a valid email."; return; }
-  if (pw.length < 6) { $("aerr").textContent = "Password must be at least 6 characters."; return; }
-  // In production, authenticate with Supabase and verify admin role via RLS.
-  if (!allowed.includes(em)) { $("aerr").textContent = "This email is not an admin account."; return; }
-  try { sessionStorage.setItem("cp_admin","1"); } catch{}
-  A.route = "dashboard"; render();
-};
-window.adminLogout = function() { try { sessionStorage.removeItem("cp_admin"); } catch{} render(); };
-window.decide = function(i, status) { A.withdrawals[i].status = status; saveA(); render(); };
-window.sendReply = function() {
-  const t = A.tickets.find(x=>x.id==A.openTicket) || A.tickets[A.tickets.length-1];
-  const inp = $("areply"); if (!t || !inp || !inp.value.trim()) return;
-  t.msgs.push({me:true, text:inp.value.trim(), at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
-  t.updated = "Just now"; saveA(); render();
-  const m = $("amsgs"); if (m) m.scrollTop = m.scrollHeight;
-};
-window.sendBroadcast = function() {
-  const title = $("bTitle").value.trim(), msg = $("bMsg").value.trim();
-  if (!title || !msg) return;
-  A.sent.push({title, msg, at:new Date().toLocaleString("en-IN")}); saveA(); render();
-};
-
-document.addEventListener("click", e => {
-  const r = e.target.closest("[data-r]"); if (r) { A.route = r.dataset.r; render(); return; }
-  const t = e.target.closest("[data-t]"); if (t) { A.openTicket = Number(t.dataset.t); render(); const m = $("amsgs"); if (m) m.scrollTop = m.scrollHeight; return; }
-});
-window.addEventListener("load", () => { try { render(); } catch(e) { console.error(e); } });
+var MS=["October 2026","September 2026","August 2026","July 2026","June 2026","May 2026"],DD=[29,30,31,31,30,31];
+var D0={mi:0,page:"dash",users:[
+["u1","Aarav Sharma","aarav.s@mail.com","Gurugram",2450,1840,"active","12 Mar 2026",1],["u2","Priya Menon","priya.m@mail.com","Kochi",1180,1620,"active","03 Apr 2026",1],["u3","Rohan Kapoor","rohan.k@mail.com","Delhi",320,1405,"active","19 Apr 2026",1],["u4","Sneha Taneja","sneha.t@mail.com","Noida",5600,1180,"active","27 Apr 2026",1],["u5","Karan Joshi","karan.j@mail.com","Jaipur",0,960,"blocked","02 May 2026",0],["u6","Meera Iyer","meera.i@mail.com","Chennai",760,820,"active","15 May 2026",1],["u7","Dev Malhotra","dev.m@mail.com","Mumbai",90,640,"active","21 May 2026",0],["u8","Ishita Verma","ishita.v@mail.com","Lucknow",4200,590,"active","01 Jun 2026",1],["u9","Nikhil Rao","nikhil.r@mail.com","Hyderabad",1500,510,"active","18 Jun 2026",1],["u10","Anjali Gupta","anjali.g@mail.com","Pune",230,470,"active","09 Jul 2026",0],["u11","Vikram Singh","vikram.s@mail.com","Chandigarh",3100,430,"active","30 Jul 2026",1],["u12","Pooja Nair","pooja.n@mail.com","Bengaluru",680,390,"active","14 Aug 2026",1]].map(function(u){return{id:u[0],name:u[1],email:u[2],city:u[3],wal:u[4],pts:u[5],st:u[6],joined:u[7],kyc:u[8]}}),
+matches:[
+{id:1,c:"Cricket",l:"IPL · Qualifier 1",a:"Mumbai Indians",b:"Chennai Super Kings",when:"29 Oct, 7:30 PM",st:"live",win:null,pa:54,n:18420},
+{id:2,c:"Cricket",l:"India vs Australia · ODI",a:"India",b:"Australia",when:"30 Oct, 1:30 PM",st:"upcoming",win:null,pa:61,n:12760},
+{id:3,c:"Football",l:"ISL · Matchday 12",a:"Mohun Bagan",b:"Bengaluru FC",when:"29 Oct, 5:00 PM",st:"closed",win:null,pa:52,n:9120},
+{id:4,c:"Kabaddi",l:"Pro Kabaddi League",a:"Jaipur Pink Panthers",b:"Patna Pirates",when:"28 Oct, 8:00 PM",st:"settled",win:"a",pa:57,n:7480},
+{id:5,c:"India Specials",l:"Markets · Nifty close",a:"Nifty closes UP",b:"Nifty closes DOWN",when:"30 Oct, 3:30 PM",st:"upcoming",win:null,pa:55,n:21500}],
+wd:[["W-1048","u4",2500,"UPI","sneha@okbank","29 Oct","pending"],["W-1047","u8",1800,"Bank","HDFC ··4821","29 Oct","pending"],["W-1046","u11",3000,"UPI","vikram@okaxis","28 Oct","pending"],["W-1045","u1",1200,"UPI","aarav@okbank","27 Oct","approved"],["W-1044","u9",900,"Bank","SBI ··1190","26 Oct","approved"],["W-1043","u3",1500,"UPI","rohan@okicici","25 Oct","rejected"]].map(function(w){return{id:w[0],uid:w[1],amt:w[2],m:w[3],ac:w[4],d:w[5],st:w[6]}}),
+tx:[["u1","Reward","+500","Coupon cashback","28 Oct"],["u4","Credit","+2000","Wallet top-up","28 Oct"],["u8","Withdrawal","-1800","Request W-1047","29 Oct"],["u2","Reward","+300","Prediction payout","27 Oct"],["u11","Debit","-250","Contest pass","27 Oct"],["u9","Refund","+900","Void match refund","26 Oct"],["u6","Reward","+120","Prediction payout","26 Oct"]].map(function(t){return{uid:t[0],ty:t[1],amt:t[2],n:t[3],d:t[4]}}),
+sent:[{t:"Qualifier 1 is live",m:"Predictions are open until the first ball.",aud:"All users",ty:"Promo",time:"29 Oct, 6:45 PM",r:48213},{t:"Result declared",m:"Kabaddi match settled. Rewards credited.",aud:"Active users",ty:"Result",time:"28 Oct, 10:30 PM",r:46980}],
+cp:[{n:"Coffee Voucher",code:"CAFE100",dc:"₹100 off",used:312,tot:500,on:1},{n:"Shopping Coupon",code:"SHOP15",dc:"15% off",used:140,tot:300,on:1},{n:"Premium Month",code:"PREM30",dc:"30 days free",used:48,tot:100,on:1},{n:"Free Entry Pass",code:"VIPFREE",dc:"Zero-fee contest",used:12,tot:50,on:0}],
+act:[["Withdrawal W-1048 requested by Sneha Taneja","29 Oct, 4:12 PM"],["Match settled: Jaipur Pink Panthers vs Patna Pirates","28 Oct, 10:30 PM"],["New user registered: Pooja Nair","28 Oct, 9:02 PM"]],
+sel:0,nt:0};
+var D1=JSON.stringify(D0),S=JSON.parse(D1);try{var sv=localStorage.getItem("pxa1");if(sv)S=Object.assign(JSON.parse(D1),JSON.parse(sv))}catch(e){}
+var EYE=0,LOGIN=0,UQ="",WF="pending",TF="All",CPS={aud:"all",uid:"u1",ty:"Promo",t:"",m:""},MOD=null,AD=0;
+function save(){try{S.sel=0;localStorage.setItem("pxa1",JSON.stringify(S))}catch(e){}}
+function $(i){return document.getElementById(i)}
+function ic(n){return '<i data-lucide="'+n+'"></i>'}
+function num(n){return n.toLocaleString("en-IN")}
+function fm(n){return "₹"+num(n)}
+function mk(n){return '<span class="mk'+(EYE?"":" bl")+'">'+(EYE?fm(n):"₹ 00,00,000")+'</span>'}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function ini(n){return n.split(" ").map(function(w){return w[0]}).join("").slice(0,2).toUpperCase()}
+function U(i){return S.users.filter(function(u){return u.id===i})[0]}
+function MM(i){return S.matches.filter(function(m){return m.id==i})[0]}
+function now(){return new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
+function act(t){S.act.unshift([t,now()]);S.act=S.act.slice(0,12)}
+function toast(t,k){var e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+t;document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(function(){e.remove()},2400)}
+function rnd(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var MC={};function MD(i){if(i>5)i=5;if(MC[i])return MC[i];var r=rnd(77+i*13),d=[],t=0;for(var k=0;k<DD[i];k++){var v=Math.round(15500-i*650+r()*9000+Math.sin(k/3)*1800);d.push(v);t+=v}
+  return MC[i]={d:d,t:t,nu:Math.round(780+r()*620),pr:Math.round(14000+r()*8000),po:Math.round(t*.38),wp:Math.round(t*.22)}}
+function chg(){var c=MD(S.mi).t,p=S.mi<5?MD(S.mi+1).t:c*.93;return Math.round((c-p)/p*1000)/10}
+function chart(a){var n=a.length,mx=Math.max.apply(null,a),w=700/n,s='<svg viewBox="0 0 700 190" width="100%" role="img" aria-label="Daily earnings">';a.forEach(function(v,i){var h=v/mx*148;s+='<rect x="'+(i*w+w*.15)+'" y="'+(158-h)+'" width="'+w*.7+'" height="'+h+'" rx="2" style="fill:var(--pr);opacity:.85">'+(EYE?'<title>Day '+(i+1)+': '+fm(v)+'</title>':'')+'</rect>';if(i===0||(i+1)%5===0)s+='<text x="'+(i*w+w/2)+'" y="178" font-size="10" text-anchor="middle" style="fill:var(--mu)">'+(i+1)+'</text>'});return s+'</svg>'}
+function pendW(){return S.wd.filter(function(w){return w.st==="pending"})}
+function chipM(s){return '<span class="chip '+({live:"no",upcoming:"",closed:"wa",settled:"ok"}[s])+'">'+s[0].toUpperCase()+s.slice(1)+'</span>'}
+/* views */
+function dashV(){var d=MD(S.mi),c=chg(),pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
+  var sp=[["Premium passes",.52],["Sponsorships",.31],["Advertising",.17]];
+  return '<div class="hd"><div><h1>Overview</h1><small>Business summary for '+MS[S.mi]+'</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="month">'+MS.map(function(m,i){return '<option value="'+i+'"'+(i===S.mi?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>'+
+  '<div class="card"><div class="erow"><div><small>Total earnings · '+MS[S.mi]+'</small><div style="display:flex;align-items:center;gap:12px;margin-top:4px"><div class="big">'+mk(d.t)+'</div><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button></div><div style="margin-top:6px"><span class="chip '+(c>=0?"ok":"no")+'">'+(c>=0?"+":"")+c+'% vs previous month</span> <small>'+(EYE?"":"Earnings are hidden. Click the eye icon to reveal.")+'</small></div></div><div class="src">'+sp.map(function(s){return '<div><small>'+s[0]+'</small><b>'+mk(Math.round(d.t*s[1]))+'</b></div>'}).join("")+'</div></div><div class="'+(EYE?"":"bl ")+'mk" style="margin-top:14px">'+chart(d.d)+'</div></div>'+
+  '<div class="g4">'+[["Total users",num(48213+0),"users"],["New users · month",num(d.nu),"user-plus"],["Predictions · month",num(d.pr),"target"],["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
+  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+m.a+' vs '+m.b+'</b><small>'+m.l+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+w.id+' · '+fm(w.amt)+'</b><small>'+u.name+' · '+w.m+'</small></div><div class="ac"><button class="btn s k" data-wd="'+w.id+'|approved">Approve</button><button class="btn s r" data-wd="'+w.id+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join("")+'</div></div>'}
+function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){return '<tr><td><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><br><small>'+esc(m.l)+'</small></td><td>'+esc(m.when)+'</td><td>'+num(m.n)+'</td><td><small>'+m.pa+'% / '+(100-m.pa)+'%</small></td><td>'+chipM(m.st)+(m.win?'<br><small>Winner: '+(m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b))+'</small>':'')+'</td><td><div class="ac">'+(m.st==="settled"?'':(m.st==="upcoming"?'<button class="btn s g" data-cl="'+m.id+'">Close picks</button>':'')+'<button class="btn s" data-win="'+m.id+'">Set winner</button>')+'<button class="btn s g" data-dm="'+m.id+'" aria-label="Delete">'+ic("trash-2")+'</button></div></td></tr>'}).join("")+'</table></div>'}
+function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>'+S.users.filter(function(u){return!q||(u.name+u.email+u.city).toLowerCase().indexOf(q)>-1}).map(function(u){return '<tr><td><b>'+esc(u.name)+'</b><br><small>'+esc(u.email)+'</small></td><td>'+esc(u.city)+'</td><td>'+fm(u.wal)+'</td><td>'+u.pts+'</td><td><span class="chip '+(u.kyc?"ok":"wa")+'">'+(u.kyc?"Verified":"Pending")+'</span></td><td><span class="chip '+(u.st==="active"?"ok":"no")+'">'+u.st+'</span></td><td><div class="ac"><button class="btn s g" data-uv="'+u.id+'">View</button><button class="btn s g" data-un="'+u.id+'" aria-label="Notify">'+ic("bell")+'</button><button class="btn s g" data-uw="'+u.id+'" aria-label="Wallet">'+ic("wallet")+'</button><button class="btn s '+(u.st==="active"?"r":"k")+'" data-ub="'+u.id+'">'+(u.st==="active"?"Block":"Unblock")+'</button></div></td></tr>'}).join("")+'</table>'}
+function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of 48,213 registered (sample list)</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
+function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,S.users.map(function(u){return u.wal})))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+t.d+'</td></tr>'}).join("")+'</table></div>'}
+function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+w.id+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+w.m+'<br><small>'+esc(w.ac)+'</small></td><td>'+w.d+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+w.id+'|approved">Approve</button><button class="btn s r" data-wd="'+w.id+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
+function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?48213:CPS.aud==="act"?46980:1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+x.id+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
+function rewV(){return '<div class="hd"><div><h1>Rewards and coupons</h1><small>Manage coupons that users claim with points</small></div><div class="sp"></div><button class="btn" data-a="addc">'+ic("plus")+'Create coupon</button></div><div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>'+S.cp.map(function(c,i){return '<tr><td><b>'+esc(c.n)+'</b></td><td><span class="chip">'+esc(c.code)+'</span></td><td>'+esc(c.dc)+'</td><td>'+c.used+' / '+c.tot+'</td><td><span class="chip '+(c.on?"ok":"")+'">'+(c.on?"Active":"Paused")+'</span></td><td><div class="ac"><button class="btn s g" data-ct="'+i+'">'+(c.on?"Pause":"Activate")+'</button></div></td></tr>'}).join("")+'</table></div>'}
+function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div class="card"><h3>Admin account</h3><div class="kv"><span>Name</span><span>Administrator</span><span>Email</span><span>'+esc(S.adm||"admin@predictx.edu")+'</span><span>Role</span><span>Super admin</span></div></div><div class="card"><h3>Preferences</h3><div class="ls"><div><b>Appearance</b><small>Switch between light and dark</small></div><button class="btn g" data-a="theme">Toggle theme</button></div><div class="ls"><div><b>Reset demo data</b><small>Restore all sample data</small></div><button class="btn r" data-a="reset">Reset</button></div></div><div class="card"><button class="btn g" data-a="out">'+ic("log-out")+'Sign out</button></div><small>Prototype with sample data. No real payments or personal data are processed.</small>'}
+var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
+var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],rew:["Rewards",rewV],set:["Settings",setV]};
+function nav(){return NV.map(function(n){return n[0]==="H"?'<h6>'+n[1]+'</h6>':'<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+(n[0]==="wd"&&pendW().length?'<span class="cn">'+pendW().length+'</span>':'')+'</button>'}).join("")}
+function loginV(){return '<div id="lg"><form id="lf"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only. Demo build.</small><div style="height:16px"></div><label class="f">Email<input class="in" id="em" type="email" value="admin@predictx.edu" required></label><label class="f">Password<input class="in" type="password" value="demo1234" required></label><button class="btn w" type="submit">Sign in</button></form></div>'}
+function render(){var r=$("root");
+  if(!LOGIN){r.innerHTML=loginV()}
+  else{var v=VT[S.page];r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>PredictX Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">Educational demo</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>'}
+  try{lucide.createIcons()}catch(e){}}
+function modal(h){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+h+'</div>';document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
+function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null}
+function fld(l,id,v,t){return '<label class="f">'+l+'<input class="in" id="'+id+'" type="'+(t||"text")+'" value="'+(v||"")+'" required></label>'}
+document.addEventListener("input",function(e){var t=e.target;if(t.id==="uq"){UQ=t.value;$("ut").innerHTML=usersTbl();try{lucide.createIcons()}catch(x){}}if(t.dataset.cp&&(t.dataset.cp==="t"||t.dataset.cp==="m"))CPS[t.dataset.cp]=t.value});
+document.addEventListener("change",function(e){var t=e.target;if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}else if(t.dataset.sel==="tf"){TF=t.value;render()}else if(t.dataset.cp){CPS[t.dataset.cp]=t.value;if(t.dataset.cp==="aud"||t.dataset.cp==="uid")render()}});
+document.addEventListener("submit",function(e){e.preventDefault();var id=e.target.id;
+  if(id==="lf"){LOGIN=1;S.adm=$("em").value}
+  else if(id==="mf"){S.matches.unshift({id:Date.now()%100000,c:$("mc").value,l:$("ml").value,a:$("ma").value,b:$("mb").value,when:$("mw").value,st:"upcoming",win:null,pa:50,n:0});act("Match created: "+$("ma").value+" vs "+$("mb").value);closeM();toast("Match added")}
+  else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
+  else if(id==="wf"){var u=U(MOD),a=+$("wa").value,cr=$("wt").value==="c";if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}u.wal+=cr?a:-a;S.tx.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:$("wr").value,d:"29 Oct"});act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);closeM();toast("Wallet updated")}
+  else if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});closeM();toast("Coupon created")}
+  else if(id==="nf"){if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}var one=CPS.aud==="one";S.sent.unshift({t:CPS.t,m:CPS.m,aud:one?U(CPS.uid).name:CPS.aud==="all"?"All users":"Active users",ty:CPS.ty,time:now(),r:one?1:CPS.aud==="all"?48213:46980});act("Notification sent: "+CPS.t);CPS.t="";CPS.m="";toast("Notification sent")}
+  save();render()});
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close]");if(!t)return;var d=t.dataset;
+  if(d.close!==undefined){closeM();return}
+  if(d.p){S.page=d.p;window.scrollTo(0,0)}
+  else if(d.a==="eye")EYE=!EYE;
+  else if(d.a==="theme"){var h=document.documentElement,cur=h.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");h.setAttribute("data-theme",cur==="dark"?"light":"dark")}
+  else if(d.a==="out"){LOGIN=0;EYE=0}
+  else if(d.a==="reset"){localStorage.removeItem("pxa1");S=JSON.parse(D1);toast("Demo data restored")}
+  else if(d.a==="addm"){modal('<h3>Add match</h3><form id="mf">'+fld("League or event","ml")+'<div class="fg">'+fld("Team A","ma")+fld("Team B","mb")+'</div><div class="fg"><label class="f">Category<select class="in" id="mc"><option>Cricket</option><option>Football</option><option>Kabaddi</option><option>India Specials</option></select></label>'+fld("Start (e.g. 31 Oct, 7:30 PM)","mw")+'</div><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create match</button></div></form>');return}
+  else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
+  else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
+  else if(d.cl){MM(d.cl).st="closed";act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b);toast("Predictions closed")}
+  else if(d.dm){var m=MM(d.dm);S.matches=S.matches.filter(function(x){return x!==m});act("Match deleted: "+m.a+" vs "+m.b);toast("Match deleted","trash-2")}
+  else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+u.joined+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+x.amt+'<small>'+esc(x.n)+' · '+x.d+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
+  else if(d.un){CPS.aud="one";CPS.uid=d.un;S.page="not"}
+  else if(d.uw){var u=U(d.uw);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
+  else if(d.ub){var u=U(d.ub);u.st=u.st==="active"?"blocked":"active";act((u.st==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+u.st)}
+  else if(d.wf)WF=d.wf;
+  else if(d.wd){var p=d.wd.split("|"),w=S.wd.filter(function(x){return x.id===p[0]})[0],u=U(w.uid);w.st=p[1];if(p[1]==="rejected"){u.wal+=w.amt;S.tx.unshift({uid:u.id,ty:"Refund",amt:"+"+w.amt,n:"Rejected "+w.id,d:"29 Oct"})}act("Withdrawal "+w.id+" "+p[1]+" ("+u.name+")");toast("Withdrawal "+p[1])}
+  else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
+  save();render()});
+render();
 </script>
 </body>
 </html>
