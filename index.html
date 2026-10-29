@@ -706,7 +706,7 @@ document.addEventListener("click", e => {
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
     case "gmail": {
-      if (window.CP_DB && CP_DB.ready && CP_DB.authClient) {
+      if (window.CP_DB && CP_DB.ready) {
         toast("Opening Google...", "clock");
         // prompt:'select_account' forces Google to show the list of emails every time
         CP_DB.authClient.auth.signInWithOAuth({
