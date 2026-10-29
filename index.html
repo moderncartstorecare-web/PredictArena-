@@ -646,12 +646,19 @@ document.addEventListener("click", e => {
     case "page": S.pub = v; if (S.user) S.route = v; closeSheet(); render(); scrollTo(0,0); break;
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
-     case "gmail": {
+    case "gmail": {
       if (window.CP_DB && CP_DB.ready) {
-        toast("Redirecting to Google...", "clock");
-        CP_DB.signInGoogle().catch(err => toast(err.message || "Google login failed", "x"));
+        toast("Opening Google...", "clock");
+        // Using prompt: 'select_account' forces Google to show the list of emails
+        window.CP_DB.authClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname,
+            queryParams: { prompt: 'select_account' }
+          }
+        }).catch(err => toast(err.message, "x"));
       } else {
-        toast("Google sign-in needs Supabase credentials","shield");
+        toast("Supabase not ready", "x");
       }
       break;
     }
@@ -927,32 +934,34 @@ async function checkPaymentReturn() {
 }
 
 /* init — avoids white flash */
-/* init — avoids white flash */
+/* init — avoids white flash & fixes the login loop */
 window.addEventListener("load", async () => {
   try {
-    // 1. Load theme
     applyTheme();
     
-    // 2. Catch the Google Token from the URL FIRST
-    if (window.CP_DB && CP_DB.ready) {
-      CP_DB.loadSession(); 
+    if (!window.CP_DB || !CP_DB.ready) {
+      render();
+      return;
     }
 
-    // 3. Check if user is logged in
-    if (window.CP_DB && CP_DB.ready) {
-      const user = await CP_DB.getUser();
-      if (user) {
-        // Fetch their data and log them in
-        const profile = await CP_DB.getProfile(user.id);
-        const tx = await CP_DB.getTransactions(user.id);
+    // 1. Listen for login (Catches the Google Redirect)
+    CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        // Clean the URL so the #access_token doesn't stay in the bar
+        if(location.hash.includes("access_token")) {
+          history.replaceState(null, "", location.pathname);
+        }
+        
+        // Fetch user data
+        const profile = await CP_DB.getProfile(session.user.id);
+        const tx = await CP_DB.getTransactions(session.user.id);
         
         S.user = { 
-          id: user.id, 
-          n: profile?.display_name || user.email.split('@')[0] || "Player", 
-          e: user.email || "" 
+          id: session.user.id, 
+          n: profile?.display_name || session.user.email.split('@')[0] || "Player", 
+          e: session.user.email || "" 
         };
         S.bal = profile?.wallet?.[0]?.balance || 0; 
-        
         S.txs = (tx || []).map(t => ({
           type: t.type,
           amount: t.amount,
@@ -962,20 +971,43 @@ window.addEventListener("load", async () => {
         }));
         
         save();
-        render(); // Render the dashboard
-      } else {
-        render(); // Render the landing page if no user
+        render(); // Render Dashboard
+      } else if (event === "SIGNED_OUT") {
+        S.user = null;
+        render(); // Render Landing Page
       }
-    } else {
-      render();
+    });
+
+    // 2. Check current session on load
+    const { data: { session } } = await CP_DB.authClient.auth.getSession();
+    
+    if (session) {
+      // User is already logged in
+      const profile = await CP_DB.getProfile(session.user.id);
+      const tx = await CP_DB.getTransactions(session.user.id);
+      
+      S.user = { 
+        id: session.user.id, 
+        n: profile?.display_name || session.user.email.split('@')[0] || "Player", 
+        e: session.user.email || "" 
+      };
+      S.bal = profile?.wallet?.[0]?.balance || 0; 
+      S.txs = (tx || []).map(t => ({
+        type: t.type,
+        amount: t.amount,
+        n: t.description || t.note,
+        status: t.status,
+        date: new Date(t.created_at).toLocaleDateString("en-IN")
+      }));
+      save();
     }
     
-    // 4. Check for ZapUPI payment return
+    render();
     checkPaymentReturn();
 
   } catch (err) {
     console.error("Init error:", err);
-    render(); // Fallback to landing page on error
+    render(); 
   }
 });
 </script>
