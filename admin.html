@@ -81,8 +81,19 @@ var REFUND_ON_REJECT=false;        /* true = also credit the user's wallet when 
 var TICKET_STATUS_AFTER_REPLY="";  /* e.g. "answered" to update the ticket status after you reply; empty = leave unchanged */
 
 var db=null;
-try{if(typeof supabase!=="undefined"&&SUPABASE_URL.indexOf("YOUR-")<0&&SUPABASE_ANON_KEY.indexOf("YOUR-")<0)db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch(e){db=null}
-
+try{
+  if(typeof supabase!=="undefined" && SUPABASE_URL.indexOf("YOUR-")<0){
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        detectSessionInUrl: true,
+        persistSession: true
+      }
+    });
+  }
+}catch(e){
+  console.error("Supabase init failed", e);
+  db=null;
+}
 var MS=["October 2026","September 2026","August 2026","July 2026","June 2026","May 2026"],DD=[29,30,31,31,30,31];
 /* users, withdrawals, tickets and the wallet ledger come from Supabase.
    matches, notification history, coupons and activity stay local (no table for them yet). */
@@ -273,24 +284,25 @@ document.addEventListener("click",function(e){
   save();render()});
 /* ---------- start ---------- */
 async function boot(){
-  render();
-  if(!db)return;
+  if(!db){
+    render();
+    return;
+  }
   
-  // Listen for auth changes (This catches the Google redirect)
+  // 1. Setup the listener
   db.auth.onAuthStateChange(async function(ev, session){
-    if(ev==="SIGNED_IN" && session){
+    if((ev==="SIGNED_IN" || ev==="INITIAL_SESSION") && session){
       LOGIN=1;
       S.adm=session.user.email;
       render();
       await loadAll();
-    }
-    if(ev==="SIGNED_OUT" && LOGIN){
+    } else if (ev==="SIGNED_OUT") {
       LOGIN=0;
       render();
     }
   });
 
-  // Check if already logged in when page loads (for desktop)
+  // 2. Check current session (this processes the #access_token in the URL)
   try{
     var s=await db.auth.getSession();
     if(s.data && s.data.session){
@@ -298,8 +310,13 @@ async function boot(){
       S.adm=s.data.session.user.email;
       render();
       await loadAll();
+    } else {
+      // If no session, show the login screen
+      render();
     }
-  }catch(e){}
+  }catch(e){
+    render();
+  }
 }
 boot();
 </script>
