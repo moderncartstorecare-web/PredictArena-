@@ -87,12 +87,29 @@ window.CP_CONFIG = {
     },
 
     setSession: s => { window.CP_SESSION = s; try { localStorage.setItem("cp_session", JSON.stringify(s)); } catch {} },
-    
     loadSession: () => {
+      // 1. Try to load from localStorage first
       try {
         const s = JSON.parse(localStorage.getItem("cp_session") || "null");
         if (s && s.access_token) window.CP_SESSION = s;
       } catch {}
+
+      // 2. If we just returned from Google, the token is in the URL hash
+      if (window.location.hash && window.location.hash.includes("access_token")) {
+        const params = new URLSearchParams(window.location.hash.substring(1)); // remove the #
+        const access_token = params.get("access_token");
+        const refresh_token = params.get("refresh_token");
+        
+        if (access_token) {
+          // Save it as a session
+          const session = { access_token, refresh_token };
+          window.CP_SESSION = session;
+          try { localStorage.setItem("cp_session", JSON.stringify(session)); } catch {}
+          
+          // Clean the URL so it doesn't loop
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
     }
   };
 })();
