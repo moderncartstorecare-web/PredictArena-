@@ -85,7 +85,9 @@ window.CP_CONFIG = {
        const p = await rest(`match_history?user_id=eq.${userId}&order=created_at.desc`);
        return p || [];
     },
-
+    authClient: supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { detectSessionInUrl: true, persistSession: true }
+    }),
     setSession: s => { window.CP_SESSION = s; try { localStorage.setItem("cp_session", JSON.stringify(s)); } catch {} },
     loadSession: () => {
       // 1. Try to load from localStorage first
