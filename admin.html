@@ -202,8 +202,9 @@ async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta
   if(TICKET_STATUS_AFTER_REPLY){if(await upd("support_tickets",COLS.tk.id,t.id,P(COLS.tk.status,TICKET_STATUS_AFTER_REPLY)))t.st=normTk(TICKET_STATUS_AFTER_REPLY)}
   act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
 /* ---------- Auth ---------- */
-async function doLogin(){if(!db){toast("Add your Supabase URL and anon key at the top of the script","circle-alert");return}
-  // Correctly triggers Google OAuth and returns to the admin page
+async function doLogin(){
+  if(!db){toast("Add your Supabase URL and anon key at the top of the script","circle-alert");return}
+  // Trigger Google OAuth
   var r=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
   if(r.error){toast("Sign in failed: "+r.error.message,"circle-alert");return}
 }
@@ -275,7 +276,7 @@ async function boot(){
   render();
   if(!db)return;
   
-  // Listen for auth changes (this catches the Google login redirect)
+  // Listen for auth changes (This catches the Google redirect)
   db.auth.onAuthStateChange(async function(ev, session){
     if(ev==="SIGNED_IN" && session){
       LOGIN=1;
@@ -289,7 +290,7 @@ async function boot(){
     }
   });
 
-  // Check if already logged in when page loads
+  // Check if already logged in when page loads (for desktop)
   try{
     var s=await db.auth.getSession();
     if(s.data && s.data.session){
