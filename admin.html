@@ -214,23 +214,10 @@ async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta
   act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
 /* ---------- Auth ---------- */
 async function doLogin(){
-  if(!db){
-    alert("Database not connected.");
-    return;
-  }
-  
-  // This forces Google to show the account picker every time
-  var r = await db.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: window.location.href,
-      queryParams: { prompt: 'select_account' } 
-    }
-  });
-  
-  if(r.error){
-    alert("Sign in failed: " + r.error.message);
-  }
+  if(!db){toast("Add your Supabase URL and anon key at the top of the script","circle-alert");return}
+  // Trigger Google OAuth
+  var r=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  if(r.error){toast("Sign in failed: "+r.error.message,"circle-alert");return}
 }
 async function doLogout(){try{if(db)await db.auth.signOut()}catch(e){}LOGIN=0;location.reload()}
 /* views */
@@ -252,18 +239,7 @@ function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div c
 var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
 var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
 function nav(){return NV.map(function(n){return n[0]==="H"?'<h6>'+n[1]+'</h6>':'<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+(n[0]==="wd"&&pendW().length?'<span class="cn">'+pendW().length+'</span>':'')+(n[0]==="sup"&&openTk()?'<span class="cn">'+openTk()+'</span>':'')+'</button>'}).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>'}
-function loginV(){
-  return '<div id="lg">' +
-    '<div class="brand" style="margin-bottom:18px">' +
-      '<span>'+ic("shield-check")+'</span>PredictX Admin' +
-    '</div>' +
-    '<h1 style="margin-bottom:4px">Admin sign in</h1>' +
-    '<small>Authorised administrators only.</small>' +
-    '<div style="height:16px"></div>' +
-    // Using type="button" instead of type="submit" prevents the page from refreshing
-    '<button class="btn w" type="button" onclick="doLogin()">Sign in with Google</button>' +
-  '</div>';
-}
+function loginV(){return '<div id="lg"><form id="lf" onsubmit="event.preventDefault();doLoginGoogle()"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only.</small><div style="height:16px"></div><button class="btn w" type="submit">Sign in with Google</button></form></div>'}
 function render(){var r=$("root");
   if(!LOGIN){r.innerHTML=loginV()}
   else{var v=VT[S.page]||VT.dash;r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">Educational demo</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>'}
