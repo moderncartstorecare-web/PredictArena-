@@ -70,6 +70,10 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
 var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
 
+/* Optional: only these Google accounts can enter the dashboard.
+   Example: ["you@gmail.com","partner@gmail.com"]. Leave empty to allow any signed-in account. */
+var ADMIN_EMAILS=[];
+
 /* Column names. If your tables use different names, change them here only. */
 var COLS={
   users:{id:"id",name:"name",email:"email",city:"city",wallet:"wallet_balance",points:"points",status:"status",kyc:"kyc_verified",created:"created_at"},
@@ -150,7 +154,8 @@ function mapUser(r){var c=COLS.users;return{
   name:r[c.name]||r.full_name||r[c.email]||"User",
   email:r[c.email]||"",
   city:r[c.city]||"",
-  wal:Number(r.wallet && r.wallet[0] ? r.wallet[0].balance : (r[c.wallet]||0)), // 👈 Now reads from wallet table
+  /* wallet balance: reads the attached wallet row (object or array), falls back to the users column */
+  wal:Number((r.wallet&&(Array.isArray(r.wallet)?(r.wallet[0]||{}).balance:r.wallet.balance))||r[c.wallet]||0),
   pts:Number(r[c.points]||0),
   st:normSt(r[c.status]),
   joined:fd(r[c.created],1),
@@ -165,31 +170,32 @@ async function loadAll(){
   if(!db)return;
   try{
     var r=await Promise.all([
-      fetchT("users",COLS.users.created,500,1), // Fetch users
-      fetchT("wallet",null,500,0),              // 👈 Fetch wallets too
+      fetchT("users",COLS.users.created,500,1), /* users */
+      fetchT("wallet",null,500,0),              /* wallets */
       fetchT("withdrawal_requests",COLS.wd.created,300),
       fetchT("support_tickets",COLS.tk.created,300)
     ]);
-   var names=["users","wallet","withdrawal_requests","support_tickets"],er=[];
-  r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); // Ignore error for wallet if empty
-  if(er.length)toast("Could not load "+er[0],"circle-alert");
+    var names=["users","wallet","withdrawal_requests","support_tickets"],er=[];
+    r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); /* ignore error for wallet if empty */
+    if(er.length)toast("Could not load "+er[0],"circle-alert");
 
-  if(!r[0].error){
-    var usersData = r[0].data || [];
-    var walletData = (r[1] && r[1].data) ? r[1].data : [];
-    
-    // 👈 Attach wallet balance to user object
-    usersData.forEach(function(u){
-       var w = walletData.find(function(x){return x.user_id === u.id});
-       if(w) u.wallet = w; 
-    });
+    if(!r[0].error){
+      var usersData = r[0].data || [];
+      var walletData = (r[1] && r[1].data) ? r[1].data : [];
 
-    S.users=usersData.map(mapUser);
-    S.ucount=r[0].count||S.users.length;
-  }
-  
-  if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
-  if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk)}catch(e){toast("Network error while loading data","circle-alert")}
+      /* attach wallet balance to each user object */
+      usersData.forEach(function(u){
+        var w = walletData.find(function(x){return x.user_id === u.id});
+        if(w) u.wallet = w;
+      });
+
+      S.users=usersData.map(mapUser);
+      S.ucount=r[0].count||S.users.length;
+    }
+
+    if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
+    if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk)
+  }catch(e){toast("Network error while loading data","circle-alert")}
   rebuildTx();render()}
 async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
 async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0];if(!u){toast("User not found","circle-alert");return}var ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.status,ns))))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
@@ -213,13 +219,22 @@ async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta
   if(TICKET_STATUS_AFTER_REPLY){if(await upd("support_tickets",COLS.tk.id,t.id,P(COLS.tk.status,TICKET_STATUS_AFTER_REPLY)))t.st=normTk(TICKET_STATUS_AFTER_REPLY)}
   act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
 /* ---------- Auth ---------- */
+/* Always return to the clean page URL (no old #access_token or ?code leftovers) */
+function authRedirect(){return location.origin+location.pathname}
+function cleanUrl(){if(/access_token|code=|error/.test(location.hash+location.search))history.replaceState(null,"",location.pathname)}
 async function doLogin(){
-  if(!db){toast("Add your Supabase URL and anon key at the top of the script","circle-alert");return}
-  // Trigger Google OAuth
-  var r=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
-  if(r.error){toast("Sign in failed: "+r.error.message,"circle-alert");return}
+  if(!db){toast("Supabase is not configured","circle-alert");return}
+  toast("Opening Google sign in…","log-in");
+  /* prompt:"select_account" makes Google show the email list every time */
+  var r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:authRedirect(),queryParams:{prompt:"select_account"}}});
+  if(r.error)toast("Sign in failed: "+r.error.message,"circle-alert");
 }
-async function doLogout(){try{if(db)await db.auth.signOut()}catch(e){}LOGIN=0;location.reload()}
+async function doLogout(){
+  try{if(db)await db.auth.signOut()}catch(e){}
+  LOGIN=0;
+  history.replaceState(null,"",location.pathname);
+  location.reload();
+}
 /* views */
 function dashV(){var d=MD(S.mi),c=chg(),pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
   var sp=[["Premium passes",.52],["Sponsorships",.31],["Advertising",.17]];
@@ -239,7 +254,7 @@ function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div c
 var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
 var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
 function nav(){return NV.map(function(n){return n[0]==="H"?'<h6>'+n[1]+'</h6>':'<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+(n[0]==="wd"&&pendW().length?'<span class="cn">'+pendW().length+'</span>':'')+(n[0]==="sup"&&openTk()?'<span class="cn">'+openTk()+'</span>':'')+'</button>'}).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>'}
-function loginV(){return '<div id="lg"><form id="lf" onsubmit="event.preventDefault();doLoginGoogle()"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only.</small><div style="height:16px"></div><button class="btn w" type="submit">Sign in with Google</button></form></div>'}
+function loginV(){return '<div id="lg"><form id="lf"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only.</small><div style="height:16px"></div><button class="btn w" type="submit">Sign in with Google</button></form></div>'}
 function render(){var r=$("root");
   if(!LOGIN){r.innerHTML=loginV()}
   else{var v=VT[S.page]||VT.dash;r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">Educational demo</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>'}
@@ -283,40 +298,33 @@ document.addEventListener("click",function(e){
   else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
   save();render()});
 /* ---------- start ---------- */
-async function boot(){
-  if(!db){
-    render();
+var BOOTED=0;
+async function enter(session){
+  var em=String(session.user.email||"").toLowerCase();
+  if(ADMIN_EMAILS.length&&ADMIN_EMAILS.map(function(x){return x.toLowerCase()}).indexOf(em)<0){
+    toast("This Google account is not an admin","circle-alert");
+    await db.auth.signOut();
     return;
   }
-  
-  // 1. Setup the listener
-  db.auth.onAuthStateChange(async function(ev, session){
-    if((ev==="SIGNED_IN" || ev==="INITIAL_SESSION") && session){
-      LOGIN=1;
-      S.adm=session.user.email;
-      render();
-      await loadAll();
-    } else if (ev==="SIGNED_OUT") {
-      LOGIN=0;
-      render();
-    }
+  if(BOOTED&&LOGIN)return;
+  BOOTED=1;LOGIN=1;S.adm=session.user.email;
+  cleanUrl();
+  render();
+  await loadAll();
+}
+async function boot(){
+  if(!db){render();return}
+  /* listener: reacts to sign in and sign out */
+  db.auth.onAuthStateChange(function(ev,session){
+    if(session&&(ev==="SIGNED_IN"||ev==="INITIAL_SESSION")){setTimeout(function(){enter(session)},0)}
+    else if(ev==="SIGNED_OUT"){LOGIN=0;BOOTED=0;render()}
   });
-
-  // 2. Check current session (this processes the #access_token in the URL)
+  /* check current session (also processes the token in the URL after Google redirects back) */
   try{
     var s=await db.auth.getSession();
-    if(s.data && s.data.session){
-      LOGIN=1;
-      S.adm=s.data.session.user.email;
-      render();
-      await loadAll();
-    } else {
-      // If no session, show the login screen
-      render();
-    }
-  }catch(e){
-    render();
-  }
+    if(s.data&&s.data.session)enter(s.data.session);
+    else render();
+  }catch(e){render()}
 }
 boot();
 </script>
