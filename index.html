@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -233,7 +233,7 @@ const RAIL = [
 
 /* ---- state ---- */
 const KEY = "cricpulse_v3";
-const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk","tickets"];
+const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk","tickets","le"];
 let S = {
   user:null, bal:0, xp:0, st:0, best:0, preds:[], cps:[], txs:[],
   nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, ts:Date.now()}],
@@ -533,6 +533,65 @@ async function enter(u) {
   S.le = u.e; S.user = u; S.route = "home"; S.pop = 0; save(); render(); scrollTo(0,0);
 }
 
+/* ---------- Google sign-in / session helpers ---------- */
+/* Always return to the clean page URL (no old #access_token or ?code= leftovers) */
+const authRedirect = () => window.location.origin + window.location.pathname;
+function cleanAuthUrl() {
+  try {
+    const u = new URL(window.location.href); let ch = false;
+    if (u.hash.includes("access_token") || u.hash.includes("error")) { u.hash = ""; ch = true; }
+    ["code","error","error_description"].forEach(k => { if (u.searchParams.has(k)) { u.searchParams.delete(k); ch = true; } });
+    if (ch) history.replaceState(null, "", u.pathname + u.search + u.hash);
+  } catch(e) {}
+}
+/* if a different account signs in on this device, don't show the previous account's local picks/XP */
+function switchAcct(em) {
+  if (S.le && S.le !== em) { Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{},tickets:[]}); }
+  S.le = em;
+}
+let AUTHED_ID = null, AUTH_P = null;
+function applySession(session) {
+  if (!session || !session.user) return Promise.resolve();
+  if (AUTHED_ID === session.user.id) return AUTH_P || Promise.resolve();
+  AUTHED_ID = session.user.id;
+  AUTH_P = (async () => {
+    cleanAuthUrl();
+    const em = session.user.email || "";
+    let profile = null, tx = [];
+    try {
+      profile = await CP_DB.getProfile(session.user.id);
+      tx = await CP_DB.getTransactions(session.user.id);
+    } catch(e) { console.error("Profile load failed", e); }
+    switchAcct(em);
+    S.user = {
+      id: session.user.id,
+      n: (profile && profile.display_name) || em.split('@')[0] || "Player",
+      e: em
+    };
+    S.bal = (profile && profile.wallet && profile.wallet[0] && profile.wallet[0].balance) || 0;
+    S.txs = (tx || []).map(t => ({
+      type: t.type,
+      amount: t.amount,
+      n: t.description || t.note,
+      status: t.status,
+      date: new Date(t.created_at).toLocaleDateString("en-IN")
+    }));
+    save();
+    render(); // Render Dashboard
+  })();
+  return AUTH_P;
+}
+async function doLogout() {
+  /* 1. really end the Supabase session (this is what makes Google ask again next time) */
+  try { if (window.CP_DB && CP_DB.authClient) await CP_DB.authClient.auth.signOut(); } catch(e) {}
+  /* 2. fallback: remove any leftover stored Supabase tokens, in case signOut could not reach the server */
+  try { Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k); }); } catch(e) {}
+  try { localStorage.removeItem("cp_session"); } catch(e) {}
+  if (window.CP_DB && CP_DB.ready) { try { CP_DB.auth("logout", null).catch(()=>{}); } catch(e) {} }
+  AUTHED_ID = null; AUTH_P = null;
+  S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); cleanAuthUrl(); render(); scrollTo(0,0);
+}
+
 function lockPicks(ids) {
   const ok = ids.filter(id => left(mkt(id)) > 0);
   if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
@@ -647,16 +706,17 @@ document.addEventListener("click", e => {
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
     case "gmail": {
-      if (window.CP_DB && CP_DB.ready) {
+      if (window.CP_DB && CP_DB.ready && CP_DB.authClient) {
         toast("Opening Google...", "clock");
-        // Using prompt: 'select_account' forces Google to show the list of emails
-        window.CP_DB.authClient.auth.signInWithOAuth({
+        // prompt:'select_account' forces Google to show the list of emails every time
+        CP_DB.authClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + window.location.pathname,
+            redirectTo: authRedirect(),
             queryParams: { prompt: 'select_account' }
           }
-        }).catch(err => toast(err.message, "x"));
+        }).then(r => { if (r && r.error) toast(r.error.message, "x"); })
+          .catch(err => toast(err.message, "x"));
       } else {
         toast("Supabase not ready", "x");
       }
@@ -718,9 +778,7 @@ document.addEventListener("click", e => {
     case "pref": S.pf[v] = t.checked ? 1 : 0; save(); break;
     case "saven": { const n = $("dn").value.replace(/[<>"&]/g,"").trim(); if (!n) { toast("Name cannot be empty.","x"); return; } S.user.n = n; save(); toast("Profile updated.","user"); render(); break; }
     case "logout": {
-      try { localStorage.removeItem("cp_session"); } catch {}
-      if (window.CP_DB && CP_DB.ready) { CP_DB.auth("logout", null).catch(()=>{}); }
-      S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); render(); scrollTo(0,0); break;
+      doLogout(); break;
     }
     case "support": S.route = "support"; render(); scrollTo(0,0); break;
     case "newticket": createTicket(); break;
@@ -945,36 +1003,13 @@ window.addEventListener("load", async () => {
     }
 
     // 1. Listen for login (Catches the Google Redirect)
-    CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
+    //    The handler only schedules work (no awaits inside), so the Supabase client is never blocked.
+    CP_DB.authClient.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        // Clean the URL so the #access_token doesn't stay in the bar
-        if(location.hash.includes("access_token")) {
-          history.replaceState(null, "", location.pathname);
-        }
-        
-        // Fetch user data
-        const profile = await CP_DB.getProfile(session.user.id);
-        const tx = await CP_DB.getTransactions(session.user.id);
-        
-        S.user = { 
-          id: session.user.id, 
-          n: profile?.display_name || session.user.email.split('@')[0] || "Player", 
-          e: session.user.email || "" 
-        };
-        S.bal = profile?.wallet?.[0]?.balance || 0; 
-        S.txs = (tx || []).map(t => ({
-          type: t.type,
-          amount: t.amount,
-          n: t.description || t.note,
-          status: t.status,
-          date: new Date(t.created_at).toLocaleDateString("en-IN")
-        }));
-        
-        save();
-        render(); // Render Dashboard
+        setTimeout(() => applySession(session), 0);
       } else if (event === "SIGNED_OUT") {
-        S.user = null;
-        render(); // Render Landing Page
+        AUTHED_ID = null; AUTH_P = null;
+        if (S.user && S.user.id) { S.user = null; save(); render(); } // Render Landing Page
       }
     });
 
@@ -982,27 +1017,11 @@ window.addEventListener("load", async () => {
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     
     if (session) {
-      // User is already logged in
-      const profile = await CP_DB.getProfile(session.user.id);
-      const tx = await CP_DB.getTransactions(session.user.id);
-      
-      S.user = { 
-        id: session.user.id, 
-        n: profile?.display_name || session.user.email.split('@')[0] || "Player", 
-        e: session.user.email || "" 
-      };
-      S.bal = profile?.wallet?.[0]?.balance || 0; 
-      S.txs = (tx || []).map(t => ({
-        type: t.type,
-        amount: t.amount,
-        n: t.description || t.note,
-        status: t.status,
-        date: new Date(t.created_at).toLocaleDateString("en-IN")
-      }));
-      save();
+      // User is already logged in (applySession renders the dashboard when ready)
+      await applySession(session);
+    } else {
+      render();
     }
-    
-    render();
     checkPaymentReturn();
 
   } catch (err) {
