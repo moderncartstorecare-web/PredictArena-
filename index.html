@@ -646,14 +646,10 @@ document.addEventListener("click", e => {
     case "page": S.pub = v; if (S.user) S.route = v; closeSheet(); render(); scrollTo(0,0); break;
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
-       case "gmail": {
+     case "gmail": {
       if (window.CP_DB && CP_DB.ready) {
-        try {
-          toast("Redirecting to Google...", "clock");
-          await CP_DB.signInGoogle();
-        } catch (err) {
-          toast(err.message || "Google login failed", "x");
-        }
+        toast("Redirecting to Google...", "clock");
+        CP_DB.signInGoogle().catch(err => toast(err.message || "Google login failed", "x"));
       } else {
         toast("Google sign-in needs Supabase credentials","shield");
       }
@@ -931,21 +927,22 @@ async function checkPaymentReturn() {
 }
 
 /* init — avoids white flash */
+/* init — avoids white flash */
 window.addEventListener("load", async () => {
   try {
+    // 1. Render the UI immediately (stops the white screen)
     applyTheme();
+    render(); 
     
-    // 1. Check for ZapUPI redirect
+    // 2. Check for ZapUPI redirect in the background
     checkPaymentReturn();
 
-    // 2. Check if user is logged in via Supabase (handles Google Redirect)
+    // 3. Check if user is logged in via Supabase (handles Google Redirect)
     if (window.CP_DB && CP_DB.ready) {
       const user = await CP_DB.getUser();
       if (user) {
-        // If logged in, fetch their profile and set it in state
         const profile = await CP_DB.getProfile(user.id);
         const tx = await CP_DB.getTransactions(user.id);
-        const preds = await CP_DB.getPredictions(user.id);
         
         S.user = { 
           id: user.id, 
@@ -960,18 +957,17 @@ window.addEventListener("load", async () => {
           status: t.status,
           date: new Date(t.created_at).toLocaleDateString("en-IN")
         }));
-        // ... map predictions if needed ...
+        
         save();
+        render(); // Re-render with the logged-in state
       }
     }
-    
-    render();
   } catch (err) {
-    document.getElementById("app").innerHTML =
-      '<div style="padding:40px 20px;font:15px/1.6 Inter,system-ui;color:#0f1729">' +
-      "<b>CricPulse</b><br>Something went wrong while loading. Please refresh." +
-      "</div>";
     console.error(err);
+    document.getElementById("app").innerHTML =
+      '<div style="padding:40px 20px;font:15px/1.6 Inter,system-ui;color:#0f1729;text-align:center;">' +
+      "<b>CricPulse</b><br>Something went wrong while loading. Please check your internet connection and refresh." +
+      "</div>";
   }
 });
 </script>
