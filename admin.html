@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PredictX Admin – Control Panel (Educational Demo)</title>
+<title>CricPulse Admin – Control Panel </title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e5ea;--pr:#2347c5;--prs:#eaeffd;--ok:#0f8a5f;--oks:#e4f4ed;--bad:#c8323c;--bads:#fbe9ea;--wa:#a16207;--was:#fdf3dc;--sb:#0f172a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#131a2e;--tx:#e8ecf6;--mu:#8b96b3;--bd:#232c47;--prs:#1b2850;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#080c18;--pr:#5b7cf5}}
@@ -59,36 +60,61 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 <body>
 <div id="root"></div>
 <script>
+/* =====================================================================
+   SUPABASE SETUP  (edit only this block)
+   - Use the anon / public key. NEVER put the service_role key in browser code.
+   - Real protection comes from Row Level Security (RLS) policies in Supabase
+     that only allow your admin account(s) to read and write these tables.
+   ===================================================================== */
+var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
+
+/* Column names. If your tables use different names, change them here only. */
+var COLS={
+  users:{id:"id",name:"name",email:"email",city:"city",wallet:"wallet_balance",points:"points",status:"status",kyc:"kyc_verified",created:"created_at"},
+  wd:{id:"id",user:"user_id",amount:"amount",method:"method",account:"account",status:"status",created:"created_at"},
+  tk:{id:"id",user:"user_id",subject:"subject",status:"status",priority:"priority",created:"created_at"},
+  msg:{id:"id",ticket:"ticket_id",sender:"sender",body:"message",created:"created_at",senderId:""}
+};
+var REFUND_ON_REJECT=false;        /* true = also credit the user's wallet when you reject a withdrawal */
+var TICKET_STATUS_AFTER_REPLY="";  /* e.g. "answered" to update the ticket status after you reply; empty = leave unchanged */
+
+var db=null;
+try{if(typeof supabase!=="undefined"&&SUPABASE_URL.indexOf("YOUR-")<0&&SUPABASE_ANON_KEY.indexOf("YOUR-")<0)db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch(e){db=null}
+
 var MS=["October 2026","September 2026","August 2026","July 2026","June 2026","May 2026"],DD=[29,30,31,31,30,31];
-var D0={mi:0,page:"dash",users:[
-["u1","Aarav Sharma","aarav.s@mail.com","Gurugram",2450,1840,"active","12 Mar 2026",1],["u2","Priya Menon","priya.m@mail.com","Kochi",1180,1620,"active","03 Apr 2026",1],["u3","Rohan Kapoor","rohan.k@mail.com","Delhi",320,1405,"active","19 Apr 2026",1],["u4","Sneha Taneja","sneha.t@mail.com","Noida",5600,1180,"active","27 Apr 2026",1],["u5","Karan Joshi","karan.j@mail.com","Jaipur",0,960,"blocked","02 May 2026",0],["u6","Meera Iyer","meera.i@mail.com","Chennai",760,820,"active","15 May 2026",1],["u7","Dev Malhotra","dev.m@mail.com","Mumbai",90,640,"active","21 May 2026",0],["u8","Ishita Verma","ishita.v@mail.com","Lucknow",4200,590,"active","01 Jun 2026",1],["u9","Nikhil Rao","nikhil.r@mail.com","Hyderabad",1500,510,"active","18 Jun 2026",1],["u10","Anjali Gupta","anjali.g@mail.com","Pune",230,470,"active","09 Jul 2026",0],["u11","Vikram Singh","vikram.s@mail.com","Chandigarh",3100,430,"active","30 Jul 2026",1],["u12","Pooja Nair","pooja.n@mail.com","Bengaluru",680,390,"active","14 Aug 2026",1]].map(function(u){return{id:u[0],name:u[1],email:u[2],city:u[3],wal:u[4],pts:u[5],st:u[6],joined:u[7],kyc:u[8]}}),
+/* users, withdrawals, tickets and the wallet ledger come from Supabase.
+   matches, notification history, coupons and activity stay local (no table for them yet). */
+var D0={mi:0,page:"dash",users:[],
 matches:[
 {id:1,c:"Cricket",l:"IPL · Qualifier 1",a:"Mumbai Indians",b:"Chennai Super Kings",when:"29 Oct, 7:30 PM",st:"live",win:null,pa:54,n:18420},
 {id:2,c:"Cricket",l:"India vs Australia · ODI",a:"India",b:"Australia",when:"30 Oct, 1:30 PM",st:"upcoming",win:null,pa:61,n:12760},
 {id:3,c:"Football",l:"ISL · Matchday 12",a:"Mohun Bagan",b:"Bengaluru FC",when:"29 Oct, 5:00 PM",st:"closed",win:null,pa:52,n:9120},
 {id:4,c:"Kabaddi",l:"Pro Kabaddi League",a:"Jaipur Pink Panthers",b:"Patna Pirates",when:"28 Oct, 8:00 PM",st:"settled",win:"a",pa:57,n:7480},
 {id:5,c:"India Specials",l:"Markets · Nifty close",a:"Nifty closes UP",b:"Nifty closes DOWN",when:"30 Oct, 3:30 PM",st:"upcoming",win:null,pa:55,n:21500}],
-wd:[["W-1048","u4",2500,"UPI","sneha@okbank","29 Oct","pending"],["W-1047","u8",1800,"Bank","HDFC ··4821","29 Oct","pending"],["W-1046","u11",3000,"UPI","vikram@okaxis","28 Oct","pending"],["W-1045","u1",1200,"UPI","aarav@okbank","27 Oct","approved"],["W-1044","u9",900,"Bank","SBI ··1190","26 Oct","approved"],["W-1043","u3",1500,"UPI","rohan@okicici","25 Oct","rejected"]].map(function(w){return{id:w[0],uid:w[1],amt:w[2],m:w[3],ac:w[4],d:w[5],st:w[6]}}),
-tx:[["u1","Reward","+500","Coupon cashback","28 Oct"],["u4","Credit","+2000","Wallet top-up","28 Oct"],["u8","Withdrawal","-1800","Request W-1047","29 Oct"],["u2","Reward","+300","Prediction payout","27 Oct"],["u11","Debit","-250","Contest pass","27 Oct"],["u9","Refund","+900","Void match refund","26 Oct"],["u6","Reward","+120","Prediction payout","26 Oct"]].map(function(t){return{uid:t[0],ty:t[1],amt:t[2],n:t[3],d:t[4]}}),
+wd:[],tx:[],txl:[],tickets:[],ucount:0,
 sent:[{t:"Qualifier 1 is live",m:"Predictions are open until the first ball.",aud:"All users",ty:"Promo",time:"29 Oct, 6:45 PM",r:48213},{t:"Result declared",m:"Kabaddi match settled. Rewards credited.",aud:"Active users",ty:"Result",time:"28 Oct, 10:30 PM",r:46980}],
 cp:[{n:"Coffee Voucher",code:"CAFE100",dc:"₹100 off",used:312,tot:500,on:1},{n:"Shopping Coupon",code:"SHOP15",dc:"15% off",used:140,tot:300,on:1},{n:"Premium Month",code:"PREM30",dc:"30 days free",used:48,tot:100,on:1},{n:"Free Entry Pass",code:"VIPFREE",dc:"Zero-fee contest",used:12,tot:50,on:0}],
-act:[["Withdrawal W-1048 requested by Sneha Taneja","29 Oct, 4:12 PM"],["Match settled: Jaipur Pink Panthers vs Patna Pirates","28 Oct, 10:30 PM"],["New user registered: Pooja Nair","28 Oct, 9:02 PM"]],
+act:[],
 sel:0,nt:0};
-var D1=JSON.stringify(D0),S=JSON.parse(D1);try{var sv=localStorage.getItem("pxa1");if(sv)S=Object.assign(JSON.parse(D1),JSON.parse(sv))}catch(e){}
-var EYE=0,LOGIN=0,UQ="",WF="pending",TF="All",CPS={aud:"all",uid:"u1",ty:"Promo",t:"",m:""},MOD=null,AD=0;
-function save(){try{S.sel=0;localStorage.setItem("pxa1",JSON.stringify(S))}catch(e){}}
+var LOCAL_KEYS=["mi","page","matches","sent","cp","act","txl"];
+var D1=JSON.stringify(D0),S=JSON.parse(D1);try{var sv=localStorage.getItem("pxa1");if(sv){var o0=JSON.parse(sv);LOCAL_KEYS.forEach(function(k){if(o0[k]!==undefined)S[k]=o0[k]})}}catch(e){}
+var EYE=0,LOGIN=0,UQ="",WF="pending",TF="All",TKF="all",TKM=null,CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""},MOD=null,AD=0;
+function save(){try{var o={};LOCAL_KEYS.forEach(function(k){o[k]=S[k]});localStorage.setItem("pxa1",JSON.stringify(o))}catch(e){}}
 function $(i){return document.getElementById(i)}
 function ic(n){return '<i data-lucide="'+n+'"></i>'}
 function num(n){return n.toLocaleString("en-IN")}
 function fm(n){return "₹"+num(n)}
 function mk(n){return '<span class="mk'+(EYE?"":" bl")+'">'+(EYE?fm(n):"₹ 00,00,000")+'</span>'}
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function ini(n){return n.split(" ").map(function(w){return w[0]}).join("").slice(0,2).toUpperCase()}
-function U(i){return S.users.filter(function(u){return u.id===i})[0]}
+function U(i){return S.users.filter(function(u){return u.id===i})[0]||{id:i,name:"Unknown user",email:"",city:"",wal:0,pts:0,st:"active",joined:"",kyc:0,ghost:1}}
 function MM(i){return S.matches.filter(function(m){return m.id==i})[0]}
+function TK(i){return S.tickets.filter(function(t){return t.id===i})[0]}
+function WDR(i){return S.wd.filter(function(w){return w.id===i})[0]}
 function now(){return new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
 function act(t){S.act.unshift([t,now()]);S.act=S.act.slice(0,12)}
-function toast(t,k){var e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+t;document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(function(){e.remove()},2400)}
+function toast(t,k){var e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+esc(t);document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(function(){e.remove()},2800)}
 function rnd(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 var MC={};function MD(i){if(i>5)i=5;if(MC[i])return MC[i];var r=rnd(77+i*13),d=[],t=0;for(var k=0;k<DD[i];k++){var v=Math.round(15500-i*650+r()*9000+Math.sin(k/3)*1800);d.push(v);t+=v}
   return MC[i]={d:d,t:t,nu:Math.round(780+r()*620),pr:Math.round(14000+r()*8000),po:Math.round(t*.38),wp:Math.round(t*.22)}}
@@ -96,64 +122,157 @@ function chg(){var c=MD(S.mi).t,p=S.mi<5?MD(S.mi+1).t:c*.93;return Math.round((c
 function chart(a){var n=a.length,mx=Math.max.apply(null,a),w=700/n,s='<svg viewBox="0 0 700 190" width="100%" role="img" aria-label="Daily earnings">';a.forEach(function(v,i){var h=v/mx*148;s+='<rect x="'+(i*w+w*.15)+'" y="'+(158-h)+'" width="'+w*.7+'" height="'+h+'" rx="2" style="fill:var(--pr);opacity:.85">'+(EYE?'<title>Day '+(i+1)+': '+fm(v)+'</title>':'')+'</rect>';if(i===0||(i+1)%5===0)s+='<text x="'+(i*w+w/2)+'" y="178" font-size="10" text-anchor="middle" style="fill:var(--mu)">'+(i+1)+'</text>'});return s+'</svg>'}
 function pendW(){return S.wd.filter(function(w){return w.st==="pending"})}
 function chipM(s){return '<span class="chip '+({live:"no",upcoming:"",closed:"wa",settled:"ok"}[s])+'">'+s[0].toUpperCase()+s.slice(1)+'</span>'}
+function TU(){return S.ucount||S.users.length}
+function AU(){return S.users.filter(function(u){return u.st==="active"}).length}
+function openTk(){return S.tickets.filter(function(t){return t.st!=="closed"}).length}
+function tkUser(t){var u=S.users.filter(function(x){return x.id===t.uid})[0];return u?u.name:(t.nm||("User "+String(t.uid).slice(0,6)))}
+function P(k,v){var o={};o[k]=v;return o}
+/* ---------- Supabase: mapping ---------- */
+function fd(v,y){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})}
+function fdt(v){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
+function normSt(v){v=String(v==null?"active":v).toLowerCase();return(v==="blocked"||v==="banned"||v==="suspended")?"blocked":"active"}
+function normWd(v){v=String(v==null?"pending":v).toLowerCase();return(v==="approved"||v==="completed"||v==="paid"||v==="success")?"approved":(v==="rejected"||v==="declined"||v==="failed"||v==="cancelled")?"rejected":"pending"}
+function normTk(v){v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":v==="pending"||v==="answered"?"pending":"open"}
+function mapUser(r){var c=COLS.users;return{
+  id:String(r[c.id]),
+  name:r[c.name]||r.full_name||r[c.email]||"User",
+  email:r[c.email]||"",
+  city:r[c.city]||"",
+  wal:Number(r.wallet && r.wallet[0] ? r.wallet[0].balance : (r[c.wallet]||0)), // 👈 Now reads from wallet table
+  pts:Number(r[c.points]||0),
+  st:normSt(r[c.status]),
+  joined:fd(r[c.created],1),
+  kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0
+}}
+function mapWd(r){var c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),st:normWd(r[c.status])}}
+function mapTk(r){var c=COLS.tk;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),d:fd(r[c.created]),msgs:null}}
+function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
+/* ---------- Supabase: data ---------- */
+async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*",cnt?{count:"exact"}:{});if(o&&oc)x=x.order(oc,{ascending:false});return x.limit(lim)};var r=await q(true);if(r.error)r=await q(false);return r}
+async function loadAll(){
+  if(!db)return;
+  try{
+    var r=await Promise.all([
+      fetchT("users",COLS.users.created,500,1), // Fetch users
+      fetchT("wallet",null,500,0),              // 👈 Fetch wallets too
+      fetchT("withdrawal_requests",COLS.wd.created,300),
+      fetchT("support_tickets",COLS.tk.created,300)
+    ]);
+   var names=["users","wallet","withdrawal_requests","support_tickets"],er=[];
+  r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); // Ignore error for wallet if empty
+  if(er.length)toast("Could not load "+er[0],"circle-alert");
+
+  if(!r[0].error){
+    var usersData = r[0].data || [];
+    var walletData = (r[1] && r[1].data) ? r[1].data : [];
+    
+    // 👈 Attach wallet balance to user object
+    usersData.forEach(function(u){
+       var w = walletData.find(function(x){return x.user_id === u.id});
+       if(w) u.wallet = w; 
+    });
+
+    S.users=usersData.map(mapUser);
+    S.ucount=r[0].count||S.users.length;
+  }
+  
+  if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
+  if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk)}catch(e){toast("Network error while loading data","circle-alert")}
+  rebuildTx();render()}
+async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
+async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0];if(!u){toast("User not found","circle-alert");return}var ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.status,ns))))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
+async function doWd(id,st){var w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,P(COLS.wd.status,st))))return;w.st=st;var u=S.users.filter(function(x){return x.id===w.uid})[0];
+  if(st==="rejected"&&REFUND_ON_REJECT&&u){var nw=u.wal+w.amt;if(await upd("users",COLS.users.id,u.id,P(COLS.users.wallet,nw))){u.wal=nw;S.txl.unshift({uid:u.id,ty:"Refund",amt:"+"+w.amt,n:"Rejected "+w.id.slice(0,8),d:fd(new Date())})}}
+  act("Withdrawal "+w.id.slice(0,8)+" "+st+" ("+(u?u.name:"unknown user")+")");toast("Withdrawal "+st);rebuildTx();save();render()}
+async function doWallet(uid,a,cr,why){var u=S.users.filter(function(x){return x.id===uid})[0];if(!u){toast("User not found","circle-alert");return}if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}var nw=u.wal+(cr?a:-a);if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.wallet,nw))))return;u.wal=nw;S.txl.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:why,d:fd(new Date())});act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);closeM();toast("Wallet updated");rebuildTx();save();render()}
+/* ---------- Support tickets ---------- */
+async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
+function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
+function renderChat(){var t=TK(TKM),el=$("tkc");if(!t||!el)return;el.innerHTML=(t.msgs&&t.msgs.length)?t.msgs.map(function(m){return '<div class="ls"><div class="ico">'+ic(m.admin?"shield-check":"user")+'</div><div><b>'+esc(m.admin?"Support":tkUser(t))+'</b><small>'+esc(m.t)+'</small><div style="white-space:pre-wrap;margin-top:2px">'+esc(m.b)+'</div></div></div>'}).join(""):'<small>No messages yet.</small>';el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
+async function openTicket(id){var t=TK(id);if(!t)return;TKM=id;modal('<h3>'+esc(t.sub)+'</h3><small>'+esc(tkUser(t))+' · '+esc(t.d)+' · '+esc(t.st)+'</small><div id="tkc" style="margin:12px 0;max-height:320px;overflow-y:auto"><small>Loading messages…</small></div><form id="tf"><label class="f">Reply<textarea class="in" id="tr" rows="3" required></textarea></label><div class="ac"><button type="button" class="btn g" data-close>Close</button><button class="btn" type="submit">'+ic("send")+'Send reply</button></div></form>');
+  if(!db){var e0=$("tkc");if(e0)e0.innerHTML='<small>Supabase is not configured.</small>';return}
+  var r=await fetchMsgs(t.id);if(TKM!==id)return;if(r.error){var e1=$("tkc");if(e1)e1.innerHTML='<small>Could not load messages: '+esc(r.error.message)+'</small>';return}
+  t.msgs=(r.data||[]).map(mapMsg);renderChat()}
+async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta.value.trim();if(!txt)return;if(!db){toast("Supabase is not configured","circle-alert");return}
+  var row={};row[COLS.msg.ticket]=t.id;row[COLS.msg.sender]="admin";row[COLS.msg.body]=txt;
+  if(COLS.msg.senderId){var g=await db.auth.getUser();if(g.data&&g.data.user)row[COLS.msg.senderId]=g.data.user.id}
+  var r=await db.from("ticket_messages").insert(row).select();if(r.error){toast("Reply failed: "+r.error.message,"circle-alert");return}
+  if(!t.msgs)t.msgs=[];t.msgs.push({admin:true,b:txt,t:fdt(new Date())});ta.value="";renderChat();
+  if(TICKET_STATUS_AFTER_REPLY){if(await upd("support_tickets",COLS.tk.id,t.id,P(COLS.tk.status,TICKET_STATUS_AFTER_REPLY)))t.st=normTk(TICKET_STATUS_AFTER_REPLY)}
+  act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
+/* ---------- Auth ---------- */
+async function doLoginGoogle(){if(!db){toast("Add your Supabase URL and anon key at the top of the script","circle-alert");return}
+  var r=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  if(r.error){toast("Sign in failed: "+r.error.message,"circle-alert");return}
+}
+async function doLogout(){try{if(db)await db.auth.signOut()}catch(e){}LOGIN=0;location.reload()}
 /* views */
 function dashV(){var d=MD(S.mi),c=chg(),pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
   var sp=[["Premium passes",.52],["Sponsorships",.31],["Advertising",.17]];
   return '<div class="hd"><div><h1>Overview</h1><small>Business summary for '+MS[S.mi]+'</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="month">'+MS.map(function(m,i){return '<option value="'+i+'"'+(i===S.mi?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>'+
   '<div class="card"><div class="erow"><div><small>Total earnings · '+MS[S.mi]+'</small><div style="display:flex;align-items:center;gap:12px;margin-top:4px"><div class="big">'+mk(d.t)+'</div><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button></div><div style="margin-top:6px"><span class="chip '+(c>=0?"ok":"no")+'">'+(c>=0?"+":"")+c+'% vs previous month</span> <small>'+(EYE?"":"Earnings are hidden. Click the eye icon to reveal.")+'</small></div></div><div class="src">'+sp.map(function(s){return '<div><small>'+s[0]+'</small><b>'+mk(Math.round(d.t*s[1]))+'</b></div>'}).join("")+'</div></div><div class="'+(EYE?"":"bl ")+'mk" style="margin-top:14px">'+chart(d.d)+'</div></div>'+
-  '<div class="g4">'+[["Total users",num(48213+0),"users"],["New users · month",num(d.nu),"user-plus"],["Predictions · month",num(d.pr),"target"],["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
-  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+m.a+' vs '+m.b+'</b><small>'+m.l+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+w.id+' · '+fm(w.amt)+'</b><small>'+u.name+' · '+w.m+'</small></div><div class="ac"><button class="btn s k" data-wd="'+w.id+'|approved">Approve</button><button class="btn s r" data-wd="'+w.id+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join("")+'</div></div>'}
+  '<div class="g4">'+[["Total users",num(TU()),"users"],["New users · month",num(d.nu),"user-plus"],["Predictions · month",num(d.pr),"target"],["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
+  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><small>'+esc(m.l)+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+esc(w.id.slice(0,8))+' · '+fm(w.amt)+'</b><small>'+esc(u.name)+' · '+esc(w.m)+'</small></div><div class="ac"><button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+(S.act.length?S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join(""):'<small>No activity yet.</small>')+'</div></div>'}
 function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){return '<tr><td><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><br><small>'+esc(m.l)+'</small></td><td>'+esc(m.when)+'</td><td>'+num(m.n)+'</td><td><small>'+m.pa+'% / '+(100-m.pa)+'%</small></td><td>'+chipM(m.st)+(m.win?'<br><small>Winner: '+(m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b))+'</small>':'')+'</td><td><div class="ac">'+(m.st==="settled"?'':(m.st==="upcoming"?'<button class="btn s g" data-cl="'+m.id+'">Close picks</button>':'')+'<button class="btn s" data-win="'+m.id+'">Set winner</button>')+'<button class="btn s g" data-dm="'+m.id+'" aria-label="Delete">'+ic("trash-2")+'</button></div></td></tr>'}).join("")+'</table></div>'}
-function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>'+S.users.filter(function(u){return!q||(u.name+u.email+u.city).toLowerCase().indexOf(q)>-1}).map(function(u){return '<tr><td><b>'+esc(u.name)+'</b><br><small>'+esc(u.email)+'</small></td><td>'+esc(u.city)+'</td><td>'+fm(u.wal)+'</td><td>'+u.pts+'</td><td><span class="chip '+(u.kyc?"ok":"wa")+'">'+(u.kyc?"Verified":"Pending")+'</span></td><td><span class="chip '+(u.st==="active"?"ok":"no")+'">'+u.st+'</span></td><td><div class="ac"><button class="btn s g" data-uv="'+u.id+'">View</button><button class="btn s g" data-un="'+u.id+'" aria-label="Notify">'+ic("bell")+'</button><button class="btn s g" data-uw="'+u.id+'" aria-label="Wallet">'+ic("wallet")+'</button><button class="btn s '+(u.st==="active"?"r":"k")+'" data-ub="'+u.id+'">'+(u.st==="active"?"Block":"Unblock")+'</button></div></td></tr>'}).join("")+'</table>'}
-function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of 48,213 registered (sample list)</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
-function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,S.users.map(function(u){return u.wal})))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+t.d+'</td></tr>'}).join("")+'</table></div>'}
-function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+w.id+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+w.m+'<br><small>'+esc(w.ac)+'</small></td><td>'+w.d+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+w.id+'|approved">Approve</button><button class="btn s r" data-wd="'+w.id+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
-function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?48213:CPS.aud==="act"?46980:1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+x.id+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
+function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>'+S.users.filter(function(u){return!q||(u.name+u.email+u.city).toLowerCase().indexOf(q)>-1}).map(function(u){return '<tr><td><b>'+esc(u.name)+'</b><br><small>'+esc(u.email)+'</small></td><td>'+esc(u.city)+'</td><td>'+fm(u.wal)+'</td><td>'+u.pts+'</td><td><span class="chip '+(u.kyc?"ok":"wa")+'">'+(u.kyc?"Verified":"Pending")+'</span></td><td><span class="chip '+(u.st==="active"?"ok":"no")+'">'+u.st+'</span></td><td><div class="ac"><button class="btn s g" data-uv="'+esc(u.id)+'">View</button><button class="btn s g" data-un="'+esc(u.id)+'" aria-label="Notify">'+ic("bell")+'</button><button class="btn s g" data-uw="'+esc(u.id)+'" aria-label="Wallet">'+ic("wallet")+'</button><button class="btn s '+(u.st==="active"?"r":"k")+'" data-ub="'+esc(u.id)+'">'+(u.st==="active"?"Block":"Unblock")+'</button></div></td></tr>'}).join("")+'</table>'}
+function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of '+num(TU())+' registered users</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
+function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,[0].concat(S.users.map(function(u){return u.wal}))))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+esc(t.d)+'</td></tr>'}).join("")+'</table></div>'}
+function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+esc(w.id.slice(0,8))+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+esc(w.m)+'<br><small>'+esc(w.ac)+'</small></td><td>'+esc(w.d)+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
+function supV(){var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th></th></tr>'+(l.map(function(t){return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><span class="chip '+(t.pr==="high"||t.pr==="urgent"?"no":t.pr==="medium"?"wa":"")+'">'+esc(t.pr)+'</span></td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td>'+esc(t.d)+'</td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'}
+function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
 function rewV(){return '<div class="hd"><div><h1>Rewards and coupons</h1><small>Manage coupons that users claim with points</small></div><div class="sp"></div><button class="btn" data-a="addc">'+ic("plus")+'Create coupon</button></div><div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>'+S.cp.map(function(c,i){return '<tr><td><b>'+esc(c.n)+'</b></td><td><span class="chip">'+esc(c.code)+'</span></td><td>'+esc(c.dc)+'</td><td>'+c.used+' / '+c.tot+'</td><td><span class="chip '+(c.on?"ok":"")+'">'+(c.on?"Active":"Paused")+'</span></td><td><div class="ac"><button class="btn s g" data-ct="'+i+'">'+(c.on?"Pause":"Activate")+'</button></div></td></tr>'}).join("")+'</table></div>'}
-function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div class="card"><h3>Admin account</h3><div class="kv"><span>Name</span><span>Administrator</span><span>Email</span><span>'+esc(S.adm||"admin@predictx.edu")+'</span><span>Role</span><span>Super admin</span></div></div><div class="card"><h3>Preferences</h3><div class="ls"><div><b>Appearance</b><small>Switch between light and dark</small></div><button class="btn g" data-a="theme">Toggle theme</button></div><div class="ls"><div><b>Reset demo data</b><small>Restore all sample data</small></div><button class="btn r" data-a="reset">Reset</button></div></div><div class="card"><button class="btn g" data-a="out">'+ic("log-out")+'Sign out</button></div><small>Prototype with sample data. No real payments or personal data are processed.</small>'}
-var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
-var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],rew:["Rewards",rewV],set:["Settings",setV]};
-function nav(){return NV.map(function(n){return n[0]==="H"?'<h6>'+n[1]+'</h6>':'<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+(n[0]==="wd"&&pendW().length?'<span class="cn">'+pendW().length+'</span>':'')+'</button>'}).join("")}
-function loginV(){return '<div id="lg"><form id="lf"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only. Demo build.</small><div style="height:16px"></div><label class="f">Email<input class="in" id="em" type="email" value="admin@predictx.edu" required></label><label class="f">Password<input class="in" type="password" value="demo1234" required></label><button class="btn w" type="submit">Sign in</button></form></div>'}
+function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div class="card"><h3>Admin account</h3><div class="kv"><span>Name</span><span>Administrator</span><span>Email</span><span>'+esc(S.adm||"admin@CricPulse.edu")+'</span><span>Role</span><span>Super admin</span></div></div><div class="card"><h3>Preferences</h3><div class="ls"><div><b>Appearance</b><small>Switch between light and dark</small></div><button class="btn g" data-a="theme">Toggle theme</button></div><div class="ls"><div><b>Reset demo data</b><small>Restore all sample data</small></div><button class="btn r" data-a="reset">Reset</button></div></div><div class="card"><button class="btn g" data-a="out">'+ic("log-out")+'Sign out</button></div><small>Prototype with sample data. No real payments or personal data are processed.</small>'}
+var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
+var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
+function nav(){return NV.map(function(n){return n[0]==="H"?'<h6>'+n[1]+'</h6>':'<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+(n[0]==="wd"&&pendW().length?'<span class="cn">'+pendW().length+'</span>':'')+(n[0]==="sup"&&openTk()?'<span class="cn">'+openTk()+'</span>':'')+'</button>'}).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>'}
+function loginV(){return '<div id="lg"><form id="lf" onsubmit="event.preventDefault();doLoginGoogle()"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>PredictX Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only.</small><div style="height:16px"></div><button class="btn w" type="submit">Sign in with Google</button></form></div>'}
 function render(){var r=$("root");
   if(!LOGIN){r.innerHTML=loginV()}
-  else{var v=VT[S.page];r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>PredictX Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">Educational demo</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>'}
+  else{var v=VT[S.page]||VT.dash;r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">Educational demo</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>'}
   try{lucide.createIcons()}catch(e){}}
 function modal(h){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+h+'</div>';document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
-function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null}
+function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null;TKM=null}
 function fld(l,id,v,t){return '<label class="f">'+l+'<input class="in" id="'+id+'" type="'+(t||"text")+'" value="'+(v||"")+'" required></label>'}
 document.addEventListener("input",function(e){var t=e.target;if(t.id==="uq"){UQ=t.value;$("ut").innerHTML=usersTbl();try{lucide.createIcons()}catch(x){}}if(t.dataset.cp&&(t.dataset.cp==="t"||t.dataset.cp==="m"))CPS[t.dataset.cp]=t.value});
 document.addEventListener("change",function(e){var t=e.target;if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}else if(t.dataset.sel==="tf"){TF=t.value;render()}else if(t.dataset.cp){CPS[t.dataset.cp]=t.value;if(t.dataset.cp==="aud"||t.dataset.cp==="uid")render()}});
 document.addEventListener("submit",function(e){e.preventDefault();var id=e.target.id;
-  if(id==="lf"){LOGIN=1;S.adm=$("em").value}
+  if(id==="lf"){doLogin();return}
+  else if(id==="tf"){sendReply();return}
   else if(id==="mf"){S.matches.unshift({id:Date.now()%100000,c:$("mc").value,l:$("ml").value,a:$("ma").value,b:$("mb").value,when:$("mw").value,st:"upcoming",win:null,pa:50,n:0});act("Match created: "+$("ma").value+" vs "+$("mb").value);closeM();toast("Match added")}
   else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
-  else if(id==="wf"){var u=U(MOD),a=+$("wa").value,cr=$("wt").value==="c";if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}u.wal+=cr?a:-a;S.tx.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:$("wr").value,d:"29 Oct"});act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);closeM();toast("Wallet updated")}
+  else if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
   else if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});closeM();toast("Coupon created")}
-  else if(id==="nf"){if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}var one=CPS.aud==="one";S.sent.unshift({t:CPS.t,m:CPS.m,aud:one?U(CPS.uid).name:CPS.aud==="all"?"All users":"Active users",ty:CPS.ty,time:now(),r:one?1:CPS.aud==="all"?48213:46980});act("Notification sent: "+CPS.t);CPS.t="";CPS.m="";toast("Notification sent")}
+  else if(id==="nf"){if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}var one=CPS.aud==="one";S.sent.unshift({t:CPS.t,m:CPS.m,aud:one?U(CPS.uid).name:CPS.aud==="all"?"All users":"Active users",ty:CPS.ty,time:now(),r:one?1:CPS.aud==="all"?TU():AU()});act("Notification sent: "+CPS.t);CPS.t="";CPS.m="";toast("Notification sent")}
   save();render()});
 document.addEventListener("click",function(e){
-  var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close]");if(!t)return;var d=t.dataset;
+  var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close],[data-tk],[data-kf]");if(!t)return;var d=t.dataset;
   if(d.close!==undefined){closeM();return}
   if(d.p){S.page=d.p;window.scrollTo(0,0)}
   else if(d.a==="eye")EYE=!EYE;
   else if(d.a==="theme"){var h=document.documentElement,cur=h.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");h.setAttribute("data-theme",cur==="dark"?"light":"dark")}
-  else if(d.a==="out"){LOGIN=0;EYE=0}
-  else if(d.a==="reset"){localStorage.removeItem("pxa1");S=JSON.parse(D1);toast("Demo data restored")}
+  else if(d.a==="out"||d.a==="logout"){doLogout();return}
+  else if(d.a==="refresh"){toast("Refreshing…","refresh-cw");loadAll();return}
+  else if(d.a==="reset"){localStorage.removeItem("pxa1");var adm=S.adm;S=JSON.parse(D1);S.adm=adm;toast("Demo data restored");loadAll()}
   else if(d.a==="addm"){modal('<h3>Add match</h3><form id="mf">'+fld("League or event","ml")+'<div class="fg">'+fld("Team A","ma")+fld("Team B","mb")+'</div><div class="fg"><label class="f">Category<select class="in" id="mc"><option>Cricket</option><option>Football</option><option>Kabaddi</option><option>India Specials</option></select></label>'+fld("Start (e.g. 31 Oct, 7:30 PM)","mw")+'</div><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create match</button></div></form>');return}
   else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
   else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
   else if(d.cl){MM(d.cl).st="closed";act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b);toast("Predictions closed")}
   else if(d.dm){var m=MM(d.dm);S.matches=S.matches.filter(function(x){return x!==m});act("Match deleted: "+m.a+" vs "+m.b);toast("Match deleted","trash-2")}
-  else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+u.joined+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+x.amt+'<small>'+esc(x.n)+' · '+x.d+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
+  else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
   else if(d.un){CPS.aud="one";CPS.uid=d.un;S.page="not"}
   else if(d.uw){var u=U(d.uw);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
-  else if(d.ub){var u=U(d.ub);u.st=u.st==="active"?"blocked":"active";act((u.st==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+u.st)}
+  else if(d.ub){doBlock(d.ub);return}
   else if(d.wf)WF=d.wf;
-  else if(d.wd){var p=d.wd.split("|"),w=S.wd.filter(function(x){return x.id===p[0]})[0],u=U(w.uid);w.st=p[1];if(p[1]==="rejected"){u.wal+=w.amt;S.tx.unshift({uid:u.id,ty:"Refund",amt:"+"+w.amt,n:"Rejected "+w.id,d:"29 Oct"})}act("Withdrawal "+w.id+" "+p[1]+" ("+u.name+")");toast("Withdrawal "+p[1])}
+  else if(d.kf)TKF=d.kf;
+  else if(d.tk){openTicket(d.tk);return}
+  else if(d.wd){var p=d.wd.split("|");doWd(p[0],p[1]);return}
   else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
   save();render()});
-render();
+/* ---------- start ---------- */
+async function boot(){render();if(!db)return;
+  try{db.auth.onAuthStateChange(function(ev){if(ev==="SIGNED_OUT"&&LOGIN){LOGIN=0;render()}})}catch(e){}
+  try{var s=await db.auth.getSession();if(s.data&&s.data.session){LOGIN=1;S.adm=s.data.session.user.email;render();await loadAll()}}catch(e){}}
+boot();
 </script>
 </body>
 </html>
