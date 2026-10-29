@@ -930,44 +930,52 @@ async function checkPaymentReturn() {
 /* init — avoids white flash */
 window.addEventListener("load", async () => {
   try {
-    // 1. Render the UI immediately (stops the white screen)
+    // 1. Load theme
     applyTheme();
-    render(); 
     
-    // 2. Check for ZapUPI redirect in the background
-    checkPaymentReturn();
+    // 2. Catch the Google Token from the URL FIRST
+    if (window.CP_DB && CP_DB.ready) {
+      CP_DB.loadSession(); 
+    }
 
-    // 3. Check if user is logged in via Supabase (handles Google Redirect)
+    // 3. Check if user is logged in
     if (window.CP_DB && CP_DB.ready) {
       const user = await CP_DB.getUser();
       if (user) {
+        // Fetch their data and log them in
         const profile = await CP_DB.getProfile(user.id);
         const tx = await CP_DB.getTransactions(user.id);
         
         S.user = { 
           id: user.id, 
-          n: profile?.display_name || user.email.split('@')[0], 
-          e: user.email 
+          n: profile?.display_name || user.email.split('@')[0] || "Player", 
+          e: user.email || "" 
         };
-        S.bal = profile?.balance || 0;
-        S.txs = tx.map(t => ({
+        S.bal = profile?.wallet?.[0]?.balance || 0; 
+        
+        S.txs = (tx || []).map(t => ({
           type: t.type,
           amount: t.amount,
-          n: t.description,
+          n: t.description || t.note,
           status: t.status,
           date: new Date(t.created_at).toLocaleDateString("en-IN")
         }));
         
         save();
-        render(); // Re-render with the logged-in state
+        render(); // Render the dashboard
+      } else {
+        render(); // Render the landing page if no user
       }
+    } else {
+      render();
     }
+    
+    // 4. Check for ZapUPI payment return
+    checkPaymentReturn();
+
   } catch (err) {
-    console.error(err);
-    document.getElementById("app").innerHTML =
-      '<div style="padding:40px 20px;font:15px/1.6 Inter,system-ui;color:#0f1729;text-align:center;">' +
-      "<b>CricPulse</b><br>Something went wrong while loading. Please check your internet connection and refresh." +
-      "</div>";
+    console.error("Init error:", err);
+    render(); // Fallback to landing page on error
   }
 });
 </script>
