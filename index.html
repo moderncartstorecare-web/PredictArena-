@@ -132,6 +132,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 <div id="sh"></div>
 <div class="tw" id="tw"></div>
 
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script> 
 <script src="config.js"></script>
 <script>
 /* =========================================================
@@ -997,7 +998,7 @@ window.addEventListener("load", async () => {
   try {
     applyTheme();
     
-    if (!window.CP_DB || !CP_DB.ready) {
+    if (!window.CP_DB || !CP_DB.authClient) {
       render();
       return;
     }
