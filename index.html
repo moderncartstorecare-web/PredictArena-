@@ -484,18 +484,30 @@ const marketsV = () => {
 function homeV() {
   const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
   const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
-  const cs = CATS.map(c => { const d = S.preds.filter(p => p.res && mkt(p.m).c == c[0]), w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; }).join("");
-  return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
+  const cs = CATS.map(c => { 
+    const d = S.preds.filter(p => { const m = mkt(p.m); return p.res && m && m.c == c[0]; }); 
+    const w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; 
+    return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; 
+  }).join("");
+   return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
 <div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
 <div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${MK.slice(0,3).map(m => row(m)).join("")}</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
-<div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
+<div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
+  const m = mkt(p.m); 
+  if (!m) return ''; 
+  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; 
+}).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
 <div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
 }
 function picksV() {
   const f = S.pff, cnt = k => S.preds.filter(p => k=="all"||(k=="p"?!p.res:p.res==k)).length;
   const L = S.preds.filter(p => f=="all"||(f=="p"?!p.res:p.res==f)).slice().reverse();
-  return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">${esc(full(m,p.p))} · ${(p.p=="A"?m.oa:m.ob).toFixed(2)}x${p.res=="w"?" · +"+inr(p.pay):""}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res?"":`<button class="btn sm" data-a="settle" data-v="${p.id}">Settle</button>`}</div></div>`; }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
+  return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { 
+    const m = mkt(p.m); 
+    if (!m) return ''; 
+    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">${esc(full(m,p.p))} · ${(p.p=="A"?m.oa:m.ob).toFixed(2)}x${p.res=="w"?" · +"+inr(p.pay):""}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res?"":`<button class="btn sm" data-a="settle" data-v="${p.id}">Settle</button>`}</div></div>`; 
+  }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
   const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
@@ -590,7 +602,9 @@ const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewar
 const MORE = ["rewards","ranks","alerts","profile","support","help"];
 
 function shell() {
-  const un = S.nts.filter(n => !n.r).length, R = S.route, mt = R == "match", m = mt ? mkt(S.mid) : null;
+  const un = S.nts.filter(n => !n.r).length, R = S.route;
+  const mt = R == "match", m = mt ? mkt(S.mid) : null;
+  if (mt && !m) { S.route = "home"; return shell(); }
   const title = mt ? ttl(m) : (META[R] ? META[R][0] : "CricPulse"), sub = mt ? cl(m.c) + " · " + m.lg : (META[R] ? META[R][1] : "");
   const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
   const hasBack = ["match","ticket","support"].includes(R) || R=="help";
@@ -1161,8 +1175,8 @@ setInterval(async () => {
           id: m.id,
           c: m.category,
           lg: m.league,
-          A: [m.team_a.split(' ')[0], m.team_a], 
-          B: [m.team_b.split(' ')[0], m.team_b],
+          A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
+          B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
           cricket_match_id: m.cricket_match_id, 
           s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
@@ -1309,8 +1323,8 @@ window.addEventListener("load", async () => {
           id: m.id,
           c: m.category,
           lg: m.league,
-          A: [m.team_a.split(' ')[0], m.team_a], 
-          B: [m.team_b.split(' ')[0], m.team_b],
+          A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
+          B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
           cricket_match_id: m.cricket_match_id, 
           s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
