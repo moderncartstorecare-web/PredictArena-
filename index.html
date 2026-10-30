@@ -350,19 +350,13 @@ MK.forEach(m => {
 });
 const ov = b => Math.floor(b/6) + "." + b%6;
 function liveText(m) {
-  if (m.liveData) return "Live · " + m.liveData.statusText;
-  const L = LV[m.id];
-  if (!L) return "Live · Match in progress";
-  if (m.q) return "Live · " + (m.id==7 ? "₹"+L.v.toFixed(1)+" crore so far" : "Sensex "+ni(L.v));
-  if (m.c == "cricket") return "Live · " + m.A[0] + " " + L.r + "/" + L.w + " (" + ov(L.b) + " ov) · RR " + (L.r/(L.b/6)).toFixed(2);
-  if (m.c == "football") return "Live · " + m.A[0] + " " + L.g[0] + " - " + L.g[1] + " " + m.B[0] + " · " + L.n + "'";
-  if (m.c == "kabaddi") return "Live · " + m.A[0] + " " + L.p[0] + " - " + L.p[1] + " " + m.B[0];
-  return "Live · " + m.A[0] + " " + L.rd[0] + " - " + L.rd[1] + " " + m.B[0];
+  if (m.liveData && m.liveData.statusText) return m.liveData.statusText;
+  return "Match yet to start"; // Clean fallback instead of fake data
 }
 function liveBoard(m) {
-  // If we are still waiting for the API to respond, show a loading state
+  // If we are still waiting for the API to respond, show a clean state
   if (!m.liveData) {
-    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Loading...</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Loading...</small></div></div><div class="ex">Connecting to live feed...</div>`;
+    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Not started</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Not started</small></div></div><div class="ex">Waiting for live feed...</div>`;
   }
   
   // Use REAL data from the API
@@ -467,7 +461,7 @@ function legalPage(kind) {
 /* ============== APP VIEWS ============== */
 const mrow = m => {
   const lk = S.preds.find(p => p.m == m.id), cls = !left(m), sel = S.slip[m.id];
-  return `<div class="mk"><div class="bt" style="align-items:flex-start"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)} · crowd ${m.w}/${100-m.w}</div><div class="lvt" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
+  return `<div class="mk"><div class="bt" style="align-items:flex-start"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)} · crowd ${m.w}/${100-m.w}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
 };
 const mlist = () => {
   const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
@@ -483,7 +477,7 @@ const marketsV = () => {
 };
 function homeV() {
   const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
-  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
+  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
   const cs = CATS.map(c => { 
     const d = S.preds.filter(p => { const m = mkt(p.m); return p.res && m && m.c == c[0]; }); 
     const w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; 
@@ -941,7 +935,7 @@ document.addEventListener("click", e => {
     case "slipsheet": slipSheet(); break;
     case "lockslip": lockPicks(Object.keys(S.slip)); break;
     case "lockm": lockPicks([v]); break;
-    case "open": S.route = "match"; S.mid = Number(v); S.pop = 0; render(); scrollTo(0,0); break;
+    case "open": S.route = "match"; S.mid = v; S.pop = 0; render(); scrollTo(0,0); break;
     case "pff": S.pff = v; render(); break;
     case "nf": S.nf = v; render(); break;
     case "rk": S.rk = v; render(); break;
@@ -1184,10 +1178,7 @@ setInterval(async () => {
           oa: m.odds_a,
           ob: m.odds_b
         }));
-         MK.forEach(m => {
-           if (!LV[m.id]) LV[m.id] = m.c == "cricket" ? {r:96, w:2, b:12, tg:180, lg:["Match started"]} : {v:100, lg:["Live"]};
-         });
-         if (S.route === "markets" || S.route === "home") render(); // Refresh screen
+         fetchLiveScores(); // Fetch real live scores for newly synced matches
        }
     }
 
@@ -1334,14 +1325,10 @@ window.addEventListener("load", async () => {
         }));
         
         // Initialize Live Feed for the new matches
-        MK.forEach(m => {
-           if (!LV[m.id]) {
-             LV[m.id] = m.c == "cricket" ? {r:96, w:2, b:12, tg:180, lg:["Match started"]} : {v:100, lg:["Live"]};
-           }
-        });
-      }
-    } catch(e) { console.log("Using fallback matches (DB empty or unreachable)", e); }
 
+      }
+      fetchLiveScores(); // Trigger the live score fetch immediately
+    } catch(e) { console.log("Using fallback matches (DB empty or unreachable)", e); }
     // 3. Check current session
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     
