@@ -350,7 +350,9 @@ MK.forEach(m => {
 });
 const ov = b => Math.floor(b/6) + "." + b%6;
 function liveText(m) {
+  if (m.liveData) return "Live · " + m.liveData.statusText;
   const L = LV[m.id];
+  if (!L) return "Live · Match in progress";
   if (m.q) return "Live · " + (m.id==7 ? "₹"+L.v.toFixed(1)+" crore so far" : "Sensex "+ni(L.v));
   if (m.c == "cricket") return "Live · " + m.A[0] + " " + L.r + "/" + L.w + " (" + ov(L.b) + " ov) · RR " + (L.r/(L.b/6)).toFixed(2);
   if (m.c == "football") return "Live · " + m.A[0] + " " + L.g[0] + " - " + L.g[1] + " " + m.B[0] + " · " + L.n + "'";
@@ -485,7 +487,7 @@ function homeV() {
   const cs = CATS.map(c => { const d = S.preds.filter(p => p.res && mkt(p.m).c == c[0]), w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; }).join("");
   return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
 <div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
-<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${[1,2,5].map(i => row(mkt(i))).join("")}</div>
+<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${MK.slice(0,3).map(m => row(m)).join("")}</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { const m = mkt(p.m); return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
 <div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
@@ -571,7 +573,9 @@ function ticketV() {
 /* match */
 function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
 function matchV() {
-  const m = mkt(S.mid), lk = S.preds.find(p => p.m == m.id), sel = S.slip[m.id], cls = !left(m);
+  const m = mkt(S.mid);
+  if (!m) return '<div class="card empty">Match not found or has ended.</div>';
+  const lk = S.preds.find(p => p.m == m.id), sel = S.slip[m.id], cls = !left(m);
   const fa = form(m,0), fb = form(m,1), h = 2+m.id%3, n = 4200+m.id*1730, ro = RO[m.c] || [], op = wide() ? " open" : "";
   const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
   const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id]],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free"],["Reward","Funds, XP and a coupon"],["Participants",n.toLocaleString("en-IN")]];
@@ -1154,17 +1158,18 @@ setInterval(async () => {
        
        if (changed) {
          MK = liveMatches.map(m => ({
-            id: m.id,
-            c: m.category,
-            lg: m.league,
-            A: [m.team_a.split(' ')[0], m.team_a], 
-            B: [m.team_b.split(' ')[0], m.team_b],
-            q: m.question,
-            s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
-            w: m.crowd_a,
-            oa: m.odds_a,
-            ob: m.odds_b
-         }));
+          id: m.id,
+          c: m.category,
+          lg: m.league,
+          A: [m.team_a.split(' ')[0], m.team_a], 
+          B: [m.team_b.split(' ')[0], m.team_b],
+          q: m.question,
+          cricket_match_id: m.cricket_match_id, 
+          s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
+          w: m.crowd_a,
+          oa: m.odds_a,
+          ob: m.odds_b
+        }));
          MK.forEach(m => {
            if (!LV[m.id]) LV[m.id] = m.c == "cricket" ? {r:96, w:2, b:12, tg:180, lg:["Match started"]} : {v:100, lg:["Live"]};
          });
@@ -1307,7 +1312,7 @@ window.addEventListener("load", async () => {
           A: [m.team_a.split(' ')[0], m.team_a], 
           B: [m.team_b.split(' ')[0], m.team_b],
           q: m.question,
-          // Calculate seconds left from the database closing time
+          cricket_match_id: m.cricket_match_id, 
           s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
           w: m.crowd_a,
           oa: m.odds_a,
