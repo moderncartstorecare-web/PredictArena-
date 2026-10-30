@@ -68,7 +68,7 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
      that only allow your admin account(s) to read and write these tables.
    ===================================================================== */
 var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
+var SUPABASE_ANON_KEY="sb_publishable_894UwPwZc0SF2MyCP9sztQ_6-s0AALZ";
 
 /* Optional: only these Google accounts can enter the dashboard.
    Example: ["you@gmail.com","partner@gmail.com"]. Leave empty to allow any signed-in account. */
@@ -312,21 +312,23 @@ document.addEventListener("submit",function(e){e.preventDefault();var id=e.targe
   else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
   else if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
   else if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});closeM();toast("Coupon created")}
-  else if(id==="nf"){
+    else if(id==="nf"){
     if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}
     
-    // 1. Save to Supabase (user_id: null means send to ALL users)
+    // Figure out if we are sending to everyone or one specific user
+    var targetUser = (CPS.aud === "one") ? CPS.uid : null; 
+    
     db.from('notifications').insert({
       title: CPS.t,
       body: CPS.m,
       icon: CPS.ty === 'Alert' ? 'alert' : 'bell',
-      user_id: null 
+      user_id: targetUser
     }).then(function(res) {
       if (res.error) {
          toast("Error sending: " + res.error.message, "circle-alert");
          return;
       }
-      toast("Notification sent to all users!");
+      toast("Notification sent!");
       CPS.t=""; CPS.m="";
       render();
     });
