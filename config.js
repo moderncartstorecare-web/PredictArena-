@@ -1,5 +1,5 @@
 // config.js — CricPulse Core Database Integration
-const SUPABASE_URL = "https://sqldalrqohvhayfmbice.supabase.co";
+const SUPABASE_URL = "https://hmiyhdekyqpzkxqiukvb.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_894UwPwZc0SF2MyCP9sztQ_6-s0AALZ";
 
 // Initialize Supabase
