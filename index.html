@@ -933,11 +933,14 @@ document.addEventListener("click", e => {
       t.disabled = true;
       t.textContent = 'Creating payment...';
 
-      if (window.CP_DB && CP_DB.ready) {
-        CP_DB.rest('payment_requests', {
-          method: 'POST',
-          body: JSON.stringify({ user_id: S.user.e, txn_id: orderId, amount_inr: x, status: 'pending' })
-        }).catch(e => console.error('Supabase insert failed', e));
+      if (window.CP_DB && CP_DB.ready && S.user && S.user.id) {
+        supabase.from('payment_requests').insert({
+          user_id: S.user.id,
+          txn_id: orderId,
+          amount_inr: x,
+          tokens_to_credit: x,
+          status: 'pending'
+        }).then(r => { if (r.error) console.error('Payment request insert failed', r.error); });
       }
 
       ZapUPI.createOrder({
@@ -969,7 +972,22 @@ document.addEventListener("click", e => {
       if (!x || x < 100) { er.textContent = "Minimum withdrawal is ₹100."; return; }
       if (x > S.bal) { er.textContent = "Amount exceeds your balance."; return; }
       if (!d) { er.textContent = "Enter a destination."; return; }
-      S.bal -= x; addTx("withdraw",x,"To "+mask(d),"pending"); note("Withdrawal requested",inr2(x)+" is being processed.","wallet"); save(); closeSheet(); toast("Withdrawal requested.","wallet"); render(); break;
+      t.disabled = true; t.textContent = "Processing...";
+      (async () => {
+        try {
+          const { data, error } = await supabase.rpc('create_withdrawal_request', { p_amount: x, p_account: d });
+          if (error) throw error;
+          if (!data || data.ok === false) throw new Error((data && data.message) || 'Failed');
+          S.bal = data.new_balance;
+          addTx("withdraw", x, "To " + mask(d), "pending");
+          note("Withdrawal requested", inr2(x) + " is being processed.", "wallet");
+          save(); closeSheet(); toast("Withdrawal requested.", "wallet"); render();
+        } catch(e) {
+          er.textContent = e.message || "Could not submit withdrawal.";
+          t.disabled = false; t.textContent = "Request withdrawal";
+        }
+      })();
+      break;
     }
     case "wcancel": {
       const x = S.txs[Number(v)]; if (!x || x.status != "pending") return;
@@ -1222,8 +1240,30 @@ window.addEventListener("load", async () => {
     } else {
       render();
     }
+    /* AUTO-APPROVE PAYMENT AFTER ZAPUPI REDIRECTS BACK */
+    async function checkPaymentReturn() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const orderId = params.get('order_id');
+        if (!orderId) return;
+        if (status === 'success' && S.user && S.user.id) {
+          const { error } = await supabase.from('payment_requests')
+            .update({ status: 'approved' })
+            .eq('txn_id', orderId)
+            .eq('user_id', S.user.id);
+          if (!error) {
+            toast('Payment successful. Wallet updated.', 'check');
+            const p = await CP_DB.getProfile(S.user.id);
+            if (p && p.wallet && p.wallet[0]) { S.bal = p.wallet[0].balance; save(); render(); }
+          }
+        } else if (status === 'failed' || status === 'timeout') {
+          toast('Payment ' + status + '. Try again.', 'x');
+        }
+        history.replaceState({}, document.title, window.location.pathname);
+      } catch(e) { console.error('Payment return check failed', e); }
+    }
     checkPaymentReturn();
-
   } catch (err) {
     console.error("Init error:", err);
     render(); 
