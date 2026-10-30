@@ -168,39 +168,57 @@ async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*
 async function loadAll(){
   if(!db)return;
   try{
+  async function loadAll(){
+  if(!db)return;
+  try{
     var r=await Promise.all([
-       
-      fetchT("users",COLS.users.created,500,1), /* users */
-      fetchT("wallet",null,500,0),              /* wallets */
-      fetchT("withdrawal_requests",COLS.wd.created,300),
-      fetchT("notifications","created_at",100) // <-- ADD THIS
-      fetchT("support_tickets",COLS.tk.created,300),
-      fetchT("matches","created_at",500)        /* <-- ADD THIS LINE */
+      fetchT("users",COLS.users.created,500,1), /* index 0: users */
+      fetchT("wallet",null,500,0),              /* index 1: wallets */
+      fetchT("withdrawal_requests",COLS.wd.created,300), /* index 2: withdrawals */
+      fetchT("notifications","created_at",100), /* index 3: notifications */
+      fetchT("support_tickets",COLS.tk.created,300), /* index 4: tickets */
+      fetchT("matches","created_at",500)        /* index 5: matches */
     ]);
-    var names=["users","wallet","withdrawal_requests","support_tickets"],er=[];
-    r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); /* ignore error for wallet if empty */
+    var names=["users","wallet","withdrawal_requests","notifications","support_tickets","matches"],er=[];
+    r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); 
+    
     if(er.length)toast("Could not load "+er[0],"circle-alert");
 
+    // 1. Users & Wallet
     if(!r[0].error){
       var usersData = r[0].data || [];
       var walletData = (r[1] && r[1].data) ? r[1].data : [];
-
-      /* attach wallet balance to each user object */
       usersData.forEach(function(u){
         var w = walletData.find(function(x){return x.user_id === u.id});
         if(w) u.wallet = w;
       });
-
       S.users=usersData.map(mapUser);
       S.ucount=r[0].count||S.users.length;
     }
 
+    // 2. Withdrawals
     if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
-    if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk);
     
-    /* <-- ADD THIS BLOCK FOR MATCHES */
-    if(!r[4].error){
-      S.matches=(r[4].data||[]).map(function(x){
+    // 3. Notifications (Map real data to Sent History UI)
+    if(!r[3].error){
+      S.sent = (r[3].data || []).map(function(x){
+        return {
+          t: x.title, 
+          m: x.body, 
+          aud: x.user_id ? "Particular user" : "All users", 
+          ty: x.icon === 'alert' ? 'Alert' : 'Promo',
+          time: fdt(x.created_at),
+          r: x.user_id ? 1 : TU()
+        };
+      });
+    }
+
+    // 4. Support Tickets
+    if(!r[4].error)S.tickets=(r[4].data||[]).map(mapTk);
+    
+    // 5. Matches
+    if(!r[5].error){
+      S.matches=(r[5].data||[]).map(function(x){
         return {
           id:x.id,
           c:x.category,
@@ -215,8 +233,13 @@ async function loadAll(){
         };
       });
     }
-  }catch(e){toast("Network error while loading data","circle-alert")}
-  rebuildTx();render()}
+  }catch(e){
+    console.error(e);
+    toast("Network error while loading data","circle-alert");
+  }
+  rebuildTx();
+  render();
+}
 async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
 async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0];if(!u){toast("User not found","circle-alert");return}var ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.status,ns))))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
 async function doWd(id,st){var w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,P(COLS.wd.status,st))))return;w.st=st;var u=S.users.filter(function(x){return x.id===w.uid})[0];
