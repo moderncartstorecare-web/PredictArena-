@@ -177,12 +177,11 @@ async function doWallet(uid,a,cr,why){
   if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}
   if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}
   
-  var nw=u.wal+(cr?a:-a);
-  
-  var r = await db.from("wallet").update({ balance: nw }).eq("user_id", u.id);
+  var r = await db.rpc("admin_adjust_balance", { p_user_id: u.id, p_delta: cr ? a : -a, p_reason: why || "Admin update" });
   if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return}
+  if(!r.data || r.data.ok === false){toast((r.data && r.data.message) || "Update failed","circle-alert");return}
   
-  u.wal=nw;
+  u.wal = r.data.new_balance;
   S.txl.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:why,d:fd(new Date())});
   act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);
   closeM();toast("Wallet updated");rebuildTx();save();render();
