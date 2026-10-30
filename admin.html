@@ -480,6 +480,25 @@ function initAdminRealtime() {
 // Call this immediately after admin logs in.
 // Find `async function enter(session)` in admin.html and add this right before the closing brace:
 // initAdminRealtime();
+// Real-time sync for Admin
+function initAdminRealtime() {
+  if (!db) return;
+  db.channel('admin-sync')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, () => loadAll())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
+      if (S.page === 'sup' && TKM === payload.new.ticket_id) {
+        fetchMsgs(TKM).then(r => { if(!r.error) { TK(TKM).msgs = r.data.map(mapMsg); renderChat(); } });
+      }
+    })
+    .subscribe();
+}
+
+async function enter(session) {
+  // ... (keep existing code inside enter) ...
+  await loadAll();
+  initAdminRealtime(); // <-- ADD THIS LINE
+}
+// ... (keep boot function)
 boot();
 </script>
 </body>
