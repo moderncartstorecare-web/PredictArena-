@@ -411,20 +411,38 @@ document.addEventListener("click",function(e){
 var BOOTED=0;
 async function enter(session){
   var em=String(session.user.email||"").toLowerCase();
+  
+  // 1. Verify Email
   if(ADMIN_EMAILS.length&&ADMIN_EMAILS.map(function(x){return x.toLowerCase()}).indexOf(em)<0){
     toast("This Google account is not an admin","circle-alert");
     await db.auth.signOut();
     return;
   }
+  
   if(BOOTED&&LOGIN)return;
-  BOOTED=1;LOGIN=1;S.adm=session.user.email;
+  BOOTED = 1; 
+  LOGIN = 1; 
+  S.adm = session.user.email;
+  
   cleanUrl();
-  render();
-  await loadAll();
+  render(); // Render the dashboard shell immediately so you aren't stuck on the login screen
+  
+  try {
+    // 2. Load Data (If this fails, it will catch the error instead of crashing the page)
+    await loadAll(); 
+    
+    // 3. Start Real-time Sync so the admin panel updates instantly
+    initAdminRealtime(); 
+  } catch (e) {
+    console.error("Dashboard load error:", e);
+    toast("Loaded with some errors: " + e.message, "circle-alert");
+  }
 }
 async function boot(){
   if(!db){render();return}
-  /* listener: reacts to sign in and sign out */
+ 
+   
+/* listener: reacts to sign in and sign out */
   db.auth.onAuthStateChange(function(ev,session){
     if(session&&(ev==="SIGNED_IN"||ev==="INITIAL_SESSION")){setTimeout(function(){enter(session)},0)}
     else if(ev==="SIGNED_OUT"){LOGIN=0;BOOTED=0;render()}
