@@ -679,6 +679,9 @@ function applySession(session) {
       }));
     }
 
+    // 👇 ADD THIS LINE HERE 👇
+    initRealtimeSync();
+
     save();
     render(); // Render Dashboard
   })();
