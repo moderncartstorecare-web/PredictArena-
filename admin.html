@@ -267,12 +267,53 @@ document.addEventListener("change",function(e){var t=e.target;if(t.dataset.sel==
 document.addEventListener("submit",function(e){e.preventDefault();var id=e.target.id;
   if(id==="lf"){doLogin();return}
   else if(id==="tf"){sendReply();return}
-  else if(id==="mf"){S.matches.unshift({id:Date.now()%100000,c:$("mc").value,l:$("ml").value,a:$("ma").value,b:$("mb").value,when:$("mw").value,st:"upcoming",win:null,pa:50,n:0});act("Match created: "+$("ma").value+" vs "+$("mb").value);closeM();toast("Match added")}
+  else if(id==="mf"){
+    // 1. Save to Supabase
+    var newMatch = {
+      category: $("mc").value.toLowerCase(),
+      league: $("ml").value,
+      team_a: $("ma").value,
+      team_b: $("mb").value,
+      closes_at: new Date(Date.now() + 86400000).toISOString(), // Closes in 24 hours
+      crowd_a: 50,
+      odds_a: 1.85,
+      odds_b: 2.10
+    };
+    
+    db.from('matches').insert(newMatch).then(function(res) {
+      if (res.error) {
+         toast("Error saving match: " + res.error.message, "circle-alert");
+         return;
+      }
+      toast("Match published to website!");
+      closeM();
+      // Reload data to show the new match
+      loadAll(); 
+    });
+  }
   else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
   else if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
   else if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});closeM();toast("Coupon created")}
-  else if(id==="nf"){if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}var one=CPS.aud==="one";S.sent.unshift({t:CPS.t,m:CPS.m,aud:one?U(CPS.uid).name:CPS.aud==="all"?"All users":"Active users",ty:CPS.ty,time:now(),r:one?1:CPS.aud==="all"?TU():AU()});act("Notification sent: "+CPS.t);CPS.t="";CPS.m="";toast("Notification sent")}
-  save();render()});
+  else if(id==="nf"){
+    if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}
+    
+    // 1. Save to Supabase (user_id: null means send to ALL users)
+    db.from('notifications').insert({
+      title: CPS.t,
+      body: CPS.m,
+      icon: CPS.ty === 'Alert' ? 'alert' : 'bell',
+      user_id: null 
+    }).then(function(res) {
+      if (res.error) {
+         toast("Error sending: " + res.error.message, "circle-alert");
+         return;
+      }
+      toast("Notification sent to all users!");
+      CPS.t=""; CPS.m="";
+      render();
+    });
+  }
+save();render()});
 document.addEventListener("click",function(e){
   var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close],[data-tk],[data-kf]");if(!t)return;var d=t.dataset;
   if(d.close!==undefined){closeM();return}
