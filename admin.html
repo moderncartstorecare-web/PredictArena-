@@ -190,10 +190,34 @@ async function doWallet(uid,a,cr,why){
 async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
 function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
 function renderChat(){var t=TK(TKM),el=$("tkc");if(!t||!el)return;el.innerHTML=(t.msgs&&t.msgs.length)?t.msgs.map(function(m){return '<div class="ls"><div class="ico">'+ic(m.admin?"shield-check":"user")+'</div><div><b>'+esc(m.admin?"Support":tkUser(t))+'</b><small>'+esc(m.t)+'</small><div style="white-space:pre-wrap;margin-top:2px">'+esc(m.b)+'</div></div></div>'}).join(""):'<small>No messages yet.</small>';el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
-async function openTicket(id){var t=TK(id);if(!t)return;TKM=id;modal('<h3>'+esc(t.sub)+'</h3><small>'+esc(tkUser(t))+' · '+esc(t.d)+' · '+esc(t.st)+'</small><div id="tkc" style="margin:12px 0;max-height:320px;overflow-y:auto"><small>Loading messages…</small></div><form id="tf"><label class="f">Reply<textarea class="in" id="tr" rows="3" required></textarea></label><div class="ac"><button type="button" class="btn g" data-close>Close</button><button class="btn" type="submit">'+ic("send")+'Send reply</button></div></form>');
-  if(!db){var e0=$("tkc");if(e0)e0.innerHTML='<small>Supabase is not configured.</small>';return}
-  var r=await fetchMsgs(t.id);if(TKM!==id)return;if(r.error){var e1=$("tkc");if(e1)e1.innerHTML='<small>Could not load messages: '+esc(r.error.message)+'</small>';return}
-  t.msgs=(r.data||[]).map(mapMsg);renderChat()}
+async function openTicket(id){
+  var t=TK(id);if(!t)return;
+  TKM=id;
+  if(!db){toast("Supabase not configured","circle-alert");return}
+  var r=await fetchMsgs(t.id);
+  if(r.error){toast("Error loading messages","circle-alert");return}
+  t.msgs=(r.data||[]).map(mapMsg);
+  // Mark user messages as read in DB
+  db.from('ticket_messages').update({ is_read: true }).eq('ticket_id', id).eq('sender', 'user').then(function(){});
+  render();
+  setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
+}
+async function adminReply(ticketId) {
+  var input = document.getElementById('admin-reply-input');
+  var txt = input ? input.value.trim() : '';
+  if (!txt) return;
+  var row = { ticket_id: ticketId, sender: 'admin', message: txt, is_read: false };
+  var r = await db.from('ticket_messages').insert(row).select();
+  if (r.error) { toast("Failed to send: " + r.error.message, "circle-alert"); return; }
+  var t = TK(ticketId);
+  if (t) {
+    if (!t.msgs) t.msgs = [];
+    t.msgs.push({ admin: true, b: txt, t: fdt(new Date()) });
+  }
+  input.value = '';
+  render();
+  setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
+}
 async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta.value.trim();if(!txt)return;if(!db){toast("Supabase is not configured","circle-alert");return}
   var row={};row[COLS.msg.ticket]=t.id;row[COLS.msg.sender]="admin";row[COLS.msg.body]=txt;
   if(COLS.msg.senderId){var g=await db.auth.getUser();if(g.data&&g.data.user)row[COLS.msg.senderId]=g.data.user.id}
@@ -237,7 +261,39 @@ function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>C
 function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of '+num(TU())+' registered users</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
 function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,[0].concat(S.users.map(function(u){return u.wal}))))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+esc(t.d)+'</td></tr>'}).join("")+'</table></div>'}
 function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+esc(w.id.slice(0,8))+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+esc(w.m)+'<br><small>'+esc(w.ac)+'</small></td><td>'+esc(w.d)+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
-function supV(){var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th></th></tr>'+(l.map(function(t){return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><span class="chip '+(t.pr==="high"||t.pr==="urgent"?"no":t.pr==="medium"?"wa":"")+'">'+esc(t.pr)+'</span></td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td>'+esc(t.d)+'</td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'}
+function supV() {
+  if (TKM) {
+    var t = TK(TKM);
+    if (!t) { TKM = null; return supV(); }
+    var u = U(t.uid);
+    return `<div class="hd"><div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div><div class="sp"></div><button class="btn g" data-a="closeticket">${ic("arrow-left")} Back to tickets</button></div>
+    <div class="cols" style="grid-template-columns: 1fr 2fr;">
+      <div class="card">
+        <h3>Customer Details</h3>
+        <div class="kv">
+          <span>Name</span><span>${esc(u.name)}</span>
+          <span>Email</span><span>${esc(u.email)}</span>
+          <span>Wallet</span><span>${fm(u.wal)}</span>
+          <span>City</span><span>${esc(u.city)}</span>
+          <span>Joined</span><span>${esc(u.joined)}</span>
+        </div>
+        <button class="btn w" style="margin-top:12px" data-a="notify-user" data-v="${u.id}">${ic("bell")} Send Notification</button>
+        <button class="btn w g" style="margin-top:8px" data-a="wallet-user" data-v="${u.id}">${ic("wallet")} Adjust Wallet</button>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column; height: 600px; padding:0;">
+        <div style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;" id="admin-chat-msgs">
+           ${(t.msgs||[]).map(function(m){ return '<div style="align-self:'+(m.admin?'flex-end':'flex-start')+'; background:'+(m.admin?'var(--pr)':'var(--bg)')+'; color:'+(m.admin?'#fff':'var(--tx)')+'; padding:10px 14px; border-radius:12px; max-width:80%;">'+esc(m.b)+'<br><small style="opacity:0.7;font-size:10px;">'+esc(m.t)+'</small></div>'; }).join('')}
+        </div>
+        <div style="padding:12px; border-top:1px solid var(--bd); display:flex; gap:8px; background:var(--card);">
+           <input type="text" class="in" id="admin-reply-input" placeholder="Type your reply..." style="flex:1;" onkeydown="if(event.key==='Enter') adminReply('${t.id}')">
+           <button class="btn" onclick="adminReply('${t.id}')">Send</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});
+  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th></th></tr>'+(l.map(function(t){return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><span class="chip '+(t.pr==="high"||t.pr==="urgent"?"no":t.pr==="medium"?"wa":"")+'">'+esc(t.pr)+'</span></td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td>'+esc(t.d)+'</td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
+}
 function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
 function rewV(){return '<div class="hd"><div><h1>Rewards and coupons</h1><small>Manage coupons that users claim with points</small></div><div class="sp"></div><button class="btn" data-a="addc">'+ic("plus")+'Create coupon</button></div><div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>'+S.cp.map(function(c,i){return '<tr><td><b>'+esc(c.n)+'</b></td><td><span class="chip">'+esc(c.code)+'</span></td><td>'+esc(c.dc)+'</td><td>'+c.used+' / '+c.tot+'</td><td><span class="chip '+(c.on?"ok":"")+'">'+(c.on?"Active":"Paused")+'</span></td><td><div class="ac"><button class="btn s g" data-ct="'+i+'">'+(c.on?"Pause":"Activate")+'</button></div></td></tr>'}).join("")+'</table></div>'}
 function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div class="card"><h3>Admin account</h3><div class="kv"><span>Name</span><span>Administrator</span><span>Email</span><span>'+esc(S.adm||"admin@CricPulse.edu")+'</span><span>Role</span><span>Super admin</span></div></div><div class="card"><h3>Preferences</h3><div class="ls"><div><b>Appearance</b><small>Switch between light and dark</small></div><button class="btn g" data-a="theme">Toggle theme</button></div><div class="ls"><div><b>Reset demo data</b><small>Restore all sample data</small></div><button class="btn r" data-a="reset">Reset</button></div></div><div class="card"><button class="btn g" data-a="out">'+ic("log-out")+'Sign out</button></div><small>Prototype with sample data. No real payments or personal data are processed.</small>'}
@@ -316,6 +372,9 @@ document.addEventListener("click",function(e){
   else if(d.wf)WF=d.wf;
   else if(d.kf)TKF=d.kf;
   else if(d.tk){openTicket(d.tk);return}
+  else if(d.a==="closeticket"){TKM=null;render();return}
+  else if(d.a==="notify-user"){TKM=null;CPS.aud="one";CPS.uid=d.v;S.page="not";render();return}
+  else if(d.a==="wallet-user"){TKM=null;var u=U(d.v);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
   else if(d.wd){var p=d.wd.split("|");doWd(p[0],p[1]);return}
   else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
   save();render();
@@ -369,7 +428,13 @@ function initAdminRealtime() {
   db.channel('admin-messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
       if (S.page === 'sup' && TKM === payload.new.ticket_id) {
-        fetchMsgs(TKM).then(r => { if(!r.error) { TK(TKM).msgs = r.data.map(mapMsg); renderChat(); } });
+        fetchMsgs(TKM).then(function(r) { 
+          if(!r.error) { 
+            TK(TKM).msgs = r.data.map(mapMsg); 
+            render(); 
+            setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
+          } 
+        });
       }
     }).subscribe();
   db.channel('admin-wallets')
