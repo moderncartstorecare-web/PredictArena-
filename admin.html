@@ -169,9 +169,11 @@ async function loadAll(){
   if(!db)return;
   try{
     var r=await Promise.all([
+       
       fetchT("users",COLS.users.created,500,1), /* users */
       fetchT("wallet",null,500,0),              /* wallets */
       fetchT("withdrawal_requests",COLS.wd.created,300),
+      fetchT("notifications","created_at",100) // <-- ADD THIS
       fetchT("support_tickets",COLS.tk.created,300),
       fetchT("matches","created_at",500)        /* <-- ADD THIS LINE */
     ]);
