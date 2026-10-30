@@ -1190,10 +1190,27 @@ function initRealtimeSync() {
             ts: new Date(n.created_at).getTime()
           });
           save();
-          save();
           render(); // Force render on ALL pages so the bell count updates instantly
           toast("New notification received!", "bell");
         }
+      }
+    })
+    .subscribe();
+
+  // 3. REAL-TIME TICKET REPLIES LISTENER
+  supabase.channel('cricpulse-tickets-' + S.user.id)
+    .on('postgres_changes', { 
+      event: 'INSERT', 
+      schema: 'public', 
+      table: 'ticket_messages' 
+    }, (payload) => {
+      const msg = payload.new;
+      // If the ticket is currently open, reload its messages instantly
+      if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
+        loadTickets().then(() => {
+          render();
+          setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+        });
       }
     })
     .subscribe();
@@ -1277,7 +1294,7 @@ window.addEventListener("load", async () => {
           if (!error) {
             toast('Payment successful. Wallet updated.', 'check');
             const p = await CP_DB.getProfile(S.user.id);
-            if (p && p.wallet && p.wallet[0]) { S.bal = p.wallet[0].balance; save(); render(); }
+            if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); }
           }
         } else if (status === 'failed' || status === 'timeout') {
           toast('Payment ' + status + '. Try again.', 'x');
