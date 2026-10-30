@@ -220,8 +220,24 @@ async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0
 async function doWd(id,st){var w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,P(COLS.wd.status,st))))return;w.st=st;var u=S.users.filter(function(x){return x.id===w.uid})[0];
   if(st==="rejected"&&REFUND_ON_REJECT&&u){var nw=u.wal+w.amt;if(await upd("users",COLS.users.id,u.id,P(COLS.users.wallet,nw))){u.wal=nw;S.txl.unshift({uid:u.id,ty:"Refund",amt:"+"+w.amt,n:"Rejected "+w.id.slice(0,8),d:fd(new Date())})}}
   act("Withdrawal "+w.id.slice(0,8)+" "+st+" ("+(u?u.name:"unknown user")+")");toast("Withdrawal "+st);rebuildTx();save();render()}
-async function doWallet(uid,a,cr,why){var u=S.users.filter(function(x){return x.id===uid})[0];if(!u){toast("User not found","circle-alert");return}if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}var nw=u.wal+(cr?a:-a);if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.wallet,nw))))return;u.wal=nw;S.txl.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:why,d:fd(new Date())});act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);closeM();toast("Wallet updated");rebuildTx();save();render()}
-/* ---------- Support tickets ---------- */
+async function doWallet(uid,a,cr,why){
+  var u=S.users.filter(function(x){return x.id===uid})[0];
+  if(!u){toast("User not found","circle-alert");return}
+  if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}
+  if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}
+  
+  var nw=u.wal+(cr?a:-a);
+  
+  // Fix: Update the separate 'wallet' table instead of the 'users' table
+  var r = await db.from("wallet").update({ balance: nw }).eq("user_id", u.id);
+  if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return}
+  
+  u.wal=nw;
+  S.txl.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:why,d:fd(new Date())});
+  act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);
+  closeM();toast("Wallet updated");rebuildTx();save();render();
+}
+   /* ---------- Support tickets ---------- */
 async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
 function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
 function renderChat(){var t=TK(TKM),el=$("tkc");if(!t||!el)return;el.innerHTML=(t.msgs&&t.msgs.length)?t.msgs.map(function(m){return '<div class="ls"><div class="ico">'+ic(m.admin?"shield-check":"user")+'</div><div><b>'+esc(m.admin?"Support":tkUser(t))+'</b><small>'+esc(m.t)+'</small><div style="white-space:pre-wrap;margin-top:2px">'+esc(m.b)+'</div></div></div>'}).join(""):'<small>No messages yet.</small>';el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
@@ -242,8 +258,19 @@ function authRedirect(){return location.origin+location.pathname}
 function cleanUrl(){if(/access_token|code=|error/.test(location.hash+location.search))history.replaceState(null,"",location.pathname)}
 async function doLogin(){
   if(!db){toast("Supabase is not configured","circle-alert");return}
+  
+  // Check if a non-admin is already logged in via Supabase and kick them out immediately
+  var check = await db.auth.getSession();
+  if(check.data && check.data.session){
+      var em = check.data.session.user.email;
+      if(ADMIN_EMAILS.length && ADMIN_EMAILS.map(function(x){return x.toLowerCase()}).indexOf(em.toLowerCase()) < 0){
+          toast("This Google account is not an admin. Logging out...","circle-alert");
+          await db.auth.signOut();
+          return;
+      }
+  }
+  
   toast("Opening Google sign in…","log-in");
-  /* prompt:"select_account" makes Google show the email list every time */
   var r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:authRedirect(),queryParams:{prompt:"select_account"}}});
   if(r.error)toast("Sign in failed: "+r.error.message,"circle-alert");
 }
