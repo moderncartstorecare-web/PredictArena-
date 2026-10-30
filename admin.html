@@ -436,27 +436,50 @@ async function boot(){
     else render();
   }catch(e){render()}
 }
-   // AUTO-SYNC: Fetch new data every 5 seconds without refreshing the page
-setInterval(async () => {
-  if (!LOGIN || !db) return; 
-  try {
-    // 1. Sync Support Tickets
-    const { data: tickets } = await db.from('support_tickets').select('*'); // Removed order by to prevent crashes
-    
-    // If the number of tickets changed, reload everything
-    if (tickets && tickets.length !== S.tickets.length) {
-       await loadAll(); 
-    } else if (S.page === 'sup' && TKM) {
-       // 2. If you are inside a chat, check for new messages
-       const r = await fetchMsgs(TKM);
-       const currentChat = S.tickets.find(t=>t.id===TKM);
-       if (!r.error && currentChat && r.data.length > (currentChat.msgs?.length || 0)) {
-         currentChat.msgs = r.data.map(mapMsg);
-         renderChat();
-       }
-    }
-  } catch(e) { console.log("Auto-sync skipped", e); }
-}, 5000);
+// ============================================================
+// REAL-TIME ADMIN SYNC (Tickets & Wallets)
+// ============================================================
+function initAdminRealtime() {
+  if (!db) return;
+
+  // 1. Listen for new Support Tickets
+  db.channel('admin-tickets')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
+      loadAll(); // Reload tickets to update the list and badges
+    })
+    .subscribe();
+
+  // 2. Listen for new Ticket Messages (Chat)
+  db.channel('admin-messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
+      // If we are currently looking at this ticket's chat, reload the messages instantly
+      if (S.page === 'sup' && TKM === payload.new.ticket_id) {
+        fetchMsgs(TKM).then(r => {
+           if(!r.error) {
+             TK(TKM).msgs = r.data.map(mapMsg);
+             renderChat();
+           }
+        });
+      }
+    })
+    .subscribe();
+
+  // 3. Listen for Wallet updates (so Admin sees balance change instantly)
+  db.channel('admin-wallets')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'wallet' }, (payload) => {
+      const user = S.users.find(u => u.id === payload.new.user_id);
+      if (user && user.wal !== payload.new.balance) {
+        user.wal = payload.new.balance;
+        save();
+        if (S.page === 'users' || S.page === 'dash') render();
+      }
+    })
+    .subscribe();
+}
+
+// Call this immediately after admin logs in.
+// Find `async function enter(session)` in admin.html and add this right before the closing brace:
+// initAdminRealtime();
 boot();
 </script>
 </body>
