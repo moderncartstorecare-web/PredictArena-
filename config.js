@@ -32,20 +32,29 @@ window.CP_DB = {
 
   // --- FRONTEND DATA FETCHING ---
   getProfile: async (userId) => {
-    const { data, error } = await supabase.from('users').select('*, wallet(*)').eq('id', userId).single();
-    if (error) return null;
+    let { data, error } = await supabase.from('users').select('*, wallet(*)').eq('id', userId).maybeSingle();
+    if (error || !data) return null;
     
-    // Format to match frontend expectations
+    // Handle array vs object (Supabase can return either)
+    let w = Array.isArray(data.wallet) ? data.wallet[0] : data.wallet;
+    
+    // Auto-create wallet with ₹25 if it's missing (fixes old users)
+    if (!w) {
+      const { data: newW } = await supabase.from('wallet').insert({ user_id: userId, balance: 25 }).select().single();
+      w = newW;
+      await supabase.from('transactions').insert({ user_id: userId, description: 'Welcome bonus', type: 'credit', amount: 25 });
+    }
+
     return {
       display_name: data.full_name || data.email?.split('@')[0],
       email: data.email,
-      balance: data.wallet?.[0]?.balance || 0,
-      xp: data.wallet?.[0]?.points || 0,
+      balance: w?.balance || 0,
+      xp: w?.points || 0,
       streak: 0, 
       streak_best: 0
     };
   },
-
+  
   getTransactions: async (userId) => {
     const { data } = await supabase.from('transactions').select('*').eq('user_id', userId).order('created_at', { ascending: false });
     return data || [];
