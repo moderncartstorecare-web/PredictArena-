@@ -640,11 +640,19 @@ function applySession(session) {
   AUTH_P = (async () => {
     cleanAuthUrl();
     const em = session.user.email || "";
-    let profile = null, tx = [];
+    let profile = null, tx = [], realNotifs = [];
     try {
       profile = await CP_DB.getProfile(session.user.id);
       tx = await CP_DB.getTransactions(session.user.id);
+      // NEW: Fetch actual notifications from database
+      const { data } = await supabase.from('notifications')
+        .select('*')
+        .or(`user_id.eq.${session.user.id},user_id.is.null`)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) realNotifs = data;
     } catch(e) { console.error("Profile load failed", e); }
+    
     switchAcct(em);
     S.user = {
       id: session.user.id,
@@ -659,6 +667,18 @@ function applySession(session) {
       status: t.status,
       date: new Date(t.created_at).toLocaleDateString("en-IN")
     }));
+    
+    // NEW: Map the real notifications into the UI format
+    if (realNotifs.length > 0) {
+      S.nts = realNotifs.map(n => ({
+        t: n.title,
+        d: n.body,
+        i: n.icon || "bell",
+        r: 0,
+        ts: new Date(n.created_at).getTime()
+      }));
+    }
+
     save();
     render(); // Render Dashboard
   })();
@@ -1027,6 +1047,62 @@ setInterval(() => {
   if (ch) { save(); if (S.user && S.route == "wallet") render(); }
 }, 2000);
 
+// AUTO-SYNC: Fetch new matches and notifications from Admin every 10 seconds
+setInterval(async () => {
+  if (!window.CP_DB || !CP_DB.ready) return;
+  try {
+    // 1. Sync Matches
+    const liveMatches = await CP_DB.getMatches();
+    if (liveMatches && liveMatches.length > 0) {
+       let changed = false;
+       liveMatches.forEach(m => {
+         if (!MK.find(x => x.id === m.id)) changed = true; // New match found
+       });
+       
+       if (changed) {
+         MK = liveMatches.map(m => ({
+            id: m.id,
+            c: m.category,
+            lg: m.league,
+            A: [m.team_a.split(' ')[0], m.team_a], 
+            B: [m.team_b.split(' ')[0], m.team_b],
+            q: m.question,
+            s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
+            w: m.crowd_a,
+            oa: m.odds_a,
+            ob: m.odds_b
+         }));
+         MK.forEach(m => {
+           if (!LV[m.id]) LV[m.id] = m.c == "cricket" ? {r:96, w:2, b:12, tg:180, lg:["Match started"]} : {v:100, lg:["Live"]};
+         });
+         if (S.route === "markets" || S.route === "home") render(); // Refresh screen
+       }
+    }
+
+    // 2. Sync Notifications
+    if (S.user) {
+       const { data: newNotifs } = await supabase.from('notifications')
+         .select('*')
+         .or(`user_id.eq.${S.user.id},user_id.is.null`)
+         .order('created_at', { ascending: false })
+         .limit(20);
+       
+       if (newNotifs && newNotifs.length > 0) {
+         let currentIds = S.nts.map(n => n.ts).join(',');
+         let newIds = newNotifs.map(n => new Date(n.created_at).getTime()).join(',');
+         
+         // If a new notification arrived, update the UI
+         if (currentIds !== newIds) {
+           S.nts = newNotifs.map(n => ({
+             t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime()
+           }));
+           if (S.route === "alerts" || S.pop) render();
+         }
+       }
+    }
+  } catch(e) {}
+}, 10000);
+
 async function checkPaymentReturn() {
   const params = new URLSearchParams(window.location.search);
   const status = params.get('status');
@@ -1044,19 +1120,37 @@ async function checkPaymentReturn() {
           const data = await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}&select=*`);
           if (data && data[0]) {
             const amt = data[0].amount_inr;
-            // Mark as approved
+            
+            // Mark payment as approved
             await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}`, {
               method: 'PATCH',
               body: JSON.stringify({ status: 'approved' })
             });
-            // Credit wallet locally
-            S.bal += amt;
+            
+            // NEW: Fetch current wallet balance and update database
+            const { data: wData } = await supabase.from('wallet').select('balance').eq('user_id', S.user.id).single();
+            let currentBal = wData ? wData.balance : 0;
+            let newBal = currentBal + amt;
+
+            // Update the database wallet table
+            await supabase.from('wallet').update({ balance: newBal }).eq('user_id', S.user.id);
+
+            // Add to Transactions table for history
+            await supabase.from('transactions').insert({
+              user_id: S.user.id,
+              type: 'deposit',
+              amount: amt,
+              description: 'ZapUPI Deposit',
+              status: 'completed'
+            });
+
+            // Update frontend
+            S.bal = newBal;
             addTx("deposit", amt, "ZapUPI Deposit", "completed");
             note("Funds added", inr2(amt)+" added to your wallet via ZapUPI.", "wallet");
             save(); toast(`Payment successful! ₹${amt} added.`, "wallet"); render();
           }
         } else {
-          // Fallback if Supabase isn't ready
           toast("Payment successful. Balance synced.", "wallet");
         }
       } catch(e) {
@@ -1073,7 +1167,6 @@ async function checkPaymentReturn() {
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 }
-
 /* init — avoids white flash */
 /* init — avoids white flash & fixes the login loop */
 window.addEventListener("load", async () => {
