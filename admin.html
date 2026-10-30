@@ -331,7 +331,7 @@ document.addEventListener("submit",function(e){
   if(id==="lf"){doLogin();return}
   else if(id==="tf"){sendReply();return}
   else if(id==="mf"){
-    var newMatch = { category: $("mc").value.toLowerCase(), league: $("ml").value, team_a: $("ma").value, team_b: $("mb").value, closes_at: new Date(Date.now() + 86400000).toISOString(), crowd_a: 50, odds_a: 1.85, odds_b: 2.10 };
+    var newMatch = { category: $("mc").value.toLowerCase(), league: $("ml").value, team_a: $("ma").value, team_b: $("mb").value, cricket_match_id: $("mid").value, closes_at: new Date(Date.now() + 86400000).toISOString(), crowd_a: 50, odds_a: 1.85, odds_b: 2.10 };
     db.from('matches').insert(newMatch).then(function(res) {
       if (res.error) { toast("Error saving match: " + res.error.message, "circle-alert"); return; }
       toast("Match published to website!"); closeM(); loadAll(); 
@@ -360,7 +360,7 @@ document.addEventListener("click",function(e){
   else if(d.a==="out"||d.a==="logout"){doLogout();return}
   else if(d.a==="refresh"){toast("Refreshing…","refresh-cw");loadAll();return}
   else if(d.a==="reset"){localStorage.removeItem("pxa1");var adm=S.adm;S=JSON.parse(D1);S.adm=adm;toast("Demo data restored");loadAll()}
-  else if(d.a==="addm"){modal('<h3>Add match</h3><form id="mf">'+fld("League or event","ml")+'<div class="fg">'+fld("Team A","ma")+fld("Team B","mb")+'</div><div class="fg"><label class="f">Category<select class="in" id="mc"><option>Cricket</option><option>Football</option><option>Kabaddi</option><option>India Specials</option></select></label>'+fld("Start (e.g. 31 Oct, 7:30 PM)","mw")+'</div><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create match</button></div></form>');return}
+  else if(d.a==="addm"){modal('<h3>Add match</h3><form id="mf">'+fld("League or event","ml")+'<div class="fg">'+fld("Team A","ma")+fld("Team B","mb")+'</div><div class="fg"><label class="f">Category<select class="in" id="mc"><option>Cricket</option><option>Football</option><option>Kabaddi</option><option>India Specials</option></select></label>'+fld("CricAPI Match ID (for live score)","mid")+'</div>'+fld("Start (e.g. 31 Oct, 7:30 PM)","mw")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create match</button></div></form>');return}
   else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
   else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
   else if(d.cl){MM(d.cl).st="closed";act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b);toast("Predictions closed")}
