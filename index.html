@@ -1102,7 +1102,40 @@ setInterval(async () => {
     }
   } catch(e) {}
 }, 10000);
+// AUTO-SYNC FOR USER WEBSITE (Wallet & Notifications)
+setInterval(async () => {
+  if (!window.CP_DB || !CP_DB.ready || !S.user) return;
+  try {
+    // 1. Sync Wallet Balance
+    const { data: wData } = await supabase.from('wallet').select('balance').eq('user_id', S.user.id).single();
+    if (wData && wData.balance !== S.bal) {
+      S.bal = wData.balance; 
+      save();
+      if (S.route === "wallet" || S.route === "home") render(); 
+    }
 
+    // 2. Sync Notifications
+    const { data: newNotifs } = await supabase.from('notifications')
+      .select('*')
+      .or(`user_id.eq.${S.user.id},user_id.is.null`)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    if (newNotifs && newNotifs.length > 0) {
+      let currentIds = S.nts.map(n => n.ts).join(',');
+      let newIds = newNotifs.map(n => new Date(n.created_at).getTime()).join(',');
+      
+      // If new notifications arrived, update the screen automatically
+      if (currentIds !== newIds) {
+        S.nts = newNotifs.map(n => ({
+          t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime()
+        }));
+        save();
+        if (S.route === "alerts" || S.pop) render();
+      }
+    }
+  } catch(e) {}
+}, 10000); // Checks the database every 10 seconds
 async function checkPaymentReturn() {
   const params = new URLSearchParams(window.location.search);
   const status = params.get('status');
