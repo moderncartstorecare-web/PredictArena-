@@ -85,6 +85,47 @@ window.CP_CONFIG = {
        const p = await rest(`match_history?user_id=eq.${userId}&order=created_at.desc`);
        return p || [];
     },
+
+    // --- NEW: Matches, Coupons, Notifications ---
+    
+    getMatches: async () => {
+       const m = await rest(`matches?order=created_at.desc`);
+       return m || [];
+    },
+
+    addMatch: async (match) => {
+       const m = await rest(`matches`, {
+         method: 'POST',
+         body: JSON.stringify(match)
+       });
+       return m;
+    },
+
+    updateMatch: async (id, patch) => {
+       const m = await rest(`matches?id=eq.${id}`, {
+         method: 'PATCH',
+         body: JSON.stringify(patch)
+       });
+       return m;
+    },
+
+    getCoupons: async (userId) => {
+       const c = await rest(`coupons?user_id=eq.${userId}&order=created_at.desc`);
+       return c || [];
+    },
+
+    getNotifications: async (userId) => {
+       const n = await rest(`notifications?or=(user_id.eq.${userId},user_id.is.null)&order=created_at.desc`);
+       return n || [];
+    },
+
+    sendBroadcast: async (title, body) => {
+       const n = await rest(`notifications`, {
+         method: 'POST',
+         body: JSON.stringify({ title, body, user_id: null })
+       });
+       return n;
+    },
     authClient: supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { detectSessionInUrl: true, persistSession: true }
     }),
