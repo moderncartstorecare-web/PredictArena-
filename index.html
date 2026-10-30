@@ -532,7 +532,7 @@ function supportV() {
   const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
   return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"60 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
 <div class="grid2"><button class="tile" data-a="newticket">${ic("chat",18)}<div><b>Create a ticket</b><div class="mut s11">Chat with our team</div></div></button><button class="tile" data-a="instagram">${ic("instagram",18)}<div><b>Instagram</b><div class="mut s11">@${esc(ig)}</div></div></button></div>
-<div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">${esc(t.subject)}</b><span class="mut s12">${t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
+<div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">${esc(t.subject)}</b><span class="mut s12">${t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><div class="row" style="gap:6px"><span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span>${t.unread > 0 ? `<span class="dot" style="position:static;">${t.unread}</span>` : ''}</div></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
 <div class="card"><h3>Common questions</h3>${faqH(3)}</div></div>`;
 }
 function ticketV() {
@@ -787,17 +787,22 @@ async function loadTickets() {
   if (!S.user || !window.CP_DB) return;
   try {
     const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
-    S.tickets = (data || []).map(t => ({
-      id: t.id,
-      subject: t.subject,
-      status: t.status,
-      updated: new Date(t.created_at).toLocaleDateString(),
-      msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({
-        me: m.sender === 'user',
-        text: m.message,
-        at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      }))
-    }));
+    S.tickets = (data || []).map(t => {
+      // Count admin messages that haven't been read
+      const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
+      return {
+        id: t.id,
+        subject: t.subject,
+        status: t.status,
+        updated: new Date(t.created_at).toLocaleDateString(),
+        unread: unread,
+        msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({
+          me: m.sender === 'user',
+          text: m.message,
+          at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        }))
+      };
+    });
     save();
   } catch(e) { console.error("Tickets load failed", e); }
 }
@@ -920,7 +925,17 @@ document.addEventListener("click", e => {
     }
     case "support": S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); break;
     case "newticket": createTicket(); break;
-    case "openticket": S.ticketOpen = Number(v); S.route = "ticket"; render(); loadTickets().then(() => render()); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); break;
+    case "openticket": 
+      S.ticketOpen = v; // Don't use Number(v) for UUIDs!
+      S.route = "ticket"; 
+      render(); 
+      loadTickets().then(() => { 
+        render(); 
+        // Mark admin messages as read
+        supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then();
+        setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); 
+      }); 
+      break;
     case "instagram": {
       const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
       window.open("https://instagram.com/" + ig, "_blank", "noopener");
@@ -1205,12 +1220,16 @@ function initRealtimeSync() {
       table: 'ticket_messages' 
     }, (payload) => {
       const msg = payload.new;
-      // If the ticket is currently open, reload its messages instantly
       if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
         loadTickets().then(() => {
           render();
           setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
         });
+      } else {
+         // Update the unread badge on the support page
+         loadTickets().then(() => {
+            if (S.route === "support") render();
+         });
       }
     })
     .subscribe();
