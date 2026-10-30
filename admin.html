@@ -173,7 +173,8 @@ async function loadAll(){
       fetchT("users",COLS.users.created,500,1), /* users */
       fetchT("wallet",null,500,0),              /* wallets */
       fetchT("withdrawal_requests",COLS.wd.created,300),
-      fetchT("support_tickets",COLS.tk.created,300)
+      fetchT("support_tickets",COLS.tk.created,300),
+      fetchT("matches","created_at",500)        /* <-- ADD THIS LINE */
     ]);
     var names=["users","wallet","withdrawal_requests","support_tickets"],er=[];
     r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); /* ignore error for wallet if empty */
@@ -194,7 +195,25 @@ async function loadAll(){
     }
 
     if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
-    if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk)
+    if(!r[3].error)S.tickets=(r[3].data||[]).map(mapTk);
+    
+    /* <-- ADD THIS BLOCK FOR MATCHES */
+    if(!r[4].error){
+      S.matches=(r[4].data||[]).map(function(x){
+        return {
+          id:x.id,
+          c:x.category,
+          l:x.league,
+          a:x.team_a,
+          b:x.team_b,
+          when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "",
+          st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming",
+          win:null,
+          pa:x.crowd_a||50,
+          n:0
+        };
+      });
+    }
   }catch(e){toast("Network error while loading data","circle-alert")}
   rebuildTx();render()}
 async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
