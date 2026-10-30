@@ -168,9 +168,6 @@ async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*
 async function loadAll(){
   if(!db)return;
   try{
-  async function loadAll(){
-  if(!db)return;
-  try{
     var r=await Promise.all([
       fetchT("users",COLS.users.created,500,1), /* index 0: users */
       fetchT("wallet",null,500,0),              /* index 1: wallets */
