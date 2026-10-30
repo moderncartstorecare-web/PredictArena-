@@ -247,8 +247,17 @@ const inr2 = n => "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigi
 const ni = n => Math.round(n).toLocaleString("en-IN");
 
 const CATS = [["cricket","Cricket","cricket"],["football","Football","football"],["kabaddi","Kabaddi","kabaddi"],["indian","Indian events","rupee"],["esports","Esports","gamepad"]];
-let MK = []; // Populated dynamically from Supabase
-
+let MK = [
+  {id:1,c:"cricket",lg:"IPL, Match 42",A:["MI","Mumbai Indians"],B:["CSK","Chennai Super Kings"],s:1500,w:62,oa:1.85,ob:2.1},
+  {id:2,c:"cricket",lg:"ODI Series",A:["IND","India"],B:["AUS","Australia"],s:5400,w:58,oa:1.7,ob:2.3},
+  {id:3,c:"cricket",lg:"Women's T20",A:["RCB","Bengaluru Royals"],B:["DC","Delhi Capitals"],s:9000,w:49,oa:2.05,ob:1.9},
+  {id:4,c:"cricket",lg:"Ranji Trophy",A:["KAR","Karnataka"],B:["TN","Tamil Nadu"],s:3600,w:44,oa:2.15,ob:1.8},
+  {id:5,c:"cricket",lg:"T20 League",A:["KKR","Kolkata Knight Riders"],B:["SRH","Sunrisers Hyderabad"],s:12000,w:47,oa:1.95,ob:1.95},
+  {id:6,c:"cricket",lg:"ODI, Day/Night",A:["ENG","England"],B:["SA","South Africa"],s:7200,w:55,oa:1.75,ob:2.2},
+  {id:7,c:"indian",lg:"Entertainment",q:"Will the new film cross ₹300 crore by Sunday?",A:["Y","Yes"],B:["N","No"],s:20000,w:51,oa:1.9,ob:2},
+  {id:8,c:"indian",lg:"Economy",q:"Will Sensex close above last week's high?",A:["Y","Yes"],B:["N","No"],s:15000,w:46,oa:2.1,ob:1.85},
+  {id:9,c:"esports",lg:"BGMI Pro Series",A:["TSM","Team Soul"],B:["GE","Godlike"],s:6400,w:53,oa:1.8,ob:2.1}
+];
 const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
 const FAQ = [
   ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
