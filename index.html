@@ -659,7 +659,7 @@ function applySession(session) {
       n: (profile && profile.display_name) || em.split('@')[0] || "Player",
       e: em
     };
-    S.bal = (profile && profile.wallet && profile.wallet[0] && profile.wallet[0].balance) || 0;
+    S.bal = (profile && profile.balance) || 0;
     S.txs = (tx || []).map(t => ({
       type: t.type,
       amount: t.amount,
@@ -674,7 +674,7 @@ function applySession(session) {
         t: n.title,
         d: n.body,
         i: n.icon || "bell",
-        r: 0,
+        r: n.is_read ? 1 : 0, // Respect DB read status on refresh
         ts: new Date(n.created_at).getTime()
       }));
     }
@@ -783,14 +783,42 @@ const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">Mor
 function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
 
 /* support helpers */
-function createTicket() {
-  const now = new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
-  const t = { id: Date.now(), subject:"Support request", status:"open", updated:"Just now", msgs:[
-    {me:false, text:"Hi! This is CricPulse Support. We reply within "+(window.CP_CONFIG?.SUPPORT_REPLY_WINDOW||"60 minutes")+". How can we help?", at:now},
-    {me:true, text:"I need help with my account.", at:now}
-  ]};
-  S.tickets.push(t); S.ticketOpen = t.id; save(); S.route = "ticket"; render(); scrollTo(0,0);
-  setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+async function loadTickets() {
+  if (!S.user || !window.CP_DB) return;
+  try {
+    const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
+    S.tickets = (data || []).map(t => ({
+      id: t.id,
+      subject: t.subject,
+      status: t.status,
+      updated: new Date(t.created_at).toLocaleDateString(),
+      msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({
+        me: m.sender === 'user',
+        text: m.message,
+        at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      }))
+    }));
+    save();
+  } catch(e) { console.error("Tickets load failed", e); }
+}
+
+async function createTicket() {
+  if (!S.user || !window.CP_DB) return;
+  try {
+    const { data: t, error } = await supabase.from('support_tickets').insert({
+      user_id: S.user.id, subject: "Support request", status: "open"
+    }).select().single();
+    if (error) throw error;
+    await supabase.from('ticket_messages').insert({
+      ticket_id: t.id, sender: 'user', message: "I need help with my account."
+    });
+    await loadTickets();
+    S.ticketOpen = t.id;
+    S.route = "ticket";
+    render();
+    scrollTo(0,0);
+    setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+  } catch(e) { toast("Could not create ticket: " + e.message, "x"); }
 }
 
 /* one-click handlers */
@@ -860,7 +888,11 @@ document.addEventListener("click", e => {
     case "theme": S.theme = isDark() ? "light" : "dark"; applyTheme(); save(); closeSheet(); render(); break;
     case "more": moreSheet(); break;
     case "pop": S.pop = S.pop ? 0 : 1; render(); break;
-    case "readall": S.nts.forEach(n => n.r = 1); save(); render(); break;
+    case "readall": 
+      S.nts.forEach(n => n.r = 1); 
+      save(); 
+      if (S.user) supabase.from('notifications').update({ is_read: true }).eq('user_id', S.user.id).then(() => render());
+      break;
     case "cat": S.cat = v; render(); break;
     case "pick": case "mpick": {
       const [id,k] = v.split(":");
@@ -886,9 +918,9 @@ document.addEventListener("click", e => {
     case "logout": {
       doLogout(); break;
     }
-    case "support": S.route = "support"; render(); scrollTo(0,0); break;
+    case "support": S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); break;
     case "newticket": createTicket(); break;
-    case "openticket": S.ticketOpen = Number(v); S.route = "ticket"; render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); break;
+    case "openticket": S.ticketOpen = Number(v); S.route = "ticket"; render(); loadTickets().then(() => render()); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); break;
     case "instagram": {
       const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
       window.open("https://instagram.com/" + ig, "_blank", "noopener");
@@ -901,15 +933,7 @@ document.addEventListener("click", e => {
       t2.msgs.push({me:true, text:txt, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
       t2.updated = "Just now"; ta.value = ""; save(); render();
       setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
-      // simulated support ack (real replies come from admin panel / Supabase)
-      setTimeout(() => {
-        const t3 = S.tickets.find(x => x.id == S.ticketOpen);
-        if (t3 && t3.status != "closed") {
-          t3.msgs.push({me:false, text:"Thanks for the message — our team will reply within "+(window.CP_CONFIG?.SUPPORT_REPLY_WINDOW||"60 minutes")+".", at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
-          t3.updated = "Just now"; save();
-          if (S.route == "ticket") { render(); const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }
-        }
-      }, 2500);
+      supabase.from('ticket_messages').insert({ ticket_id: t2.id, sender: 'user', message: txt }).then();
       break;
     }
     case "dep": depSheet(); break;
@@ -1166,10 +1190,8 @@ function initRealtimeSync() {
             ts: new Date(n.created_at).getTime()
           });
           save();
-          // Re-render to show the red dot instantly
-          if (S.route === "alerts" || S.pop) render();
-          
-          // Play a small sound or show a toast (Optional)
+          save();
+          render(); // Force render on ALL pages so the bell count updates instantly
           toast("New notification received!", "bell");
         }
       }
