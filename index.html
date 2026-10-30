@@ -1102,104 +1102,65 @@ setInterval(async () => {
     }
   } catch(e) {}
 }, 10000);
-// AUTO-SYNC FOR USER WEBSITE (Wallet & Notifications)
-setInterval(async () => {
+// ============================================================
+// REAL-TIME SYNC (Wallet & Notifications) - Inspired by SkillClash
+// ============================================================
+function initRealtimeSync() {
   if (!window.CP_DB || !CP_DB.ready || !S.user) return;
-  try {
-    // 1. Sync Wallet Balance
-    const { data: wData } = await supabase.from('wallet').select('balance').eq('user_id', S.user.id).single();
-    if (wData && wData.balance !== S.bal) {
-      S.bal = wData.balance; 
-      save();
-      if (S.route === "wallet" || S.route === "home") render(); 
-    }
 
-    // 2. Sync Notifications
-    const { data: newNotifs } = await supabase.from('notifications')
-      .select('*')
-      .or(`user_id.eq.${S.user.id},user_id.is.null`)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    
-    if (newNotifs && newNotifs.length > 0) {
-      let currentIds = S.nts.map(n => n.ts).join(',');
-      let newIds = newNotifs.map(n => new Date(n.created_at).getTime()).join(',');
-      
-      // If new notifications arrived, update the screen automatically
-      if (currentIds !== newIds) {
-        S.nts = newNotifs.map(n => ({
-          t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime()
-        }));
+  // 1. REAL-TIME WALLET LISTENER
+  supabase.channel('cricpulse-wallet-' + S.user.id)
+    .on('postgres_changes', { 
+      event: 'UPDATE', 
+      schema: 'public', 
+      table: 'wallet', 
+      filter: `user_id=eq.${S.user.id}` 
+    }, (payload) => {
+      const newBal = payload.new.balance;
+      if (typeof newBal === 'number' && newBal !== S.bal) {
+        S.bal = newBal;
         save();
-        if (S.route === "alerts" || S.pop) render();
+        if (S.route === "wallet" || S.route === "home") render();
       }
-    }
-  } catch(e) {}
-}, 10000); // Checks the database every 10 seconds
-async function checkPaymentReturn() {
-  const params = new URLSearchParams(window.location.search);
-  const status = params.get('status');
-  const orderId = params.get('order_id');
-  
-  if (!orderId) return;
+    })
+    .subscribe();
 
-  if (status === 'success') {
-    toast("Verifying payment...", "clock");
-    
-    setTimeout(async () => {
-      try {
-        if (window.CP_DB && CP_DB.ready) {
-          // Verify with Supabase
-          const data = await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}&select=*`);
-          if (data && data[0]) {
-            const amt = data[0].amount_inr;
-            
-            // Mark payment as approved
-            await CP_DB.rest(`payment_requests?txn_id=eq.${orderId}`, {
-              method: 'PATCH',
-              body: JSON.stringify({ status: 'approved' })
-            });
-            
-            // NEW: Fetch current wallet balance and update database
-            const { data: wData } = await supabase.from('wallet').select('balance').eq('user_id', S.user.id).single();
-            let currentBal = wData ? wData.balance : 0;
-            let newBal = currentBal + amt;
-
-            // Update the database wallet table
-            await supabase.from('wallet').update({ balance: newBal }).eq('user_id', S.user.id);
-
-            // Add to Transactions table for history
-            await supabase.from('transactions').insert({
-              user_id: S.user.id,
-              type: 'deposit',
-              amount: amt,
-              description: 'ZapUPI Deposit',
-              status: 'completed'
-            });
-
-            // Update frontend
-            S.bal = newBal;
-            addTx("deposit", amt, "ZapUPI Deposit", "completed");
-            note("Funds added", inr2(amt)+" added to your wallet via ZapUPI.", "wallet");
-            save(); toast(`Payment successful! ₹${amt} added.`, "wallet"); render();
-          }
-        } else {
-          toast("Payment successful. Balance synced.", "wallet");
+  // 2. REAL-TIME NOTIFICATIONS LISTENER
+  supabase.channel('cricpulse-notifs-' + S.user.id)
+    .on('postgres_changes', { 
+      event: 'INSERT', 
+      schema: 'public', 
+      table: 'notifications' 
+    }, (payload) => {
+      const n = payload.new;
+      // Only show if it's for this user OR for everyone (null)
+      if (n.user_id === S.user.id || n.user_id === null) {
+        const exists = S.nts.some(x => x.ts === new Date(n.created_at).getTime());
+        if (!exists) {
+          S.nts.unshift({
+            t: n.title, 
+            d: n.body, 
+            i: n.icon || "bell", 
+            r: 0, 
+            ts: new Date(n.created_at).getTime()
+          });
+          save();
+          // Re-render to show the red dot instantly
+          if (S.route === "alerts" || S.pop) render();
+          
+          // Play a small sound or show a toast (Optional)
+          toast("New notification received!", "bell");
         }
-      } catch(e) {
-        console.error('Payment verification failed', e);
       }
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }, 2000);
-    
-  } else if (status === 'failed') {
-    toast('Payment failed. Please try again.', 'xmark');
-    window.history.replaceState({}, document.title, window.location.pathname);
-  } else if (status === 'timeout') {
-    toast('Payment timed out. Please try again.', 'xmark');
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
+    })
+    .subscribe();
 }
+
+// Call this function when the user logs in
+// Find: `applySession(session)` inside index.html. Add this at the end of it:
+// initRealtimeSync();
+
+                                                                                                   
 /* init — avoids white flash */
 /* init — avoids white flash & fixes the login loop */
 window.addEventListener("load", async () => {
