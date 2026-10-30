@@ -358,23 +358,24 @@ function liveText(m) {
   return "Live · " + m.A[0] + " " + L.rd[0] + " - " + L.rd[1] + " " + m.B[0];
 }
 function liveBoard(m) {
-  const L = LV[m.id], lg = `<div class="lg">${L.lg.map(x => `<div>${esc(x)}</div>`).join("")}</div>`;
-  if (m.q) {
-    const t = m.id==7 ? 300 : 78900, pc = Math.min(100, Math.round(L.v/t*100));
-    return `<div class="tm" style="padding:8px 0 10px"><b>${m.id==7?"Collection so far":"Sensex now"}</b><span>${m.id==7?"₹"+L.v.toFixed(1)+" cr":ni(L.v)}</span><small>Target ${m.id==7?"₹300 cr":ni(t)}</small></div><div class="bar"><i style="width:${pc}%"></i></div><div class="mut s12" style="margin:6px 0 8px">${pc}% of target</div>${lg}`;
+  // If we are still waiting for the API to respond, show a loading state
+  if (!m.liveData) {
+    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Loading...</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Loading...</small></div></div><div class="ex">Connecting to live feed...</div>`;
   }
-  let a,as,b,bs,ex;
-  if (m.c == "cricket") { a = L.r+"/"+L.w; as = ov(L.b)+" ov"; b = "-"; bs = "Yet to bat"; ex = m.A[1]+" batting, target "+L.tg; }
-  else if (m.c == "football") { a = L.g[0]; as = ""; b = L.g[1]; bs = ""; ex = L.n+"' played"; }
-  else if (m.c == "kabaddi") { a = L.p[0]; as = ""; b = L.p[1]; bs = ""; ex = L.n+" of 40 minutes"; }
-  else { a = L.rd[0]; as = "rounds"; b = L.rd[1]; bs = "rounds"; ex = "Map 2, first to 13"; }
-  return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>${a}</span><small>${as}</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>${b}</span><small>${bs}</small></div></div><div class="ex">${ex}</div>${lg}`;
+  
+  // Use REAL data from the API
+  const d = m.liveData;
+  return `
+    <div class="sg">
+      <div class="tm"><b>${esc(m.A[1])}</b><span>${d.scoreA}</span><small>${d.oversA}</small></div>
+      <div class="mut s12">vs</div>
+      <div class="tm"><b>${esc(m.B[1])}</b><span>${d.scoreB}</span><small>${d.oversB}</small></div>
+    </div>
+    <div class="ex">${d.statusText}</div>
+  `;
 }
-const miniBoard = () => {
-  const m = MK[0], L = LV[1];
-  return `<div class="sg"><div class="tm"><b>${m.A[0]}</b><span>${L.r}/${L.w}</span><small>${ov(L.b)} ov</small></div><div class="mut s12">vs</div><div class="tm"><b>${m.B[0]}</b><span>-</span><small>Yet to bat</small></div></div>`;
-};
-
+const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';
+  
 /* ui helpers */
 const toast = (m,g="check") => {
   const n = document.createElement("div"); n.className = "ts";
@@ -1078,38 +1079,57 @@ setInterval(() => {
   });
 }, 1000);
 
-function tick() {
-  MK.forEach(m => {
-    const L = LV[m.id], r = Math.random(), A = m.A[0], B = m.B[0];
-    if (m.c == "cricket") {
-      if (L.b >= 119) return;
-      const o = [0,0,1,1,1,2,4,4,6,-1][Math.floor(r*10)];
-      L.b++;
-      if (o < 0) { if (L.w < 9) L.w++; L.lg.unshift(ov(L.b)+" ov: WICKET"); }
-      else { L.r += o; L.lg.unshift(ov(L.b)+" ov: "+(o==4?"FOUR":o==6?"SIX":o?o+" run"+(o>1?"s":""):"Dot ball")); }
-    } else if (m.c == "football") {
-      if (L.n >= 90) return; L.n++;
-      if (r < .05) { const k = Math.random()*100 < m.w ? 0 : 1; L.g[k]++; L.lg.unshift(L.n+"' GOAL, "+(k?B:A)); }
-      else if (r < .12) L.lg.unshift(L.n+"' Corner, "+(r<.08?A:B));
-    } else if (m.c == "kabaddi") {
-      if (L.n >= 40) return; if (r < .5) L.n++;
-      const k = r < .5 ? 0 : 1, p = 1+Math.floor(Math.random()*3);
-      L.p[k] += p; L.lg.unshift("Raid: "+(k?B:A)+" +"+p);
-    } else if (m.c == "esports") {
-      if (L.rd[0] >= 13 || L.rd[1] >= 13) return;
-      const k = r < m.w/100 ? 0 : 1; L.rd[k]++; L.lg.unshift("Round won by "+(k?B:A));
-    } else {
-      L.v += m.id==7 ? Math.random()*1.4 : (Math.random()-.45)*45;
-      L.lg.unshift("Update: "+(m.id==7?"₹"+L.v.toFixed(1)+" cr":ni(L.v)));
+// ============================================================
+// REAL-TIME LIVE SCORES (Fetches from Supabase Edge Function)
+// ============================================================
+async function fetchLiveScores() {
+  if (!MK || MK.length === 0) return;
+  
+  for (const m of MK) {
+    // Only fetch for cricket matches that have an API ID
+    if (m.c === 'cricket' && m.cricket_match_id) {
+      try {
+        const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matchId: m.cricket_match_id })
+        });
+        
+        const result = await response.json();
+        
+        if (result && result.status === 'success' && result.data) {
+          const info = result.data;
+          let scoreA = '-', scoreB = '-', oversA = '', oversB = '';
+          
+          // Parse team scores if available
+          if (info.score && info.score.length > 0) {
+            info.score.forEach(s => {
+              if (s.inning.includes(info.teams[0])) {
+                scoreA = s.r + '/' + (s.w || 0);
+                oversA = s.o ? s.o + ' ov' : '';
+              } else if (s.inning.includes(info.teams[1])) {
+                scoreB = s.r + '/' + (s.w || 0);
+                oversB = s.o ? s.o + ' ov' : '';
+              }
+            });
+          }
+          
+          m.liveData = { scoreA, oversA, scoreB, oversB, statusText: info.status || 'Match in progress' };
+        }
+      } catch (err) {
+        console.error("Live score fetch failed for", m.id, err);
+      }
     }
-    L.lg = L.lg.slice(0,5);
-  });
-  document.querySelectorAll("[data-lb]").forEach(n => n.innerHTML = liveBoard(mkt(n.dataset.lb)));
-  document.querySelectorAll("[data-lt]").forEach(n => n.textContent = liveText(mkt(n.dataset.lt)));
-  document.querySelectorAll("[data-mini]").forEach(n => n.innerHTML = miniBoard());
+  }
+  
+  // Refresh the UI if we are on a page that shows scores
+  if (S.route === "match" || S.route === "home" || S.route === "markets") {
+    render();
+  }
 }
-setInterval(tick, 3000);
 
+// Fetch every 15 seconds (prevents hitting API limits)
+setInterval(fetchLiveScores, 15000);
 setInterval(() => {
   let ch = 0;
   S.txs.forEach(t => {
