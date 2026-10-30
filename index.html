@@ -247,7 +247,7 @@ const inr2 = n => "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigi
 const ni = n => Math.round(n).toLocaleString("en-IN");
 
 const CATS = [["cricket","Cricket","cricket"],["football","Football","football"],["kabaddi","Kabaddi","kabaddi"],["indian","Indian events","rupee"],["esports","Esports","gamepad"]];
-const MK = [
+let MK = [
   {id:1,c:"cricket",lg:"IPL, Match 42",A:["MI","Mumbai Indians"],B:["CSK","Chennai Super Kings"],s:1500,w:62,oa:1.85,ob:2.1},
   {id:2,c:"cricket",lg:"ODI Series",A:["IND","India"],B:["AUS","Australia"],s:5400,w:58,oa:1.7,ob:2.3},
   {id:3,c:"cricket",lg:"Women's T20",A:["RCB","Bengaluru Royals"],B:["DC","Delhi Capitals"],s:9000,w:49,oa:2.05,ob:1.9},
@@ -1096,11 +1096,38 @@ window.addEventListener("load", async () => {
       }
     });
 
-    // 2. Check current session on load
+     // 2. Fetch Live Matches from Supabase
+    try {
+      const liveMatches = await CP_DB.getMatches();
+      // Only replace the hardcoded matches if there are matches in the database
+      if (liveMatches && liveMatches.length > 0) {
+        MK = liveMatches.map(m => ({
+          id: m.id,
+          c: m.category,
+          lg: m.league,
+          A: [m.team_a.split(' ')[0], m.team_a], 
+          B: [m.team_b.split(' ')[0], m.team_b],
+          q: m.question,
+          // Calculate seconds left from the database closing time
+          s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
+          w: m.crowd_a,
+          oa: m.odds_a,
+          ob: m.odds_b
+        }));
+        
+        // Initialize Live Feed for the new matches
+        MK.forEach(m => {
+           if (!LV[m.id]) {
+             LV[m.id] = m.c == "cricket" ? {r:96, w:2, b:12, tg:180, lg:["Match started"]} : {v:100, lg:["Live"]};
+           }
+        });
+      }
+    } catch(e) { console.log("Using fallback matches (DB empty or unreachable)", e); }
+
+    // 3. Check current session
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     
     if (session) {
-      // User is already logged in (applySession renders the dashboard when ready)
       await applySession(session);
     } else {
       render();
