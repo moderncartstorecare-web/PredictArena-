@@ -367,7 +367,7 @@ function liveBoard(m) {
       <div class="mut s12">vs</div>
       <div class="tm"><b>${esc(m.B[1])}</b><span>${d.scoreB}</span><small>${d.oversB}</small></div>
     </div>
-    <div class="ex">${d.statusText}</div>
+    <div class="ex" style="font-weight:600; color: ${m.isFinished ? 'var(--ok)' : 'var(--i3)'};">${d.statusText}</div>
   `;
 }
 const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';
@@ -585,7 +585,7 @@ function matchV() {
   const fa = form(m,0), fb = form(m,1), h = 2, n = 4200, ro = RO[m.c] || ["Player", "Player"], op = wide() ? " open" : "";
   const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
   const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id] || "Stadium"],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free"],["Reward","Funds, XP and a coupon"],["Participants",n.toLocaleString("en-IN")]];
-  return `<div class="lay"><div class="a card"><div class="bt"><h3>Live score</h3><span class="pill no">LIVE</span></div><div data-lb="${m.id}">${liveBoard(m)}</div><div class="mut s11" style="margin-top:6px">Live feed, updates every 3 seconds.</div></div>
+  return `<div class="lay"><div class="a card"><div class="bt"><h3>${m.isFinished ? 'Final Score' : 'Live score'}</h3><span class="pill ${m.isFinished ? 'ok' : 'no'}">${m.isFinished ? 'FINISHED' : 'LIVE'}</span></div><div data-lb="${m.id}">${liveBoard(m)}</div><div class="mut s11" style="margin-top:6px">${m.isFinished ? 'Match has ended.' : 'Live feed, updates every 15 seconds.'}</div></div>
 <div class="c card"><div class="bt" style="margin-bottom:10px"><h3>Your call</h3><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div>${lk ? `<div class="ln"><span class="t2">Your pick</span><b>${esc(full(m,lk.p))}</b></div><div class="ln"><span class="t2">Odds</span><b>${(lk.p=="A"?m.oa:m.ob).toFixed(2)}x</b></div><div class="ln"><span class="t2">Status</span>${stp(lk)}</div>${lk.res?"":`<button class="btn w" style="margin-top:8px" data-a="settle" data-v="${lk.id}">Settle result</button>`}` : `<div class="pks" style="margin-bottom:10px">${["A","B"].map(k => `<button class="pk${sel==k?" on":""}" data-a="mpick" data-v="${m.id}:${k}" ${cls?"disabled":""}><span>${esc(full(m,k))}</span><b>${(k=="A"?m.oa:m.ob).toFixed(2)}x</b></button>`).join("")}</div><button class="btn p w" data-a="lockm" data-v="${m.id}" ${sel&&!cls?"":"disabled"}>${ic("lock",14)} ${cls?"Market closed":"Lock pick, free"}</button>`}<div class="bar" style="margin-top:12px"><i style="width:${m.w}%"></i></div><div class="mut s12" style="margin-top:4px">Crowd: ${m.w}% ${esc(m.A[1])}, ${100-m.w}% ${esc(m.B[1])}</div></div>
 <div class="d stack"><details class="card"${op}><summary>Match details${ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
 ${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>${m.id==7?"Resolves Yes if the film's reported net collection reaches ₹300 crore by Sunday 11:59 PM.":"Resolves Yes if Sensex closes above last week's highest closing value on Friday."}</p></div></details>` : `<details class="card"${op}><summary>Team comparison${ic("chev",15)}</summary><div class="bd"><div class="ln"><span>${esc(m.A[0])}</span>${fs(fa)}</div><div class="ln"><span>${esc(m.B[0])}</span>${fs(fb)}</div><div class="ln"><span class="t2">Last 6 meetings</span><b>${m.A[0]} ${h} - ${6-h} ${m.B[0]}</b></div>${[[m.A,0,1],[m.B,2,3]].map(([t,a,b]) => `<div class="ln"><div><b class="s12">${NM[(m.id+a)%8]}</b><div class="mut s12">${esc(t[1])}, ${ro[0]}</div></div><div style="text-align:right"><b class="s12">${NM[(m.id+b)%8]}</b><div class="mut s12">${ro[1]}</div></div></div>`).join("")}</div></details>`}
@@ -1112,8 +1112,8 @@ async function fetchLiveScores() {
   if (!MK || MK.length === 0) return;
   
   for (const m of MK) {
-    // Only fetch for cricket matches that have an API ID
-    if (m.c === 'cricket' && m.cricket_match_id) {
+    // Only fetch for cricket matches that have an API ID and are NOT finished
+    if (m.c === 'cricket' && m.cricket_match_id && !m.isFinished) {
       try {
         const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score', {
           method: 'POST',
@@ -1143,7 +1143,10 @@ async function fetchLiveScores() {
           }
           
           m.liveData = { scoreA, oversA, scoreB, oversB, statusText: info.status || 'Match in progress' };
-        }
+          if (info.matchEnded) {
+            m.isFinished = true; // Mark it as finished
+          }
+        }        }
       } catch (err) {
         console.error("Live score fetch failed for", m.id, err);
         m.liveData = { scoreA: '-', oversA: '', scoreB: '-', oversB: '', statusText: 'API Error: ' + err.message };
