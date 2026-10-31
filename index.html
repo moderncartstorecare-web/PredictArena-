@@ -1146,7 +1146,7 @@ async function fetchLiveScores() {
           if (info.matchEnded) {
             m.isFinished = true; // Mark it as finished
           }
-        }        }
+        }
       } catch (err) {
         console.error("Live score fetch failed for", m.id, err);
         m.liveData = { scoreA: '-', oversA: '', scoreB: '-', oversB: '', statusText: 'API Error: ' + err.message };
