@@ -485,7 +485,7 @@ function homeV() {
   }).join("");
    return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
 <div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
-<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Live now</h3><span class="pill no">LIVE</span></div>${MK.slice(0,3).map(m => row(m)).join("")}</div>
+<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Matches</h3></div>${MK.slice(0,3).map(m => row(m)).join("")}</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
   const m = mkt(p.m); 
@@ -1109,7 +1109,9 @@ async function fetchLiveScores() {
         
         const result = await response.json();
         
-        if (result && result.status === 'success' && result.data) {
+        if (result && result.error) {
+           m.liveData = { scoreA: '-', oversA: '', scoreB: '-', oversB: '', statusText: 'Edge Func Error: ' + result.error };
+        } else if (result && result.status === 'success' && result.data) {
           const info = result.data;
           let scoreA = '-', scoreB = '-', oversA = '', oversB = '';
           
@@ -1130,6 +1132,7 @@ async function fetchLiveScores() {
         }
       } catch (err) {
         console.error("Live score fetch failed for", m.id, err);
+        m.liveData = { scoreA: '-', oversA: '', scoreB: '-', oversB: '', statusText: 'API Error: ' + err.message };
       }
     }
   }
