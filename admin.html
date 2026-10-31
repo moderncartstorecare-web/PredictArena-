@@ -399,10 +399,10 @@ document.addEventListener("submit",function(e){
 });
 
 document.addEventListener("click",function(e){
-  else if(d.manage){manageMatch(d.manage);return}
-  var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close],[data-tk],[data-kf]");if(!t)return;var d=t.dataset;
+  var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close],[data-tk],[data-kf],[data-manage]");if(!t)return;var d=t.dataset;
   if(d.close!==undefined){closeM();return}
   if(d.p){S.page=d.p;window.scrollTo(0,0)}
+  else if(d.manage){manageMatch(d.manage);return}
   else if(d.a==="eye")EYE=!EYE;
   else if(d.a==="theme"){var h=document.documentElement,cur=h.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");h.setAttribute("data-theme",cur==="dark"?"light":"dark")}
   else if(d.a==="out"||d.a==="logout"){doLogout();return}
@@ -467,18 +467,13 @@ async function boot(){
     else render();
   }catch(e){render()}
 }
+function initAdminRealtime() {
   db.channel('admin-preds')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'predictions' }, (payload) => {
-      // If the modal is open, refresh it
       if (document.querySelector('.ov') && document.getElementById('admin-preds-list')) {
-        var currentMatchId = document.getElementById('edit-api-id') ? document.getElementById('edit-api-id').getAttribute('data-match-id') : null;
-        // We can just re-fetch the active modal if it exists
         loadAll(); 
-        // Since re-fetching the modal requires calling manageMatch again, 
-        // we will just reload the matches list and let the user click manage again if needed.
       }
     }).subscribe();
-function initAdminRealtime() {
   if (!db) return;
   db.channel('admin-tickets')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, () => { loadAll(); })
