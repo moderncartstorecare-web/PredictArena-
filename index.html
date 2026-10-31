@@ -719,11 +719,25 @@ function lockPicks(ids) {
   const ok = ids.filter(id => left(mkt(id)) > 0);
   if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
   if (!ok.length) { render(); return; }
-  ok.forEach(id => { S.preds.push({id:Date.now()+Number(id), m:Number(id), p:S.slip[id], res:null, pay:0}); delete S.slip[id]; });
+  
+  ok.forEach(id => { 
+    S.preds.push({id:Date.now(), m:id, p:S.slip[id], res:null, pay:0}); 
+    
+    // Save vote to Database
+    if (window.CP_DB && window.CP_DB.ready && S.user) {
+      supabase.from('predictions').insert({
+        user_id: S.user.id, 
+        match_id: id, 
+        prediction_choice: S.slip[id], 
+        amount: 0 
+      }).then();
+    }
+    delete S.slip[id]; 
+  });
+  
   S.xp += ok.length*10; note(ok.length+" pick"+(ok.length>1?"s":"")+" locked", "+"+ok.length*10+" XP. Results appear in My picks.","lock");
   save(); closeSheet(); toast("Locked "+ok.length+" pick"+(ok.length>1?"s":"")+". +"+ok.length*10+" XP","lock"); render();
 }
-
 function settle(id) {
   const p = S.preds.find(x => x.id == id); if (!p || p.res) return;
   const m = mkt(p.m), win = Math.random()*100 < (p.p=="A"?m.w:100-m.w); let c = null;
