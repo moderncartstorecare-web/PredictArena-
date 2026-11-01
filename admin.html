@@ -113,10 +113,6 @@ function WDR(i){return S.wd.filter(function(w){return w.id===i})[0]}
 function now(){return new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
 function act(t){S.act.unshift([t,now()]);S.act=S.act.slice(0,12)}
 function toast(t,k){var e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+esc(t);document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(function(){e.remove()},2800)}
-function rnd(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-var MC={};function MD(i){if(i>5)i=5;if(MC[i])return MC[i];var r=rnd(77+i*13),d=[],t=0;for(var k=0;k<DD[i];k++){var v=Math.round(15500-i*650+r()*9000+Math.sin(k/3)*1800);d.push(v);t+=v} return MC[i]={d:d,t:t,nu:Math.round(780+r()*620),pr:Math.round(14000+r()*8000),po:Math.round(t*.38),wp:Math.round(t*.22)}}
-function chg(){var c=MD(S.mi).t,p=S.mi<5?MD(S.mi+1).t:c*.93;return Math.round((c-p)/p*1000)/10}
-function chart(a){var n=a.length,mx=Math.max.apply(null,a),w=700/n,s='<svg viewBox="0 0 700 190" width="100%" role="img" aria-label="Daily earnings">';a.forEach(function(v,i){var h=v/mx*148;s+='<rect x="'+(i*w+w*.15)+'" y="'+(158-h)+'" width="'+w*.7+'" height="'+h+'" rx="2" style="fill:var(--pr);opacity:.85">'+(EYE?'<title>Day '+(i+1)+': '+fm(v)+'</title>':'')+'</rect>';if(i===0||(i+1)%5===0)s+='<text x="'+(i*w+w/2)+'" y="178" font-size="10" text-anchor="middle" style="fill:var(--mu)">'+(i+1)+'</text>'});return s+'</svg>'}
 function pendW(){return S.wd.filter(function(w){return w.st==="pending"})}
 function chipM(s){return '<span class="chip '+({live:"no",upcoming:"",closed:"wa",settled:"ok"}[s])+'">'+s[0].toUpperCase()+s.slice(1)+'</span>'}
 function TU(){return S.ucount||S.users.length}
@@ -169,13 +165,14 @@ async function loadAll(){
     if(!r[6].error){
       S.totalPreds = r[6].count || 0;
     }
+    if(!r[5].error){
+      S.matches=(r[5].data||[]).map(function(x){
         return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, api_id:x.cricket_match_id, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
       });
     }
   }catch(e){ console.error(e); toast("Network error while loading data","circle-alert"); }
   rebuildTx(); render();
 }
-
 async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
 async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0];if(!u){toast("User not found","circle-alert");return}var ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.status,ns))))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
 async function doWd(id,st){var w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,P(COLS.wd.status,st))))return;w.st=st;var u=S.users.filter(function(x){return x.id===w.uid})[0];
@@ -260,13 +257,20 @@ async function doLogout(){
   location.reload();
 }
 
-function dashV(){var d=MD(S.mi),c=chg(),pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
-  var sp=[["Premium passes",.52],["Sponsorships",.31],["Advertising",.17]];
-  return '<div class="hd"><div><h1>Overview</h1><small>Business summary for '+MS[S.mi]+'</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="month">'+MS.map(function(m,i){return '<option value="'+i+'"'+(i===S.mi?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div>'+
-  '<div class="card"><div class="erow"><div><small>Total earnings · '+MS[S.mi]+'</small><div style="display:flex;align-items:center;gap:12px;margin-top:4px"><div class="big">'+mk(d.t)+'</div><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button></div><div style="margin-top:6px"><span class="chip '+(c>=0?"ok":"no")+'">'+(c>=0?"+":"")+c+'% vs previous month</span> <small>'+(EYE?"":"Earnings are hidden. Click the eye icon to reveal.")+'</small></div></div><div class="src">'+sp.map(function(s){return '<div><small>'+s[0]+'</small><b>'+mk(Math.round(d.t*s[1]))+'</b></div>'}).join("")+'</div></div><div class="'+(EYE?"":"bl ")+'mk" style="margin-top:14px">'+chart(d.d)+'</div></div>'+
-  '<div class="g4">'+[["Total users",num(TU()),"users"],["Total Predictions",num(S.totalPreds || 0),"target"],["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
-  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><small>'+esc(m.l)+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+esc(w.id.slice(0,8))+' · '+fm(w.amt)+'</b><small>'+esc(u.name)+' · '+esc(w.m)+'</small></div><div class="ac"><button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+(S.act.length?S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join(""):'<small>No activity yet.</small>')+'</div></div>'}
-function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){
+function dashV(){
+  var pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
+  
+  return '<div class="hd"><div><h1>Overview</h1><small>Platform summary</small></div></div>'+
+  '<div class="g4">'+[
+    ["Total users",num(TU()),"users"],
+    ["Total Predictions",num(S.totalPreds || 0),"target"],
+    ["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],
+    ["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]
+  ].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
+  
+  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><small>'+esc(m.l)+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+esc(w.id.slice(0,8))+' · '+fm(w.amt)+'</b><small>'+esc(u.name)+' · '+esc(w.m)+'</small></div><div class="ac"><button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+(S.act.length?S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join(""):'<small>No activity yet.</small>')+'</div></div>'
+}
+  function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){
   var actionBtns = '';
   if (m.st === 'settled') {
     actionBtns = '<button class="btn s" data-manage="'+m.id+'">Manage</button>';
@@ -524,8 +528,7 @@ var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-reopen],[da
   else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
   else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
   else if(d.cl){ MM(d.cl).st="closed"; act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b); toast("Predictions closed"); save(); render(); }
-  else if(d.reopen){ db.from('matches').update({ closes_at: new Date(Date.now() + 86400000).toISOString() }).eq('id', d.reopen).then(function(r) { if(r.error) return toast(r.error.message,"circle-alert"); toast("Match reopened!"); loadAll(); }); return; }
-  else if(d.manage){ manageMatch(d.manage); return; }
+   else if(d.reopen){ db.from('matches').update({ closes_at: new Date(Date.now() + 86400000).toISOString() }).eq('id', d.reopen).then(function(r) { if(r.error) return toast(r.error.message,"circle-alert"); toast("Match reopened!"); loadAll(); }); return; }
   else if(d.editm){ openMatchModal(MM(d.editm)); return; }
   else if(d.dm){var m=MM(d.dm);S.matches=S.matches.filter(function(x){return x!==m});act("Match deleted: "+m.a+" vs "+m.b);toast("Match deleted","trash-2")}
   else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
