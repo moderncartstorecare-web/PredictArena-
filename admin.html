@@ -167,7 +167,7 @@ async function loadAll(){
     }
     if(!r[5].error){
       S.matches=(r[5].data||[]).map(function(x){
-        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, api_id:x.cricket_match_id, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
+        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, api_id:x.cricket_match_id, league_slug:x.cricket_league, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
       });
     }
   }catch(e){ console.error(e); toast("Network error while loading data","circle-alert"); }
@@ -435,14 +435,16 @@ window.saveApiId = async function(matchId) {
       </div>
 
       <div class="fg" style="gap:12px;">
-        <label class="f">Match Start Time
-          <input class="in" type="datetime-local" id="mtime" value="${dtVal}" required>
-          <small style="display:block;margin-top:4px;">Betting locks automatically at this time.</small>
+        <label class="f">League Slug (ESPN)
+          <input class="in" id="mleague" value="${isEdit?esc(match.league_slug||'eng.1'):'eng.1'}" placeholder="e.g. eng.1, ind.1" required>
+          <small style="display:block;margin-top:4px;">The ESPN league code (e.g., eng.1 for English matches).</small>
         </label>
-        <label class="f">CricAPI Match ID
-          <input class="in" id="mid" value="${isEdit?esc(match.api_id||''):''}" placeholder="Paste API ID here">
+        <label class="f">ESPN Match ID
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <input class="in" id="mid" value="${isEdit?esc(match.api_id||''):''}" placeholder="Paste ESPN ID here" style="flex:1;">
+            <button type="button" class="btn g" onclick="autoFetchMatch()" style="padding:0 12px;">Fetch</button>
+          </div>
         </label>
-      </div>
 
       <div class="ac" style="margin-top:10px;">
         <button type="button" class="btn g" data-close>Cancel</button>
@@ -455,6 +457,43 @@ window.saveApiId = async function(matchId) {
   try{lucide.createIcons()}catch(e){}
 }
 
+window.autoFetchMatch = async function() {
+  var matchId = document.getElementById('mid').value.trim();
+  var league = document.getElementById('mleague').value.trim();
+  if (!matchId || !league) return toast("Enter both ID and League Slug first", "circle-alert");
+
+  var btn = event.target;
+  btn.textContent = 'Fetching...';
+  btn.disabled = true;
+
+  try {
+    var res = await fetch(`https://YOUR-WORKER-URL.workers.dev/?matchId=${matchId}&league=${league}`);
+    var data = await res.json();
+    
+    if (data.error) {
+      toast(data.error, "circle-alert");
+    } else {
+      // Auto-fill Team Names
+      var home = data.competitions[0].competitors.find(c => c.homeAway === 'home');
+      var away = data.competitions[0].competitors.find(c => c.homeAway === 'away');
+      if (home) document.getElementById('ma').value = home.team.displayName;
+      if (away) document.getElementById('mb').value = away.team.displayName;
+      
+      // Auto-fill Start Time
+      if (data.date) {
+        var d = new Date(data.date);
+        var localStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('mtime').value = localStr;
+      }
+      toast("Match details fetched successfully!", "check");
+    }
+  } catch (e) {
+    toast("Error: " + e.message, "circle-alert");
+  }
+  
+  btn.textContent = 'Fetch';
+  btn.disabled = false;
+}
 window.updateLeagues = function(cat) {
   var leagues = LEAGUES[cat] || [];
   document.getElementById('league-list').innerHTML = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
@@ -481,6 +520,7 @@ document.addEventListener("submit",function(e){
       team_a: $("ma").value, 
       team_b: $("mb").value, 
       cricket_match_id: $("mid").value, 
+      cricket_league: $("mleague").value,
       closes_at: closesAt, 
       crowd_a: 50, odds_a: 1.85, odds_b: 2.10 
     };
