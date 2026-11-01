@@ -72,7 +72,15 @@ var COLS={
   msg:{id:"id",ticket:"ticket_id",sender:"sender",body:"message",created:"created_at",senderId:""}
 };
 var REFUND_ON_REJECT=false;
-var TICKET_STATUS_AFTER_REPLY="";
+
+// Pre-defined leagues for auto-suggest
+var LEAGUES = {
+  cricket: ["Indian Premier League (IPL)", "T20 World Cup", "ODI Series", "Test Championship", "Big Bash League (BBL)", "The Hundred"],
+  football: ["Premier League", "La Liga", "Champions League", "FIFA World Cup", "Serie A"],
+  kabaddi: ["Pro Kabaddi League", "Kabaddi World Cup"],
+  indian: ["Entertainment", "Economy", "Politics"],
+  esports: ["BGMI Pro Series", "Valorant Champions", "CS:GO Major"]
+};var TICKET_STATUS_AFTER_REPLY="";
 
 var db=null;
 try{
@@ -159,7 +167,7 @@ async function loadAll(){
     if(!r[4].error)S.tickets=(r[4].data||[]).map(mapTk);
     if(!r[5].error){
       S.matches=(r[5].data||[]).map(function(x){
-        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
+        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, api_id:x.cricket_match_id, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
       });
     }
   }catch(e){ console.error(e); toast("Network error while loading data","circle-alert"); }
@@ -256,7 +264,7 @@ function dashV(){var d=MD(S.mi),c=chg(),pw=pendW(),aw=S.matches.filter(function(
   '<div class="card"><div class="erow"><div><small>Total earnings · '+MS[S.mi]+'</small><div style="display:flex;align-items:center;gap:12px;margin-top:4px"><div class="big">'+mk(d.t)+'</div><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button></div><div style="margin-top:6px"><span class="chip '+(c>=0?"ok":"no")+'">'+(c>=0?"+":"")+c+'% vs previous month</span> <small>'+(EYE?"":"Earnings are hidden. Click the eye icon to reveal.")+'</small></div></div><div class="src">'+sp.map(function(s){return '<div><small>'+s[0]+'</small><b>'+mk(Math.round(d.t*s[1]))+'</b></div>'}).join("")+'</div></div><div class="'+(EYE?"":"bl ")+'mk" style="margin-top:14px">'+chart(d.d)+'</div></div>'+
   '<div class="g4">'+[["Total users",num(TU()),"users"],["New users · month",num(d.nu),"user-plus"],["Predictions · month",num(d.pr),"target"],["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
   '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><small>'+esc(m.l)+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+esc(w.id.slice(0,8))+' · '+fm(w.amt)+'</b><small>'+esc(u.name)+' · '+esc(w.m)+'</small></div><div class="ac"><button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+(S.act.length?S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join(""):'<small>No activity yet.</small>')+'</div></div>'}
-function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){return '<tr><td><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><br><small>'+esc(m.l)+'</small></td><td>'+esc(m.when)+'</td><td>'+num(m.n)+'</td><td><small>'+m.pa+'% / '+(100-m.pa)+'%</small></td><td>'+chipM(m.st)+(m.win?'<br><small>Winner: '+(m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b))+'</small>':'')+'</td><td><div class="ac"><button class="btn s" data-manage="'+m.id+'">Manage</button>'+(m.st==="settled"?'':(m.st==="upcoming"?'<button class="btn s g" data-cl="'+m.id+'">Close picks</button>':'')+'<button class="btn s" data-win="'+m.id+'">Set winner</button>')+'<button class="btn s g" data-dm="'+m.id+'" aria-label="Delete">'+ic("trash-2")+'</button></div></td></tr>'}).join("")+'</table></div>'}
+function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){return '<tr><td><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><br><small>'+esc(m.l)+'</small></td><td>'+esc(m.when)+'</td><td>'+num(m.n)+'</td><td><small>'+m.pa+'% / '+(100-m.pa)+'%</small></td><td>'+chipM(m.st)+(m.win?'<br><small>Winner: '+(m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b))+'</small>':'')+'</td><td><div class="ac"><button class="btn s" data-manage="'+m.id+'">Manage</button><button class="btn s g" data-editm="'+m.id+'">'+ic("pencil")+'</button>'+(m.st==="settled"?'':(m.st==="upcoming"?'<button class="btn s g" data-cl="'+m.id+'">Close picks</button>':'')+'<button class="btn s" data-win="'+m.id+'">Set winner</button>')+'<button class="btn s g" data-dm="'+m.id+'" aria-label="Delete">'+ic("trash-2")+'</button></div></td></tr>'}).join("")+'</table></div>'}
 function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>'+S.users.filter(function(u){return!q||(u.name+u.email+u.city).toLowerCase().indexOf(q)>-1}).map(function(u){return '<tr><td><b>'+esc(u.name)+'</b><br><small>'+esc(u.email)+'</small></td><td>'+esc(u.city)+'</td><td>'+fm(u.wal)+'</td><td>'+u.pts+'</td><td><span class="chip '+(u.kyc?"ok":"wa")+'">'+(u.kyc?"Verified":"Pending")+'</span></td><td><span class="chip '+(u.st==="active"?"ok":"no")+'">'+u.st+'</span></td><td><div class="ac"><button class="btn s g" data-uv="'+esc(u.id)+'">View</button><button class="btn s g" data-un="'+esc(u.id)+'" aria-label="Notify">'+ic("bell")+'</button><button class="btn s g" data-uw="'+esc(u.id)+'" aria-label="Wallet">'+ic("wallet")+'</button><button class="btn s '+(u.st==="active"?"r":"k")+'" data-ub="'+esc(u.id)+'">'+(u.st==="active"?"Block":"Unblock")+'</button></div></td></tr>'}).join("")+'</table>'}
 function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of '+num(TU())+' registered users</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
 function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,[0].concat(S.users.map(function(u){return u.wal}))))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+esc(t.d)+'</td></tr>'}).join("")+'</table></div>'}
@@ -368,6 +376,72 @@ window.saveApiId = async function(matchId) {
   toast("CricAPI ID updated!");
   loadAll(); // Refresh matches list in background
 };
+  function openMatchModal(match = null) {
+  var isEdit = match !== null;
+  var cat = isEdit ? match.c : 'cricket';
+  var leagues = LEAGUES[cat] || [];
+  var leagueOpts = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
+  
+  // Format date for datetime-local input
+  var dtVal = "";
+  if (isEdit && match.closes_at) {
+    var d = new Date(match.closes_at);
+    dtVal = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  }
+
+  var html = `
+    <h3 style="margin-bottom:16px;">${isEdit ? 'Edit Match' : 'Create New Match'}</h3>
+    <form id="mf" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="fg" style="gap:12px;">
+        <label class="f">Category
+          <select class="in" id="mc" onchange="updateLeagues(this.value)">
+            <option value="cricket" ${cat==='cricket'?'selected':''}>Cricket</option>
+            <option value="football" ${cat==='football'?'selected':''}>Football</option>
+            <option value="kabaddi" ${cat==='kabaddi'?'selected':''}>Kabaddi</option>
+            <option value="esports" ${cat==='esports'?'selected':''}>Esports</option>
+            <option value="indian" ${cat==='indian'?'selected':''}>Indian Events</option>
+          </select>
+        </label>
+        <label class="f">League / Event
+          <input class="in" id="ml" list="league-list" value="${isEdit?esc(match.l):''}" placeholder="Select or type..." required>
+          <datalist id="league-list">${leagueOpts}</datalist>
+        </label>
+      </div>
+      
+      <div class="fg" style="gap:12px;">
+        <label class="f">Team A / Option A
+          <input class="in" id="ma" value="${isEdit?esc(match.a):''}" required>
+        </label>
+        <label class="f">Team B / Option B
+          <input class="in" id="mb" value="${isEdit?esc(match.b):''}" required>
+        </label>
+      </div>
+
+      <div class="fg" style="gap:12px;">
+        <label class="f">Match Start Time
+          <input class="in" type="datetime-local" id="mtime" value="${dtVal}" required>
+          <small style="display:block;margin-top:4px;">Betting locks automatically at this time.</small>
+        </label>
+        <label class="f">CricAPI Match ID
+          <input class="in" id="mid" value="${isEdit?esc(match.api_id||''):''}" placeholder="Paste API ID here">
+        </label>
+      </div>
+
+      <div class="ac" style="margin-top:10px;">
+        <button type="button" class="btn g" data-close>Cancel</button>
+        <button class="btn" type="submit">${isEdit ? 'Save Changes' : 'Create Match'}</button>
+      </div>
+      <input type="hidden" id="mid_db" value="${isEdit?match.id:''}">
+    </form>
+  `;
+  modal(html);
+  try{lucide.createIcons()}catch(e){}
+}
+
+window.updateLeagues = function(cat) {
+  var leagues = LEAGUES[cat] || [];
+  document.getElementById('league-list').innerHTML = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
+};
 function modal(h){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+h+'</div>';document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
 function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null;TKM=null}
 function fld(l,id,v,t){return '<label class="f">'+l+'<input class="in" id="'+id+'" type="'+(t||"text")+'" value="'+(v||"")+'" required></label>'}
@@ -379,10 +453,34 @@ document.addEventListener("submit",function(e){
   if(id==="lf"){doLogin();return}
   else if(id==="tf"){sendReply();return}
   else if(id==="mf"){
-    var newMatch = { category: $("mc").value.toLowerCase(), league: $("ml").value, team_a: $("ma").value, team_b: $("mb").value, cricket_match_id: $("mid").value, closes_at: new Date(Date.now() + 86400000).toISOString(), crowd_a: 50, odds_a: 1.85, odds_b: 2.10 };    db.from('matches').insert(newMatch).then(function(res) {
-      if (res.error) { toast("Error saving match: " + res.error.message, "circle-alert"); return; }
-      toast("Match published to website!"); closeM(); loadAll(); 
-    });
+    var dbId = $("mid_db").value;
+    var timeVal = $("mtime").value; 
+    // Convert local datetime to ISO string for Supabase
+    var closesAt = timeVal ? new Date(timeVal).toISOString() : new Date(Date.now() + 86400000).toISOString();
+    
+    var matchData = { 
+      category: $("mc").value.toLowerCase(), 
+      league: $("ml").value, 
+      team_a: $("ma").value, 
+      team_b: $("mb").value, 
+      cricket_match_id: $("mid").value, 
+      closes_at: closesAt, 
+      crowd_a: 50, odds_a: 1.85, odds_b: 2.10 
+    };
+
+    if (dbId) {
+      // Update existing match
+      db.from('matches').update(matchData).eq('id', dbId).then(function(res) {
+        if (res.error) { toast("Error updating: " + res.error.message, "circle-alert"); return; }
+        toast("Match updated successfully!"); closeM(); loadAll(); 
+      });
+    } else {
+      // Create new match
+      db.from('matches').insert(matchData).then(function(res) {
+        if (res.error) { toast("Error saving match: " + res.error.message, "circle-alert"); return; }
+        toast("Match published to website!"); closeM(); loadAll(); 
+      });
+    }
   }
   else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
   else if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
@@ -408,7 +506,8 @@ document.addEventListener("click",function(e){
   else if(d.a==="out"||d.a==="logout"){doLogout();return}
   else if(d.a==="refresh"){toast("Refreshing…","refresh-cw");loadAll();return}
   else if(d.a==="reset"){localStorage.removeItem("pxa1");var adm=S.adm;S=JSON.parse(D1);S.adm=adm;toast("Demo data restored");loadAll()}
-  else if(d.a==="addm"){modal('<h3>Add match</h3><form id="mf">'+fld("League or event","ml")+'<div class="fg">'+fld("Team A","ma")+fld("Team B","mb")+'</div><div class="fg"><label class="f">Category<select class="in" id="mc"><option>Cricket</option><option>Football</option><option>Kabaddi</option><option>India Specials</option></select></label>'+fld("CricAPI Match ID","mid")+'</div><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create match</button></div></form>');return}
+  else if(d.a==="addm"){ openMatchModal(); return; }
+  else if(d.editm){ openMatchModal(MM(d.editm)); return; }
   else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
   else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
   else if(d.cl){MM(d.cl).st="closed";act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b);toast("Predictions closed")}
