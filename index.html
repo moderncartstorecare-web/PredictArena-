@@ -1125,7 +1125,7 @@ async function fetchLiveScores() {
         const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ matchId: m.cricket_match_id })
+          body: JSON.stringify({ matchId: m.cricket_match_id, league: m.cricket_league || 'eng.1' })
         });
         
         const result = await response.json();
@@ -1192,6 +1192,7 @@ setInterval(async () => {
        });
        
        if (changed) {
+       if (changed) {
          MK = liveMatches.map(m => ({
           id: m.id,
           c: m.category,
@@ -1200,6 +1201,7 @@ setInterval(async () => {
           B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
           cricket_match_id: m.cricket_match_id, 
+          cricket_league: m.cricket_league,
           s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
           w: m.crowd_a,
           oa: m.odds_a,
@@ -1345,6 +1347,7 @@ window.addEventListener("load", async () => {
           B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
           cricket_match_id: m.cricket_match_id, 
+          cricket_league: m.cricket_league,
           s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
           w: m.crowd_a,
           oa: m.odds_a,
@@ -1352,6 +1355,7 @@ window.addEventListener("load", async () => {
         }));
         
         // Initialize Live Feed for the new matches
+        
 
       }
       fetchLiveScores(); // Trigger the live score fetch immediately
