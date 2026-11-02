@@ -393,7 +393,7 @@ window.saveApiId = async function(matchId) {
   toast("CricAPI ID updated!");
   loadAll(); // Refresh matches list in background
 };
-  function openMatchModal(match = null) {
+function openMatchModal(match = null) {
   var isEdit = match !== null;
   var cat = isEdit ? match.c : 'cricket';
   var leagues = LEAGUES[cat] || [];
@@ -407,41 +407,56 @@ window.saveApiId = async function(matchId) {
   }
 
   var html = `
-    <h3 style="margin-bottom:16px;">${isEdit ? 'Edit Match' : 'Create New Match'}</h3>
-    <form id="mf" style="display:flex;flex-direction:column;gap:12px;">
-      <div class="fg" style="gap:12px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:16px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:var(--prs);color:var(--pr);display:grid;place-items:center;">
+         <i data-lucide="${isEdit ? 'edit' : 'plus'}" style="width:24px;height:24px;"></i>
+      </div>
+      <div>
+        <h3 style="margin:0;font-size:18px;">${isEdit ? 'Edit Match' : 'Create New Match'}</h3>
+        <small style="color:var(--mu);">Fill in the details below to publish</small>
+      </div>
+    </div>
+    
+    <form id="mf" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="fg" style="gap:16px;">
         <label class="f">Category
-          <select class="in" id="mc" onchange="updateLeagues(this.value)">
-            <option value="cricket" ${cat==='cricket'?'selected':''}>Cricket</option>
-            <option value="football" ${cat==='football'?'selected':''}>Football</option>
-            <option value="kabaddi" ${cat==='kabaddi'?'selected':''}>Kabaddi</option>
-            <option value="esports" ${cat==='esports'?'selected':''}>Esports</option>
-            <option value="indian" ${cat==='indian'?'selected':''}>Indian Events</option>
+          <select class="in" id="mc" onchange="updateLeagues(this.value)" style="padding:12px;">
+            <option value="cricket" ${cat==='cricket'?'selected':''}>🏏 Cricket</option>
+            <option value="football" ${cat==='football'?'selected':''}>⚽ Football</option>
+            <option value="kabaddi" ${cat==='kabaddi'?'selected':''}>🤼 Kabaddi</option>
+            <option value="esports" ${cat==='esports'?'selected':''}>🎮 Esports</option>
+            <option value="indian" ${cat==='indian'?'selected':''}>🇮🇳 Indian Events</option>
           </select>
         </label>
         <label class="f">League / Event
-          <input class="in" id="ml" list="league-list" value="${isEdit?esc(match.l):''}" placeholder="Select or type..." required>
+          <input class="in" id="ml" list="league-list" value="${isEdit?esc(match.l):''}" placeholder="e.g. IPL 2026" required style="padding:12px;">
           <datalist id="league-list">${leagueOpts}</datalist>
         </label>
       </div>
       
-      <div class="fg" style="gap:12px;">
+      <div class="fg" style="gap:16px;">
         <label class="f">Team A / Option A
-          <input class="in" id="ma" value="${isEdit?esc(match.a):''}" required>
+          <input class="in" id="ma" value="${isEdit?esc(match.a):''}" placeholder="e.g. India" required style="padding:12px;">
         </label>
         <label class="f">Team B / Option B
-          <input class="in" id="mb" value="${isEdit?esc(match.b):''}" required>
+          <input class="in" id="mb" value="${isEdit?esc(match.b):''}" placeholder="e.g. Australia" required style="padding:12px;">
         </label>
       </div>
 
-      <div class="fg" style="gap:12px;">
-        <div class="card" style="padding:12px;background:var(--prs);margin-bottom:12px;">
-          <small><b>How it works:</b> Enter the exact team names as they appear on SportScore. The system will automatically find the live score. No ID is needed.</small>
+      <div class="fg" style="gap:16px;">
+        <label class="f">Match Start Time (Betting closes here)
+          <input class="in" type="datetime-local" id="mtime" value="${dtVal}" required style="padding:12px;">
+        </label>
+        <div style="display:flex;align-items:center;">
+           <div style="background:var(--was);border:1px solid var(--wa);padding:10px 12px;border-radius:8px;font-size:12px;color:var(--wa);width:100%;">
+             <b>Heads up:</b> Make sure the team names exactly match SportScore to get live scores.
+           </div>
         </div>
+      </div>
 
-      <div class="ac" style="margin-top:10px;">
-        <button type="button" class="btn g" data-close>Cancel</button>
-        <button class="btn" type="submit">${isEdit ? 'Save Changes' : 'Create Match'}</button>
+      <div class="ac" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);">
+        <button type="button" class="btn g" data-close style="padding:10px 20px;">Cancel</button>
+        <button class="btn" type="submit" style="padding:10px 20px;">${isEdit ? 'Save Changes' : 'Publish Match'}</button>
       </div>
       <input type="hidden" id="mid_db" value="${isEdit?match.id:''}">
     </form>
@@ -524,8 +539,15 @@ var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-reopen],[da
   else if(d.cl){ MM(d.cl).st="closed"; act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b); toast("Predictions closed"); save(); render(); }
    else if(d.reopen){ db.from('matches').update({ closes_at: new Date(Date.now() + 86400000).toISOString() }).eq('id', d.reopen).then(function(r) { if(r.error) return toast(r.error.message,"circle-alert"); toast("Match reopened!"); loadAll(); }); return; }
   else if(d.editm){ openMatchModal(MM(d.editm)); return; }
-  else if(d.dm){var m=MM(d.dm);S.matches=S.matches.filter(function(x){return x!==m});act("Match deleted: "+m.a+" vs "+m.b);toast("Match deleted","trash-2")}
-  else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
+  else if(d.dm){
+    if(!confirm("Are you sure you want to permanently delete this match?")) return;
+    db.from('matches').delete().eq('id', d.dm).then(function(r) {
+      if (r.error) { toast("Error deleting: " + r.error.message, "circle-alert"); return; }
+      toast("Match deleted successfully", "check");
+      loadAll(); // Refresh from database
+    });
+  }
+else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
   else if(d.un){CPS.aud="one";CPS.uid=d.un;S.page="not"}
   else if(d.uw){var u=U(d.uw);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
   else if(d.ub){doBlock(d.ub);return}
