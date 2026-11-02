@@ -350,8 +350,14 @@ MK.forEach(m => {
 });
 const ov = b => Math.floor(b/6) + "." + b%6;
 function liveText(m) {
-  if (m.liveData && m.liveData.statusText) return m.liveData.statusText;
-  return "Match yet to start"; // Clean fallback instead of fake data
+  if (m.liveData && m.liveData.statusText) {
+    // If we have actual scores (not just '-'), show them!
+    if (m.liveData.scoreA && m.liveData.scoreA !== '-') {
+       return `Live · ${m.liveData.scoreA} vs ${m.liveData.scoreB}`;
+    }
+    return m.liveData.statusText;
+  }
+  return "Match yet to start";
 }
 function liveBoard(m) {
   // If we are still waiting for the API to respond, show a clean state
@@ -1134,7 +1140,11 @@ async function fetchLiveScores() {
     const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score');
     const data = await response.json();
     
-    if (!data || !data.matches) return;
+    if (!data || !data.matches) {
+      // THIS WILL SHOW AN ERROR ON SCREEN IF THE API FAILS
+      toast("API Error: Could not load SportScore data", "alert"); 
+      return;
+    }
 
     for (const m of MK) {
       if (m.c !== 'cricket') continue;
