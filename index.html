@@ -478,8 +478,27 @@ const marketsV = () => {
 };
 function homeV() {
   const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
-  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
-  const cs = CATS.map(c => { 
+  // 1. Featured Matches: Only show matches that are NOT finished
+  const activeMatches = MK.filter(m => !m.isFinished).slice(0, 3);
+  
+  // 2. Closing Soon: Only show matches that haven't started closing yet
+  const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
+
+  return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
+<div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
+
+${activeMatches.length ? `<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Matches</h3></div>${activeMatches.map(m => row(m)).join("")}</div>` : ''}
+
+${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>` : ''}
+
+<div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
+  const m = mkt(p.m); 
+  if (!m) return ''; 
+  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; 
+}).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
+<div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
+}
+const cs = CATS.map(c => { 
     const d = S.preds.filter(p => { const m = mkt(p.m); return p.res && m && m.c == c[0]; }); 
     const w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; 
     return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; 
@@ -1131,7 +1150,8 @@ async function fetchLiveScores() {
         return homeMatch && awayMatch;
       });
 
-      if (liveMatch) {
+       if (liveMatch) {
+        // If the API says finished, OR if the match started a long time ago and has a score
         const isFinished = liveMatch.status === 'finished';
         m.isFinished = isFinished;
         
