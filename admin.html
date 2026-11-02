@@ -450,43 +450,6 @@ window.saveApiId = async function(matchId) {
   try{lucide.createIcons()}catch(e){}
 }
 
-window.autoFetchMatch = async function() {
-  var matchId = document.getElementById('mid').value.trim();
-  var league = document.getElementById('mleague').value.trim();
-  if (!matchId || !league) return toast("Enter both ID and League Slug first", "circle-alert");
-
-  var btn = event.target;
-  btn.textContent = 'Fetching...';
-  btn.disabled = true;
-
-  try {
-    var res = await fetch(`https://YOUR-WORKER-URL.workers.dev/?matchId=${matchId}&league=${league}`);
-    var data = await res.json();
-    
-    if (data.error) {
-      toast(data.error, "circle-alert");
-    } else {
-      // Auto-fill Team Names
-      var home = data.competitions[0].competitors.find(c => c.homeAway === 'home');
-      var away = data.competitions[0].competitors.find(c => c.homeAway === 'away');
-      if (home) document.getElementById('ma').value = home.team.displayName;
-      if (away) document.getElementById('mb').value = away.team.displayName;
-      
-      // Auto-fill Start Time
-      if (data.date) {
-        var d = new Date(data.date);
-        var localStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-        document.getElementById('mtime').value = localStr;
-      }
-      toast("Match details fetched successfully!", "check");
-    }
-  } catch (e) {
-    toast("Error: " + e.message, "circle-alert");
-  }
-  
-  btn.textContent = 'Fetch';
-  btn.disabled = false;
-}
 window.updateLeagues = function(cat) {
   var leagues = LEAGUES[cat] || [];
   document.getElementById('league-list').innerHTML = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
