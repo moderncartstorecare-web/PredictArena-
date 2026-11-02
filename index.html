@@ -1137,20 +1137,17 @@ async function fetchLiveScores() {
         return homeMatch && awayMatch;
       });
 
-      if (liveMatch) {
-        // 3. Update the live data for your match
+        if (liveMatch) {
+        const isFinished = liveMatch.status === 'finished';
+        m.isFinished = isFinished;
+        
         m.liveData = {
           scoreA: liveMatch.home_score !== null ? String(liveMatch.home_score) : '-',
           oversA: '',
           scoreB: liveMatch.away_score !== null ? String(liveMatch.away_score) : '-',
           oversB: '',
-          statusText: liveMatch.status === 'live' ? 'Live' : liveMatch.status === 'finished' ? 'Finished' : 'Upcoming'
+          statusText: isFinished ? 'Match Ended' : (liveMatch.status === 'live' ? 'Live' : 'Upcoming')
         };
-        
-        // Mark as finished if the status is finished
-        if (liveMatch.status === 'finished') {
-          m.isFinished = true;
-        }
       }
     }
   } catch (err) {
@@ -1195,7 +1192,7 @@ setInterval(async () => {
           A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
           B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
-          s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
+          s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
           w: m.crowd_a,
           oa: m.odds_a,
           ob: m.odds_b
@@ -1339,7 +1336,7 @@ window.addEventListener("load", async () => {
           A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
           B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
           q: m.question,
-          s: Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)), 
+          s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
           w: m.crowd_a,
           oa: m.odds_a,
           ob: m.odds_b
