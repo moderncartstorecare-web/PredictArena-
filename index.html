@@ -356,10 +356,7 @@ function liveText(m) {
 function liveBoard(m) {
   // If we are still waiting for the API to respond, show a clean state
   if (!m.liveData) {
-    let msg = "Waiting for live feed...";
-    if (!m.cricket_match_id) msg = "⚠️ CricAPI Match ID is missing. Add it in the Admin Panel.";
-    
-    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Not started</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Not started</small></div></div><div class="ex" style="color:${!m.cricket_match_id ? 'var(--am)' : 'var(--i3)'}">${msg}</div>`;
+    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Not started</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Not started</small></div></div><div class="ex">Waiting for live feed...</div>`;
   }
   
   // Use REAL data from the API
