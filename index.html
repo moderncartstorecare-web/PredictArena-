@@ -1117,27 +1117,21 @@ async function fetchLiveScores() {
   if (!MK || MK.length === 0) return;
   
   try {
-    // 1. Fetch all live cricket matches from your Supabase proxy
     const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score');
     const data = await response.json();
     
-    if (!data || !data.matches) {
-      console.error("Invalid data from SportScore", data);
-      return;
-    }
+    if (!data || !data.matches) return;
 
-    // 2. Loop through your matches and find the corresponding live data
     for (const m of MK) {
       if (m.c !== 'cricket') continue;
 
-      // Find the match where home and away team names loosely match your team names
       const liveMatch = data.matches.find(lm => {
         const homeMatch = lm.home.toLowerCase().includes(m.A[1].toLowerCase()) || m.A[1].toLowerCase().includes(lm.home.toLowerCase());
         const awayMatch = lm.away.toLowerCase().includes(m.B[1].toLowerCase()) || m.B[1].toLowerCase().includes(lm.away.toLowerCase());
         return homeMatch && awayMatch;
       });
 
-        if (liveMatch) {
+      if (liveMatch) {
         const isFinished = liveMatch.status === 'finished';
         m.isFinished = isFinished;
         
@@ -1154,12 +1148,10 @@ async function fetchLiveScores() {
     console.error("Live score fetch failed", err);
   }
   
-  // Refresh the UI
   if (S.route === "match" || S.route === "home" || S.route === "markets") {
     render();
   }
 }
-
 // Fetch every 15 seconds (prevents hitting API limits)
 setInterval(fetchLiveScores, 15000);
 setInterval(() => {
