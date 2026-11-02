@@ -167,7 +167,7 @@ async function loadAll(){
     }
     if(!r[5].error){
       S.matches=(r[5].data||[]).map(function(x){
-        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, api_id:x.cricket_match_id, league_slug:x.cricket_league, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
+        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
       });
     }
   }catch(e){ console.error(e); toast("Network error while loading data","circle-alert"); }
@@ -435,16 +435,9 @@ window.saveApiId = async function(matchId) {
       </div>
 
       <div class="fg" style="gap:12px;">
-        <label class="f">League Slug (ESPN)
-          <input class="in" id="mleague" value="${isEdit?esc(match.league_slug||'eng.1'):'eng.1'}" placeholder="e.g. eng.1, ind.1" required>
-          <small style="display:block;margin-top:4px;">The ESPN league code (e.g., eng.1 for English matches).</small>
-        </label>
-        <label class="f">ESPN Match ID
-          <div style="display:flex; gap:8px; margin-top:4px;">
-            <input class="in" id="mid" value="${isEdit?esc(match.api_id||''):''}" placeholder="Paste ESPN ID here" style="flex:1;">
-            <button type="button" class="btn g" onclick="autoFetchMatch()" style="padding:0 12px;">Fetch</button>
-          </div>
-        </label>
+        <div class="card" style="padding:12px;background:var(--prs);margin-bottom:12px;">
+          <small><b>How it works:</b> Enter the exact team names as they appear on SportScore. The system will automatically find the live score. No ID is needed.</small>
+        </div>
 
       <div class="ac" style="margin-top:10px;">
         <button type="button" class="btn g" data-close>Cancel</button>
@@ -519,8 +512,6 @@ document.addEventListener("submit",function(e){
       league: $("ml").value, 
       team_a: $("ma").value, 
       team_b: $("mb").value, 
-      cricket_match_id: $("mid").value, 
-      cricket_league: $("mleague").value,
       closes_at: closesAt, 
       crowd_a: 50, odds_a: 1.85, odds_b: 2.10 
     };
