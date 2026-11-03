@@ -4,25 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1a5cff">
-<title>CricPulse | Cricket Predictions</title>
-<!-- 👇 ADD THIS LINE FOR FAVICON -->
-<!-- Rounded Favicon using Base64 -->
+<title>CricPulse | Real Money Predictions</title>
 <link rel="icon" type="image/png" href="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- ZapUPI Payment Gateway -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://zapupi.com/single-html-web-kit.js"></script>
 <style>
 /* ===== design tokens ===== */
 :root{
   --bg:#f6f7fb;--sf:#fff;--s2:#eff2f8;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;--ln:#e3e7ee;--ln2:#d0d6e2;
-  /* 👇 GRADIENT COLORS ADDED HERE */
   --ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
-  --grad: linear-gradient(135deg, #1e5bf0, #1c2a55); /* The new gradient */
+  --grad: linear-gradient(135deg, #1e5bf0, #1c2a55);
   --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1
 }
-   :root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
+:root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}input,select,textarea{font:inherit;color:inherit}svg{display:block;flex:none}h1,h2,h3,p{margin:0}
@@ -30,7 +26,6 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .mut{color:var(--i3)}.t2{color:var(--i2)}.s12{font-size:12px}.s11{font-size:11px}.ok{color:var(--ok)}.no{color:var(--no)}.b{font-weight:600}.grow{flex:1;min-width:0}
 .row{display:flex;align-items:center;gap:10px}.bt{display:flex;justify-content:space-between;align-items:center;gap:10px}.col{display:flex;flex-direction:column}.stack>*+*{margin-top:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:10px;font-weight:600;font-size:13.5px;border:1px solid var(--ln2);background:var(--sf);white-space:nowrap;text-align:center}
-/* 👇 Updated Button to use Gradient */
 .btn.p{background:var(--grad);border-color:transparent;color:#fff}.btn.p:active{opacity:0.9}
 .mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--grad);color:#fff;flex:none}.btn.sm{height:32px;padding:0 12px;font-size:12.5px;border-radius:8px}.btn.w{width:100%}.btn:disabled{opacity:.4;cursor:not-allowed}
 .ib{position:relative;width:38px;height:38px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none}
@@ -49,7 +44,6 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .stats{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ln);border-radius:14px;background:var(--sf);overflow:hidden}.stats>div{padding:10px 14px}.stats>div:nth-child(odd){border-right:1px solid var(--ln)}.stats>div:nth-child(-n+2){border-bottom:1px solid var(--ln)}
 .stats small{display:block;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--i3)}.stats b{display:block;font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.stats span{display:block;font-size:11px;color:var(--i3)}
 .stats.c3{grid-template-columns:repeat(3,1fr)}.c3>div{border:0!important}.c3>div+div{border-left:1px solid var(--ln)!important}.c3 b{font-size:16px}
-.mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;flex:none}
 .av{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
 .sw{position:relative;width:42px;height:24px;flex:none}.sw input{position:absolute;inset:0;opacity:0;margin:0;z-index:1;cursor:pointer}.sw i{position:absolute;inset:0;border-radius:12px;background:var(--ln2);transition:background .15s}.sw i:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}.sw input:checked+i{background:var(--ac)}.sw input:checked+i:after{transform:translateX(18px)}
 .rail{display:none}.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln)}
@@ -61,15 +55,14 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .pp{position:fixed;right:10px;top:calc(60px + env(safe-area-inset-top));width:min(340px,calc(100vw - 20px));background:var(--sf);border:1px solid var(--ln2);border-radius:14px;box-shadow:0 16px 40px -12px rgba(15,23,41,.3);z-index:70;overflow:hidden}
 .pp header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--ln);font-weight:600}
 .nt{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid var(--ln)}.nt:last-child{border:0}.nt.u{background:var(--acs)}.nt i{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--s2);color:var(--ac);flex:none}.nt b{display:block;font-size:13px;font-weight:600}.nt small{display:block;color:var(--i2);font-size:12px}
-.mk{padding:12px 14px;border-bottom:1px solid var(--ln)}.mk:last-child{border:0}.nm{font-weight:600;font-size:14px;line-height:1.35}.nm:hover{color:var(--ac)}
+.mk{padding:12px 14px;border-bottom:1px solid var(--ln);cursor:pointer;transition:background .2s}.mk:hover{background:var(--s2)}.mk:last-child{border:0}.nm{font-weight:600;font-size:14px;line-height:1.35}.nm:hover{color:var(--ac)}
 .cd{font-size:12px;font-weight:600;color:var(--am);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.lvt{font-size:12px;font-weight:600;color:var(--ok);margin:2px 0 8px}
 .pks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pk{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:42px;padding:6px 12px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600;font-size:13px;min-width:0}
 .pk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pk b{font-size:12px;color:var(--i3)}.pk.on{border-color:var(--ac);background:var(--acs);color:var(--ac)}.pk.on b{color:var(--ac)}.pk:disabled{opacity:.6;cursor:default}
 .srch{position:relative;margin-bottom:10px}.srch svg{position:absolute;left:12px;top:13px;color:var(--i3)}.srch .inp{padding-left:36px}.slipd{display:none}
 .se{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--ln)}.sl{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
-.lay{display:grid;gap:10px}.sg{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:8px 0}.tm{text-align:center}.tm b{display:block;font-size:12px;font-weight:600;color:var(--i2)}.tm span{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}.tm small{display:block;font-size:11px;color:var(--i3)}
+.lay{display:grid;gap:16px;padding-bottom:20px}.sg{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:8px 0}.tm{text-align:center}.tm b{display:block;font-size:12px;font-weight:600;color:var(--i2)}.tm span{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}.tm small{display:block;font-size:11px;color:var(--i3)}
 .ex{text-align:center;font-size:12px;color:var(--i3);margin-bottom:6px}.lg div{padding:6px 0;border-top:1px solid var(--ln);font-size:12px;color:var(--i2)}
-.fm{display:flex;gap:4px}.fm span{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700}.fm .W{background:var(--oks);color:var(--ok)}.fm .L{background:var(--nos);color:var(--no)}
 .wbal{padding:18px;border-radius:16px;background:var(--grad);color:#fff;box-shadow:0 8px 20px rgba(30,91,240,0.25);}.wbal small{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.06em;font-weight:600}.wbal h2{font-size:32px;font-weight:700;letter-spacing:-.03em;margin:2px 0}.wbal .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:#fff;flex:1}
 .cv{min-width:54px;height:44px;border-radius:10px;background:var(--ams);color:var(--am);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
 .code{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:4px 4px 4px 10px;border:1px dashed var(--ac);border-radius:8px;background:var(--s2);font-weight:600;font-size:12px;letter-spacing:.05em}
@@ -93,80 +86,17 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--i3);font-size:12px}.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--ln)}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:44px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600}
-/* Force the chat to respect the mobile viewport and stay above the bottom nav */
-.chat{
-  display:flex;
-  flex-direction:column;
-  height:calc(100dvh - 130px); /* Adjusts for mobile browser bars and bottom nav */
-  max-height: 700px;
-  max-width: 100%;
-  margin: 0 auto;
-  border: 1px solid var(--ln);
-  border-radius: 0; /* Seamless on mobile */
-  overflow: hidden;
-  position: relative;
-  background: var(--bg);
-}
-
-/* Allow the messages to take up all available space and scroll independently */
-.chat .msgs{
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  /* Ensure it scrolls perfectly */
-  -webkit-overflow-scrolling: touch; 
-}
-
-/* Keep the input bar pinned to the bottom of the chat container */
-.chatbar{
-  display: flex;
-  flex-wrap: nowrap; /* Forces input and button to stay on one line */
-  gap: 8px;
-  padding: 10px 14px;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--ln);
-  background: var(--sf);
-  align-items: center; /* Centers them vertically */
-  flex-shrink: 0;
-}
-
-/* On desktop, give it the nice floating card look */
-@media(min-width: 900px) {
-  .chat {
-    height: calc(100vh - 120px);
-    max-width: 640px;
-    border-radius: 12px;
-    margin: 20px auto;
-  }
-}
+.chat{display:flex;flex-direction:column;height:calc(100dvh - 130px);max-height:700px;max-width:100%;margin:0 auto;border:1px solid var(--ln);border-radius:0;overflow:hidden;position:relative;background:var(--bg)}
+.chat .msgs{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+.chatbar{display:flex;flex-wrap:nowrap;gap:8px;padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);background:var(--sf);align-items:center;flex-shrink:0}
+@media(min-width:900px){.chat{height:calc(100vh - 120px);max-width:640px;border-radius:12px;margin:20px auto}}
 .msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.4;word-break:break-word}
 .msg.me{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:4px}
 .msg.them{align-self:flex-start;background:var(--s2);border-bottom-left-radius:4px}
 .msg small{display:block;font-size:10px;opacity:.7;margin-top:3px}
 .msg img{max-width:100%;border-radius:8px;margin-top:6px;display:block}
-.chatbar{display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--ln);background:var(--sf);align-items:flex-end}
-.chatbar textarea{
-  flex: 1;
-  min-width: 0; /* CRITICAL FIX: Allows textarea to shrink so button doesn't wrap */
-  height: 44px;
-  min-height: 44px;
-  max-height: 100px;
-  padding: 12px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--ln2);
-  background: var(--s2);
-  font-size: 15px;
-  resize: none;
-  outline: none;
-  line-height: 1.2;
-}
-.chatbar textarea:focus {
-  border-color: var(--ac);
-  background: var(--sf);
-}
+.chatbar textarea{flex:1;min-width:0;height:44px;min-height:44px;max-height:100px;padding:12px 16px;border-radius:20px;border:1px solid var(--ln2);background:var(--s2);font-size:15px;resize:none;outline:none;line-height:1.2}
+.chatbar textarea:focus{border-color:var(--ac);background:var(--sf)}
 .chatbar .ib{width:42px;height:42px}
 .sla{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ok);font-weight:600}
 .legal{max-width:760px;margin:0 auto;padding:16px 14px 60px;font-size:14px;line-height:1.7}
@@ -176,12 +106,10 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .rl{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--i2)}.rl:hover{background:var(--s2)}.rl.on{background:var(--acs);color:var(--ac);font-weight:600}.rg{padding:14px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--i3)}
 .bn,.sbar,.mobo,.mnone{display:none!important}.top{padding:16px 28px}.top h1{font-size:22px}.top .sub{display:block}.dk{display:grid}div.dk{display:block}
 .pg{padding:20px 28px 60px}.chips{margin:0 0 12px;padding:0;flex-wrap:wrap}.lay2{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}.slipd{display:block;position:sticky;top:90px}
-.lay{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"a c" "d c";gap:16px;align-items:start}.lay .a{grid-area:a}.lay .c{grid-area:c;position:sticky;top:90px}.lay .d{grid-area:d}
+.lay{grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}.lay .c{position:sticky;top:90px}
 .pp{top:68px;right:28px}.shx{border-radius:18px}.ov{align-items:center}
 .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:44px 0}.hero h1{font-size:42px}.lb{margin:0}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.steps .ln{border:0}.cats{grid-template-columns:repeat(5,1fr)}.sec{padding:34px 0}.pub{padding:0 max(14px,calc((100vw - 1000px)/2));height:60px}.chat{height:calc(100dvh - 60px)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-
-/* ===== PAYMENT METHODS UI ===== */
 .pay-method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .pay-method-btn{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid var(--ln2);background:var(--sf);cursor:pointer;transition:all .15s ease;text-align:left;position:relative;}
 .pay-method-btn:hover{border-color:var(--i3);}
@@ -190,6 +118,54 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .pay-method-btn .pm-text{font-weight:600;font-size:13px;line-height:1.2;}
 .pay-method-btn .pm-sub{font-size:10.5px;color:var(--i3);font-weight:500;}
 .pay-method-btn.selected .pm-text{color:var(--ac);}
+
+/* ====== EXACT "YOUR CALL" UI FROM YOUR SNIPPET ====== */
+.yc{container-type:inline-size;position:relative;overflow:hidden;color:var(--ink);font-family:inherit;background:var(--sf);border:1px solid var(--ln);border-radius:22px;box-shadow:0 1px 2px rgba(15,23,41,.04),0 18px 44px -24px rgba(15,23,41,.28)}
+.yc button,.yc input{font:inherit;color:inherit}.yc button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.yc h3,.yc p,.yc dl,.yc dd,.yc fieldset{margin:0;padding:0}.yc svg{display:block;flex:none}
+.yc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 14px;background:linear-gradient(180deg,var(--s2),var(--sf));border-bottom:1px solid var(--ln)}
+.yc-title{font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.yc-sub{margin-top:2px;font-size:12.5px;color:var(--i3)}
+.yc-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.yc-live{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:99px;background:var(--nos);color:var(--no);font-size:10.5px;font-weight:700;letter-spacing:.07em}
+.yc-live::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.yc-timer{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.yc-form{display:grid;gap:20px;padding:16px}
+.yc-label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px;padding:0;font-size:12px;font-weight:600;color:var(--i2)}
+.yc-label small{font-size:11.5px;font-weight:500;color:var(--i3)}
+.yc-picks{min-width:0;border:0}
+.yc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yc-opt{position:relative;display:block;min-width:0}
+.yc-opt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
+.yc-card{position:relative;display:flex;flex-direction:column;gap:14px;height:100%;padding:14px;border:1.5px solid var(--ln2);border-radius:18px;background:var(--sf);transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease,transform .12s ease}
+.yc-opt:hover .yc-card{border-color:var(--i3)}.yc-opt input:active+.yc-card{transform:scale(.985)}
+.yc-opt input:checked+.yc-card{border-color:var(--ac);background:var(--acs);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 16%,transparent),0 12px 26px -16px color-mix(in srgb,var(--ac) 80%,transparent)}
+.yc-top{display:flex;align-items:center;gap:9px;min-width:0}
+.yc-mono{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;font-size:11px;font-weight:800;letter-spacing:.02em;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.yc-name{min-width:0;font-size:13.5px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yc-check{margin-left:auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;border:1.5px solid var(--ln2);color:transparent;transition:background-color .15s,border-color .15s,color .15s}
+.yc-opt input:checked+.yc-card .yc-check{background:var(--ac);border-color:var(--ac);color:#fff}
+.yc-odds{display:flex;align-items:baseline;gap:6px}.yc-odds b{font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}.yc-odds span{font-size:11px;font-weight:600;color:var(--i3)}
+.yc-field{display:flex;align-items:center;gap:8px;height:68px;padding:0 16px;border:1.5px solid var(--ln2);border-radius:18px;background:var(--s2);transition:border-color .15s,background-color .15s,box-shadow .15s}
+.yc-field:focus-within{border-color:var(--ac);background:var(--sf);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+.yc-cur{font-size:26px;font-weight:700;color:var(--i3);line-height:1}
+.yc-amt{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;font-size:32px;font-weight:800;letter-spacing:-.03em;color:var(--ink);font-variant-numeric:tabular-nums}
+.yc-amt::placeholder{color:var(--ln2)}
+.yc-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.yc-chip{height:42px;border:1px solid var(--ln2);border-radius:13px;background:var(--sf);font-size:13px;font-weight:700;color:var(--ink);transition:border-color .15s,background-color .15s,color .15s,transform .12s}
+.yc-chip:hover{border-color:var(--ac);background:var(--acs);color:var(--ac)}.yc-chip:active{transform:scale(.96)}
+.yc-sum{display:grid;gap:11px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 11%,var(--sf)),color-mix(in srgb,var(--ac) 3%,var(--sf)));border:1px solid color-mix(in srgb,var(--ac) 24%,var(--ln))}
+.yc-sum>div{display:flex;justify-content:space-between;align-items:center;gap:12px}.yc-sum dt{font-size:13px;font-weight:500;color:var(--i2)}.yc-sum dd{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.yc-sum .yc-return dd{font-size:18px;letter-spacing:-.02em}.yc-sum .yc-profit{padding-top:11px;border-top:1px dashed var(--ln2)}
+.yc-sum .yc-profit dt{color:var(--ink);font-weight:600}.yc-sum .yc-profit dd{padding:3px 11px;border-radius:99px;background:var(--oks);color:var(--ok);font-size:15px}
+.yc-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:58px;border:0;border-radius:18px;background:var(--grad);color:#fff;font-size:16px;font-weight:700;letter-spacing:.01em;box-shadow:0 14px 26px -12px rgba(30,91,240,.7),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .12s ease,box-shadow .15s ease,filter .15s ease}
+.yc-cta:hover{filter:brightness(1.08)}.yc-cta:active{transform:translateY(1px) scale(.985);box-shadow:0 6px 14px -8px rgba(30,91,240,.75),inset 0 1px 0 rgba(255,255,255,.2)}
+.yc-cta:disabled{opacity:.6;box-shadow:none;transform:none;cursor:not-allowed}
+.yc-foot{display:grid;justify-items:center;gap:6px;margin-top:-4px;text-align:center}
+.yc-note{font-size:11px;color:var(--i3)}
+@container (max-width:340px){.yc-head{padding:14px}.yc-form{padding:14px;gap:18px}.yc-card{padding:12px;gap:12px}.yc-odds b{font-size:24px}.yc-amt{font-size:28px}.yc-cur{font-size:23px}}
+@container (min-width:460px){.yc-head{padding:18px 20px 16px}.yc-form{padding:20px;gap:22px}.yc-card{padding:16px}.yc-odds b{font-size:32px}}
+@media (prefers-reduced-motion:reduce){.yc *,.yc *::before,.yc *::after{transition:none!important}}
 </style>
 </head>
 <body>
@@ -197,12 +173,22 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 <div id="sh"></div>
 <div class="tw" id="tw"></div>
 
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script> 
 <script src="config.js"></script>
 <script>
-/* =========================================================
-   CricPulse — production SPA (ZapUPI Integrated)
-   ========================================================= */
+// ==========================================
+// SECURITY: BLOCK INSPECT ELEMENT / F12 / CTRL+U
+// ==========================================
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+      (e.ctrlKey && e.key === 'U')) {
+    e.preventDefault();
+    alert("Inspect element is disabled for security.");
+  }
+});
+
 const P = {
   home:"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10",
   target:"M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0zM18 12A6 6 0 1 1 6 12a6 6 0 0 1 12 0zM14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0z",
@@ -241,7 +227,9 @@ const P = {
   chat:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
   instagram:"M16 3H8a5 5 0 0 0-5 5v8a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5V8a5 5 0 0 0-5-5zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM17.5 6.5h.01",
   dot:"M12 12h.01",
-  ext:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"
+  ext:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3",
+  film:"M4 4h16v16H4zM9 4v16M15 4v16M4 9h5M4 15h5M15 9h5M15 15h5",
+  pol:"M12 2l9 21H3zM12 10v4"
 };
 const ic = (n,s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
 const $ = i => document.getElementById(i);
@@ -250,18 +238,39 @@ const inr = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigit
 const inr2 = n => "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
 const ni = n => Math.round(n).toLocaleString("en-IN");
 
-const CATS = [["cricket","Cricket","cricket"],["football","Football","football"],["kabaddi","Kabaddi","kabaddi"],["indian","Indian events","rupee"],["esports","Esports","gamepad"]];
-let MK = [
-  {id:1,c:"cricket",lg:"IPL, Match 42",A:["MI","Mumbai Indians"],B:["CSK","Chennai Super Kings"],s:1500,w:62,oa:1.85,ob:2.1},
-  {id:2,c:"cricket",lg:"ODI Series",A:["IND","India"],B:["AUS","Australia"],s:5400,w:58,oa:1.7,ob:2.3},
-  {id:3,c:"cricket",lg:"Women's T20",A:["RCB","Bengaluru Royals"],B:["DC","Delhi Capitals"],s:9000,w:49,oa:2.05,ob:1.9},
-  {id:4,c:"cricket",lg:"Ranji Trophy",A:["KAR","Karnataka"],B:["TN","Tamil Nadu"],s:3600,w:44,oa:2.15,ob:1.8},
-  {id:5,c:"cricket",lg:"T20 League",A:["KKR","Kolkata Knight Riders"],B:["SRH","Sunrisers Hyderabad"],s:12000,w:47,oa:1.95,ob:1.95},
-  {id:6,c:"cricket",lg:"ODI, Day/Night",A:["ENG","England"],B:["SA","South Africa"],s:7200,w:55,oa:1.75,ob:2.2},
-  {id:7,c:"indian",lg:"Entertainment",q:"Will the new film cross ₹300 crore by Sunday?",A:["Y","Yes"],B:["N","No"],s:20000,w:51,oa:1.9,ob:2},
-  {id:8,c:"indian",lg:"Economy",q:"Will Sensex close above last week's high?",A:["Y","Yes"],B:["N","No"],s:15000,w:46,oa:2.1,ob:1.85},
-  {id:9,c:"esports",lg:"BGMI Pro Series",A:["TSM","Team Soul"],B:["GE","Godlike"],s:6400,w:53,oa:1.8,ob:2.1}
+const CATS = [
+  ["cricket","Cricket","cricket"],
+  ["football","Football","football"],
+  ["kabaddi","Kabaddi","kabaddi"],
+  ["movies","Movies","film"],
+  ["politics","Politics","pol"],
+  ["economy","Economy","rupee"],
+  ["esports","Esports","gamepad"]
 ];
+
+// ==========================================
+// DEMO DATA FALLBACK (If Supabase is empty)
+// ==========================================
+const DEMO_MK = [
+  {
+    id: 'demo-1', c: 'cricket', lg: 'ICC T20 World Cup',
+    A: ['IND', 'India'], B: ['AUS', 'Australia'],
+    s: 3600, w: 65, oa: 1.85, ob: 2.10
+  },
+  {
+    id: 'demo-2', c: 'cricket', lg: 'Indian Premier League',
+    A: ['MI', 'Mumbai Indians'], B: ['CSK', 'Chennai Super Kings'],
+    s: 7200, w: 45, oa: 1.95, ob: 1.90
+  },
+  {
+    id: 'demo-3', c: 'football', lg: 'UEFA Champions League',
+    A: ['MCI', 'Man City'], B: ['RMA', 'Real Madrid'],
+    s: 14400, w: 55, oa: 2.10, ob: 1.75
+  }
+];
+
+let MK = [...DEMO_MK]; // Initialize with demo data immediately
+
 const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
 const FAQ = [
   ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
@@ -272,11 +281,11 @@ const FAQ = [
 ];
 const VEN = ["","Wankhede Stadium, Mumbai","Capital Oval, New Delhi","Chinnaswamy Stadium, Bengaluru","Chepauk Ground, Chennai","Eden Gardens, Kolkata","Newlands, Cape Town","Official box office trackers","Official exchange closing data","Online final, India server"];
 const NM = ["Rohan Verma","Arjun Khan","Sameer Iyer","Tanmay Nair","Vikram Das","Kunal Rao","Imran Qureshi","Nikhil Joshi"];
-const RO = {cricket:["Top-order batter","Fast bowler"],football:["Striker","Midfielder"],kabaddi:["Raider","Defender"],esports:["Entry fragger","In-game leader"]};
+const RO = {cricket:["Top-order batter","Fast bowler"],football:["Striker","Midfielder"],kabaddi:["Raider","Defender"],esports:["Entry fragger","In-game leader"],movies:["Lead Actor","Director"],politics:["Candidate A","Candidate B"],economy:["Analyst","Trader"]};
 
 const META = {
-  home:["Overview","Your prediction performance at a glance."],
-  markets:["Markets","Pick an outcome, then lock it. Entry is free."],
+  home:["Overview","Your real money performance at a glance."],
+  markets:["Markets","Pick an outcome, then lock it. Real money."],
   picks:["My picks","Track pending and settled predictions."],
   wallet:["Wallet","Balance, deposits and withdrawals."],
   rewards:["Coupons","Claim rewards you have won."],
@@ -299,12 +308,12 @@ const RAIL = [
 
 /* ---- state ---- */
 const KEY = "cricpulse_v3";
-const PERSIST = ["user","bal","xp","st","best","preds","cps","txs","nts","pf","theme","chk","tickets","le"];
+const PERSIST = ["user","bal","preds","cps","txs","nts","pf","theme","chk","tickets","le","slipStake"];
 let S = {
-  user:null, bal:0, xp:0, st:0, best:0, preds:[], cps:[], txs:[],
+  user:null, bal:0, preds:[], cps:[], txs:[],
   nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, ts:Date.now()}],
   pf:{em:1,re:1,rw:1}, theme:"", chk:"", route:"home", pub:"land", au:"in",
-  cat:"all", q:"", slip:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0,
+  cat:"all", q:"", slip:{}, slipStake:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0,
   tickets:[], ticketOpen:null, authBusy:false
 };
 try {
@@ -314,8 +323,6 @@ try {
 const save = () => { try { const o = {}; PERSIST.forEach(k => o[k] = S[k]); localStorage.setItem(KEY, JSON.stringify(o)); } catch(e) {} };
 const applyTheme = () => { document.documentElement.dataset.theme = S.theme || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"); };
 const isDark = () => document.documentElement.dataset.theme == "dark";
-const lvl = () => Math.floor(S.xp/100) + 1;
-const tier = () => lvl()>=5 ? "Gold" : lvl()>=3 ? "Silver" : "Bronze";
 const mkt = id => MK.find(m => m.id == id);
 const ttl = m => m.q || m.A[1] + " vs " + m.B[1];
 const cl = c => (CATS.find(x => x[0] == c) || [])[1] || c;
@@ -350,25 +357,13 @@ MK.forEach(m => {
 });
 const ov = b => Math.floor(b/6) + "." + b%6;
 function liveText(m) {
-  if (m.liveData && m.liveData.statusText) return m.liveData.statusText;
-  return "Match yet to start"; // Clean fallback instead of fake data
-}
-function liveBoard(m) {
-  // If we are still waiting for the API to respond, show a clean state
-  if (!m.liveData) {
-    return `<div class="sg"><div class="tm"><b>${esc(m.A[1])}</b><span>-</span><small>Not started</small></div><div class="mut s12">vs</div><div class="tm"><b>${esc(m.B[1])}</b><span>-</span><small>Not started</small></div></div><div class="ex">Waiting for live feed...</div>`;
+  if (m.liveData && m.liveData.statusText) {
+    if (m.liveData.scoreA && m.liveData.scoreA !== '-') {
+       return `Live · ${m.liveData.scoreA} vs ${m.liveData.scoreB}`;
+    }
+    return m.liveData.statusText;
   }
-  
-  // Use REAL data from the API
-  const d = m.liveData;
-  return `
-    <div class="sg">
-      <div class="tm"><b>${esc(m.A[1])}</b><span>${d.scoreA}</span><small>${d.oversA}</small></div>
-      <div class="mut s12">vs</div>
-      <div class="tm"><b>${esc(m.B[1])}</b><span>${d.scoreB}</span><small>${d.oversB}</small></div>
-    </div>
-    <div class="ex" style="font-weight:600; color: ${m.isFinished ? 'var(--ok)' : 'var(--i3)'};">${d.statusText}</div>
-  `;
+  return "Match yet to start";
 }
 const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';
   
@@ -384,7 +379,6 @@ const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class
 const stp = p => p.res == "w" ? '<span class="pill ok">Won</span>' : p.res == "l" ? '<span class="pill no">Lost</span>' : '<span class="pill">Pending</span>';
 const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("")}</div>`;
 const ntf = L => L.length ? L.map(n => {
-  // Calculate relative time
   let timeStr = n.k || "";
   if (n.ts) {
     const diff = Math.floor((Date.now() - n.ts) / 1000);
@@ -399,7 +393,6 @@ const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margi
 const wide = () => matchMedia("(min-width:900px)").matches;
 const brand = `<div class="brand"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" alt="CricPulse" style="width:32px; height:32px; object-fit:contain; border-radius:8px; margin-right:6px;">CricPulse</div>`;
 
-
 /* ============== PUBLIC PAGES ============== */
 function landing() {
   const reg = 18420 + (S.user ? 1 : 0);
@@ -408,21 +401,21 @@ function landing() {
   <section class="hero">
     <div>
       <span class="tag">${ic("shield",12)} Real Predictions, Real Rewards</span>
-      <h1>Call the match. <em>Win real rewards.</em></h1>
-      <p>Pick the winner of cricket and other matches for free, follow live scores and track your results in your wallet.</p>
+      <h1>Call the match. <em>Win real money.</em></h1>
+      <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
       <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get started free</button><button class="btn grow" data-a="guest">Try as guest</button></div>
       <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
     </div>
-    <div class="lb"><header><span>Live now, IPL Match 42</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
+    <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
   </section>
-  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket and more with live scores and crowd splits."],["lock","Lock your pick","One free pick per market before the countdown ends."],["wallet","Collect rewards","Correct picks add funds and unlock coupons."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket, movies, and more with live updates."],["lock","Lock your pick","Enter your stake and lock in your prediction."],["wallet","Collect rewards","Correct picks instantly credit your wallet."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
   <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
   <section class="sec"><h2>Questions</h2>${faqH(5)}</section>
 </div>
 <footer class="foot">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <a href="https://sportscore.com/" target="_blank" rel="dofollow" style="color:var(--i3);font-size:0.65rem;">Powered by SportScore</a>
-    <div><b>CricPulse</b><br>India's free cricket prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
+    <div><b>CricPulse</b><br>India's real money prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
     <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button><button data-a="guest">Continue as guest</button></div>
     <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
     <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
@@ -434,7 +427,7 @@ function landing() {
 function authV() {
   const up = S.au == "up";
   return `<header class="pub">${brand}<button class="btn sm" data-a="home0">Back</button></header>
-  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. No card needed.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
+  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. Real money rewards.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
   ${up ? '<div class="fld"><label for="an">Full name</label><input class="inp" id="an" autocomplete="name"></div>' : ""}
   <div class="fld"><label for="ae">Email</label><input class="inp" id="ae" type="email" autocomplete="email" inputmode="email"></div>
   <div class="fld"><label for="ap">Password</label><input class="inp" id="ap" type="password" autocomplete="${up?"new-password":"current-password"}"></div>
@@ -452,7 +445,7 @@ function legalPage(kind) {
     terms:{title:"Terms & Conditions",body:`<p>CricPulse is a skill-based prediction platform. By using this site you agree to these terms, to play responsibly, and to follow the laws of your state regarding online gaming. You must be 18 or older.</p><p>Markets are free to enter. One pick per market. Picks lock at the countdown end and cannot be edited. Settlement uses the official result; void markets refund automatically.</p><p>Wallet funds are real. Deposits are credited on confirmation; withdrawals are reviewed and processed within 24 hours. Minimum withdrawal is ₹100.</p><p>We may suspend accounts for abuse, multi-accounting or attempts to manipulate settlement.</p>`},
     privacy:{title:"Privacy Policy",body:`<p>We collect your email and display name to create your account, and transaction data to operate the wallet. We do not sell your data.</p><p>Authentication is handled by our identity provider; passwords are never stored by us. Support images are stored to resolve your tickets and are visible only to support staff.</p><p>You can request deletion of your account and data via the Support Center.</p>`},
     refund:{title:"Refund Policy",body:`<p>If a market is abandoned, tied or voided, entries and any associated balance are refunded automatically to your wallet.</p><p>Deposits are final once credited. Withdrawals are processed within 24 hours; cancellations before processing return funds instantly to your wallet.</p><p>For disputes, open a ticket in the Support Center — we reply within 60 minutes.</p>`},
-    about:{title:"About CricPulse",body:`<p>CricPulse is India's free cricket prediction platform. We let fans call the match, follow live scores, and track results in a single wallet.</p><p>Entry is free across all markets. Correct picks earn wallet funds and coupons from partner brands. Our support team replies within 60 minutes.</p><p>Play responsibly. Only 18+ users are permitted.</p>`}
+    about:{title:"About CricPulse",body:`<p>CricPulse is India's free prediction platform. We let fans call the match, follow live scores, and track results in a single wallet.</p><p>Entry is free across all markets. Correct picks earn wallet funds and coupons from partner brands. Our support team replies within 60 minutes.</p><p>Play responsibly. Only 18+ users are permitted.</p>`}
   };
   const p = PAGES[kind];
   return `<header class="pub"><div class="row"><button class="ib" data-a="${S.user?"nav":"home0"}" data-v="help" aria-label="Back">${ic("back",18)}</button>${brand}</div></header>
@@ -462,7 +455,7 @@ function legalPage(kind) {
 /* ============== APP VIEWS ============== */
 const mrow = m => {
   const lk = S.preds.find(p => p.m == m.id), cls = !left(m) || m.isFinished, sel = S.slip[m.id];
-  return `<div class="mk"><div class="bt" style="align-items:flex-start"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)} · crowd ${m.w}/${100-m.w}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
+  return `<div class="mk" data-a="open" data-v="${m.id}"><div class="bt" style="align-items:flex-start"><div class="nm">${esc(ttl(m))}</div><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
 };
 const mlist = () => {
   const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
@@ -470,30 +463,49 @@ const mlist = () => {
 };
 const slipBody = () => {
   const ids = Object.keys(S.slip);
-  return (ids.length ? ids.map(id => { const m = mkt(id); return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Your pick: ${esc(full(m,S.slip[id]))}</span></div><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div>`; }).join("") : '<div class="empty">Tap an outcome to add it here.</div>') + `<div class="sl"><span class="t2">Entry fee</span><b class="ok">Free</b></div><div class="sl"><span class="t2">XP on lock</span><b>+${ids.length*10}</b></div><button class="btn p w" style="margin-top:8px" data-a="lockslip" ${ids.length?"":"disabled"}>${ic("lock",14)} Lock ${ids.length||""} pick${ids.length==1?"":"s"}</button>`;
+  if (!ids.length) return '<div class="empty">Tap an outcome to add it here.</div>';
+  
+  let totalPotential = 0;
+  let html = ids.map(id => { 
+    const m = mkt(id); 
+    const odds = S.slip[id] == "A" ? m.oa : m.ob;
+    const stake = S.slipStake[id] || 0;
+    const potential = Math.round(stake * odds);
+    totalPotential += potential;
+    return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+  }).join("");
+  
+  html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">₹${totalPotential}</b></div>`;
+  html += `<button class="btn p w" style="margin-top:8px" data-a="lockslip">${ic("lock",14)} Lock Picks</button>`;
+  return html;
 };
 const marketsV = () => {
   const n = Object.keys(S.slip).length;
-  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">${ic("search",16)}<input class="inp" id="q" placeholder="Search teams or events" value="${esc(S.q)}"></div><div class="lay2"><div id="ml">${mlist()}</div><div class="card slipd" id="sd"><h3>Your slip</h3>${slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>${n} pick${n>1?"s":""} selected</b><div class="s11" style="opacity:.7">+${n*10} XP, free entry</div></div><button class="btn p sm" data-a="slipsheet">Review and lock</button></div>` : "");
+  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">${ic("search",16)}<input class="inp" id="q" placeholder="Search teams, events or questions" value="${esc(S.q)}"></div><div class="lay2"><div id="ml">${mlist()}</div><div class="card slipd" id="sd"><h3>Your slip</h3>${slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>${n} pick${n>1?"s":""} selected</b><div class="s11" style="opacity:.7">Click to review and lock</div></div><button class="btn p sm" data-a="slipsheet">Review</button></div>` : "");
 };
 function homeV() {
   const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
+  
   const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
-  const cs = CATS.map(c => { 
-    const d = S.preds.filter(p => { const m = mkt(p.m); return p.res && m && m.c == c[0]; }); 
-    const w = d.filter(p => p.res == "w").length, pc = d.length ? Math.round(w/d.length*100) : 0; 
-    return `<div style="margin-bottom:10px"><div class="bt s12"><span>${c[1]}</span><span class="mut">${d.length?pc+"% of "+d.length:"No data"}</span></div><div class="bar" style="margin-top:4px"><i style="width:${pc}%"></i></div></div>`; 
-  }).join("");
-   return `<div class="stack">${kpi([["Picks",t.n,t.d+" settled"],["Accuracy",t.p+"%",t.w+" correct"],["Streak",S.st,"Best "+S.best],["Wallet",inr(S.bal),un+" coupon"+(un==1?"":"s")+" to claim"]])}
-<div class="card"><div class="bt"><div><b>Level ${lvl()}, ${tier()}</b><div class="mut s12">${100-S.xp%100} XP to level ${lvl()+1}</div></div><button class="btn sm${done?"":" p"}" data-a="chk" ${done?"disabled":""}>${done?"Checked in":"Check in +10 XP"}</button></div><div class="bar" style="margin-top:10px"><i style="width:${S.xp%100}%"></i></div></div>
-<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Matches</h3></div>${MK.slice(0,3).map(m => row(m)).join("")}</div>
-<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${[...MK].sort((a,b) => a.s-b.s).slice(0,3).map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>
+
+  const activeMatches = MK.filter(m => !m.isFinished).slice(0, 3);
+  const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
+
+  return `<div class="stack">${kpi([["Wallet Balance",inr(S.bal),"Available to play"],["Total Won",inr(S.txs.filter(x=>x.type==="win").reduce((a,b)=>a+b.amount,0)),"Lifetime earnings"],["Total Predictions",t.n,t.d+" settled"],["Win Rate",t.p+"%",t.w+" correct"]])}
+
+${activeMatches.length ? `<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Markets</h3></div>${activeMatches.map(m => row(m)).join("")}</div>` : ''}
+
+${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>` : ''}
+
 <div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
   const m = mkt(p.m); 
   if (!m) return ''; 
-  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Your pick: ${esc(full(m,p.p))}</div></div>${stp(p)}</div>`; 
+  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)}</div></div>${stp(p)}</div>`; 
 }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
-<div class="card dk"><h3>Accuracy by category</h3>${cs}</div></div>`;
+</div>`;
 }
 function picksV() {
   const f = S.pff, cnt = k => S.preds.filter(p => k=="all"||(k=="p"?!p.res:p.res==k)).length;
@@ -501,37 +513,34 @@ function picksV() {
   return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { 
     const m = mkt(p.m); 
     if (!m) return ''; 
-    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">${esc(full(m,p.p))} · ${(p.p=="A"?m.oa:m.ob).toFixed(2)}x${p.res=="w"?" · +"+inr(p.pay):""}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res?"":`<button class="btn sm" data-a="settle" data-v="${p.id}">Settle</button>`}</div></div>`; 
+    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)} · Odds: ${p.odds}x</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
   }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
   const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
-  return `<div class="stack"><div class="wbal"><small>Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
+  return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
 <div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
-<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings"}[t.type]}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"?"no":"ok"}">${t.type=="withdraw"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
+<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
 <details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
 }
 function rewardsV() {
   const un = S.cps.filter(c => !c.cl).length;
-  return `<div class="stack">${kpi([["Available",un,"to claim"],["Claimed",S.cps.length-un,"codes saved"],["Tier",tier(),"Level "+lvl()],["XP",S.xp,"total"]])}
-<div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
+  return `<div class="stack"><div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
 <details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
 }
 function ranksV() {
   const W = [["Aarav Sharma",640,74],["Diya Menon",610,71],["Kabir Rao",540,68],["Meera Patel",470,65],["Rohan Thakur",390,61]];
   const A = [["Aarav Sharma",3420,72],["Diya Menon",3310,70],["Kabir Rao",3180,67],["Meera Patel",2990,66],["Rohan Thakur",2860,62]];
-  const L = [...(S.rk=="w"?W:A),[S.user.n,S.xp,tally().p,1]].sort((a,b) => b[1]-a[1]);
-  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">${i+1}</b><div class="grow">${esc(r[0])}${r[3]?" (you)":""}</div><span class="mut s12">${r[2]}%</span><b style="min-width:48px;text-align:right">${r[1]} XP</b></div>`).join("")}</div>`;
+  const L = [...(S.rk=="w"?W:A),[S.user.n,Math.round(S.bal),tally().p,1]].sort((a,b) => b[1]-a[1]);
+  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">${i+1}</b><div class="grow">${esc(r[0])}${r[3]?" (you)":""}</div><span class="mut s12">${r[2]}%</span><b style="min-width:48px;text-align:right">${inr(r[1])}</b></div>`).join("")}</div>`;
 }
 const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
 function profileV() {
   const u = S.user, t = tally();
-  const B = [["First pick","target",t.n>=1],["First win","award",t.w>=1],["3-win streak","flame",S.best>=3],["3 coupons","gift",S.cps.length>=3],["Level 3","star",lvl()>=3]];
   const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
-  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)} · Level ${lvl()} ${tier()}</div></div></div></div>
+  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)}</div></div></div></div>
 <div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
 <div class="card" style="padding:12px 14px 2px"><h3>Preferences</h3>${tg.map(([k,l,d]) => `<div class="ln"><div><b class="s12" style="display:block">${l}</b><span class="mut s12">${d}</span></div><label class="sw"><input type="checkbox" data-a="pref" data-v="${k}" ${S.pf[k]?"checked":""} aria-label="${l}"><i></i></label></div>`).join("")}<div class="ln"><b class="s12">Dark mode</b><label class="sw"><input type="checkbox" data-a="theme" ${isDark()?"checked":""} aria-label="Dark mode"><i></i></label></div></div>
-<details class="card"><summary>Badges${ic("chev",15)}</summary><div class="bd">${B.map(b => `<div class="ln" style="opacity:${b[2]?1:.45}"><div class="row">${ic(b[1],17)}<span>${b[0]}</span></div><span class="mut s12">${b[2]?"Earned":"Locked"}</span></div>`).join("")}</div></details>
 <div class="grid2"><button class="btn" data-a="support">${ic("chat",15)} Support</button><button class="btn" data-a="logout">${ic("exit",15)} Log out</button></div></div>`;
 }
 const helpV = () => `<div class="stack">${faqH()}
@@ -578,23 +587,132 @@ function ticketV() {
 }
 
 /* match */
-function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
 function matchV() {
-    const m = mkt(S.mid);
-  if (!m) return '<div class="card empty">Match not found or has ended.</div>';
-  const lk = S.preds.find(p => p.m == m.id), sel = S.slip[m.id], cls = !left(m) || m.isFinished;
-  const fa = form(m,0), fb = form(m,1), h = 2, n = 4200, ro = RO[m.c] || ["Player", "Player"], op = wide() ? " open" : "";
-  const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
-  const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id] || "Stadium"],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free"],["Reward","Funds, XP and a coupon"],["Participants",n.toLocaleString("en-IN")]];
-  return `<div class="lay"><div class="a card"><div class="bt"><h3>${m.isFinished ? 'Final Score' : 'Live score'}</h3><span class="pill ${m.isFinished ? 'ok' : 'no'}">${m.isFinished ? 'FINISHED' : 'LIVE'}</span></div><div data-lb="${m.id}">${liveBoard(m)}</div><div class="mut s11" style="margin-top:6px">${m.isFinished ? 'Match has ended.' : 'Live feed, updates every 15 seconds.'}</div></div>
-<div class="c card"><div class="bt" style="margin-bottom:10px"><h3>Your call</h3><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div>${lk ? `<div class="ln"><span class="t2">Your pick</span><b>${esc(full(m,lk.p))}</b></div><div class="ln"><span class="t2">Odds</span><b>${(lk.p=="A"?m.oa:m.ob).toFixed(2)}x</b></div><div class="ln"><span class="t2">Status</span>${stp(lk)}</div>${lk.res?"":`<button class="btn w" style="margin-top:8px" data-a="settle" data-v="${lk.id}">Settle result</button>`}` : m.isFinished ? `<div class="empty" style="padding:14px 0; background:var(--s2); border-radius:10px; margin-bottom:10px;"><b>Match has ended.</b><br><small>Predictions are closed.</small></div>` : `<div class="pks" style="margin-bottom:10px">${["A","B"].map(k => `<button class="pk${sel==k?" on":""}" data-a="mpick" data-v="${m.id}:${k}" ${cls?"disabled":""}><span>${esc(full(m,k))}</span><b>${(k=="A"?m.oa:m.ob).toFixed(2)}x</b></button>`).join("")}</div><button class="btn p w" data-a="lockm" data-v="${m.id}" ${sel&&!cls?"":"disabled"}>${ic("lock",14)} ${cls?"Market closed":"Lock pick, free"}</button>`}<div class="bar" style="margin-top:12px"><i style="width:${m.w}%"></i></div><div class="mut s12" style="margin-top:4px">Crowd: ${m.w}% ${esc(m.A[1])}, ${100-m.w}% ${esc(m.B[1])}</div></div>
-<div class="d stack"><details class="card"${op}><summary>Match details${ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
-${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>${m.id==7?"Resolves Yes if the film's reported net collection reaches ₹300 crore by Sunday 11:59 PM.":"Resolves Yes if Sensex closes above last week's highest closing value on Friday."}</p></div></details>` : `<details class="card"${op}><summary>Team comparison${ic("chev",15)}</summary><div class="bd"><div class="ln"><span>${esc(m.A[0])}</span>${fs(fa)}</div><div class="ln"><span>${esc(m.B[0])}</span>${fs(fb)}</div><div class="ln"><span class="t2">Last 6 meetings</span><b>${m.A[0]} ${h} - ${6-h} ${m.B[0]}</b></div>${[[m.A,0,1],[m.B,2,3]].map(([t,a,b]) => {
-  const idxA = String(t[1]).length % 8;
-  const idxB = String(t[0]).length % 8;
-  return `<div class="ln"><div><b class="s12">${NM[idxA]}</b><div class="mut s12">${esc(t[1])}, ${ro[0]}</div></div><div style="text-align:right"><b class="s12">${NM[idxB]}</b><div class="mut s12">${ro[1]}</div></div></div>`;
-}).join("")}</div></details>`}
-<details class="card"><summary>Rules and settlement${ic("chev",15)}</summary><div class="bd"><p>One free pick per market. Picks close when the countdown ends and cannot change after locking. Settled against the official result; voided if abandoned or tied. A correct pick adds funds, 50 XP and a coupon.</p></div></details></div></div>`;
+  const m = mkt(S.mid);
+  if (!m) return '<div class="card empty">Market not found or has ended.</div>';
+  
+  const lk = S.preds.find(p => p.m == m.id);
+  const sel = S.slip[m.id];
+  const cls = !left(m) || m.isFinished;
+  
+  let callHtml = '';
+  
+  if (lk) {
+    callHtml = `<div class="yc-content" style="align-items:center;text-align:center;padding:30px 18px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--oks);color:var(--ok);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+        ${ic("check",30)}
+      </div>
+      <h3 style="font-size:18px;font-weight:800;margin-bottom:4px;">Prediction Placed!</h3>
+      <p class="mut s12" style="margin-bottom:16px;">Your pick is locked and being tracked.</p>
+      <div class="yc-summary-panel" style="width:100%;text-align:left;">
+        <div class="yc-sum-line"><span>Your Pick</span><b>${esc(full(m,lk.p))}</b></div>
+        <div class="yc-sum-line"><span>Stake</span><b>${inr(lk.stake)}</b></div>
+        <div class="yc-sum-line"><span>Odds</span><b>${lk.odds}x</b></div>
+        <div class="yc-sum-line total"><span>Potential Payout</span><b class="ok">${inr(lk.stake * lk.odds)}</b></div>
+      </div>
+    </div>`;
+  } else if (m.isFinished) {
+    callHtml = `<div class="empty" style="padding:30px 18px; text-align:center;"><b>Market has ended.</b><br><small>Predictions are closed.</small></div>`;
+  } else {
+    const isTeamA = sel === 'A';
+    const isTeamB = sel === 'B';
+    const odds = isTeamA ? m.oa : (isTeamB ? m.ob : 0);
+    const currentStake = S.slipStake[m.id] || 50;
+    const potential = sel ? Math.round(currentStake * odds) : 0;
+    const profit = potential - currentStake;
+
+    callHtml = `
+      <div class="yc">
+        <div class="yc-head">
+          <div>
+            <h3 class="yc-title">Your Call</h3>
+            <p class="yc-sub">Pick a side and set your stake</p>
+          </div>
+          <div class="yc-badges">
+            <span class="yc-live">LIVE</span>
+            <span class="yc-timer" role="timer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span data-cd="${m.id}">${cdt(m)}</span>
+            </span>
+          </div>
+        </div>
+
+        <form class="yc-form" onsubmit="return false">
+          <fieldset class="yc-picks">
+            <legend class="yc-label">Choose your team <small>Popularity</small></legend>
+            <div class="yc-grid">
+              <label class="yc-opt">
+                <input type="radio" name="yc-side" value="A" ${sel === 'A' ? 'checked' : ''} onchange="selectSide('${m.id}', 'A')" ${cls ? 'disabled' : ''}>
+                <span class="yc-card" style="--c1:#1a5cff;--c2:#1348d6;--dot:var(--ac)">
+                  <span class="yc-top">
+                    <span class="yc-mono" aria-hidden="true">${m.A[0].slice(0,2).toUpperCase()}</span>
+                    <span class="yc-name">${m.A[1]}</span>
+                    <span class="yc-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  </span>
+                  <span class="yc-odds"><b>${m.oa.toFixed(2)}x</b><span>winnings</span></span>
+                </span>
+              </label>
+
+              <label class="yc-opt">
+                <input type="radio" name="yc-side" value="B" ${sel === 'B' ? 'checked' : ''} onchange="selectSide('${m.id}', 'B')" ${cls ? 'disabled' : ''}>
+                <span class="yc-card" style="--c1:#e0891a;--c2:#b86a0a;--dot:var(--am)">
+                  <span class="yc-top">
+                    <span class="yc-mono" aria-hidden="true">${m.B[0].slice(0,2).toUpperCase()}</span>
+                    <span class="yc-name">${m.B[1]}</span>
+                    <span class="yc-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  </span>
+                  <span class="yc-odds"><b>${m.ob.toFixed(2)}x</b><span>winnings</span></span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div>
+            <label class="yc-label" for="yc-amt">Enter your stake <small>Min ₹10 · Max ₹10,000</small></label>
+            <div class="yc-field">
+              <span class="yc-cur" aria-hidden="true">₹</span>
+              <input class="yc-amt" id="stake-input-${m.id}" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0" value="${currentStake}" oninput="updateStake('${m.id}', this.value)" ${cls ? 'disabled' : ''}>
+            </div>
+            <div class="yc-chips" role="group" aria-label="Quick add">
+              <button type="button" class="yc-chip" onclick="incrementStake('${m.id}', 50)" ${cls ? 'disabled' : ''}>+₹50</button>
+              <button type="button" class="yc-chip" onclick="incrementStake('${m.id}', 100)" ${cls ? 'disabled' : ''}>+₹100</button>
+              <button type="button" class="yc-chip" onclick="incrementStake('${m.id}', 500)" ${cls ? 'disabled' : ''}>+₹500</button>
+            </div>
+          </div>
+
+          <dl class="yc-sum" aria-live="polite">
+            <div>
+              <dt>Your Stake</dt>
+              <dd id="yc-stake-${m.id}">${inr(currentStake)}</dd>
+            </div>
+            <div class="yc-return">
+              <dt>Total Return</dt>
+              <dd id="yc-return-${m.id}">${inr(potential)}</dd>
+            </div>
+            <div class="yc-profit">
+              <dt>Potential Profit</dt>
+              <dd id="yc-profit-${m.id}">+${inr(profit)}</dd>
+            </div>
+          </dl>
+
+          <button type="submit" class="yc-cta" onclick="lockPicks(['${m.id}'])" ${cls || !sel ? 'disabled' : ''}>
+            Confirm Bet
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+          <p class="yc-foot">
+            <span class="yc-note">Real money predictions. Instant UPI payouts.</span>
+          </p>
+        </form>
+      </div>
+    `;
+  }
+
+  return `<div class="lay">
+    <div class="c card" style="padding:0; overflow:hidden;">
+      ${callHtml}
+    </div>
+  </div>`;
 }
 
 const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, support:supportV, ticket:ticketV, match:matchV};
@@ -608,7 +726,6 @@ function shell() {
   const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
   const hasBack = ["match","ticket","support"].includes(R) || R=="help";
   
-  // Mobile Header Brand (using the image)
   const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>`;
 
   return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
@@ -634,26 +751,14 @@ function render() {
 async function enter(u) {
   u.n = (u.n||"").replace(/[<>"&]/g,"").trim().slice(0,30) || "Player";
   u.e = (u.e||"").replace(/[<>"&]/g,"");
-  if (S.user === null && S.le && S.le != u.e) { Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{}}); }
+  if (S.user === null && S.le && S.le != u.e) { Object.assign(S,{bal:0,preds:[],cps:[],txs:[],slip:{},slipStake:{}}); }
   S.le = u.e; S.user = u; S.route = "home"; S.pop = 0; save(); render(); scrollTo(0,0);
 }
 
-/* ---------- Google sign-in / session helpers ---------- */
-/* Always return to the clean page URL (no old #access_token or ?code= leftovers) */
 const authRedirect = () => window.location.origin + window.location.pathname;
-function cleanAuthUrl() {
-  try {
-    const u = new URL(window.location.href); let ch = false;
-    if (u.hash.includes("access_token") || u.hash.includes("error")) { u.hash = ""; ch = true; }
-    ["code","error","error_description"].forEach(k => { if (u.searchParams.has(k)) { u.searchParams.delete(k); ch = true; } });
-    if (ch) history.replaceState(null, "", u.pathname + u.search + u.hash);
-  } catch(e) {}
-}
-/* if a different account signs in on this device, don't show the previous account's local picks/XP */
-function switchAcct(em) {
-  if (S.le && S.le !== em) { Object.assign(S,{bal:0,xp:0,st:0,best:0,preds:[],cps:[],txs:[],slip:{},tickets:[]}); }
-  S.le = em;
-}
+function cleanAuthUrl() { try { const u = new URL(window.location.href); let ch = false; if (u.hash.includes("access_token") || u.hash.includes("error")) { u.hash = ""; ch = true; } ["code","error","error_description"].forEach(k => { if (u.searchParams.has(k)) { u.searchParams.delete(k); ch = true; } }); if (ch) history.replaceState(null, "", u.pathname + u.search + u.hash); } catch(e) {} }
+function switchAcct(em) { if (S.le && S.le !== em) { Object.assign(S,{bal:0,preds:[],cps:[],txs:[],slip:{},slipStake:{},tickets:[]}); } S.le = em; }
+
 let AUTHED_ID = null, AUTH_P = null;
 function applySession(session) {
   if (!session || !session.user) return Promise.resolve();
@@ -666,53 +771,24 @@ function applySession(session) {
     try {
       profile = await CP_DB.getProfile(session.user.id);
       tx = await CP_DB.getTransactions(session.user.id);
-      // NEW: Fetch actual notifications from database
-      const { data } = await supabase.from('notifications')
-        .select('*')
-        .or(`user_id.eq.${session.user.id},user_id.is.null`)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const { data } = await supabase.from('notifications').select('*').or(`user_id.eq.${session.user.id},user_id.is.null`).order('created_at', { ascending: false }).limit(20);
       if (data) realNotifs = data;
     } catch(e) { console.error("Profile load failed", e); }
     
     switchAcct(em);
-    S.user = {
-      id: session.user.id,
-      n: (profile && profile.display_name) || em.split('@')[0] || "Player",
-      e: em
-    };
+    S.user = { id: session.user.id, n: (profile && profile.display_name) || em.split('@')[0] || "Player", e: em };
     S.bal = (profile && profile.balance) || 0;
-    S.txs = (tx || []).map(t => ({
-      type: t.type,
-      amount: t.amount,
-      n: t.description || t.note,
-      status: t.status,
-      date: new Date(t.created_at).toLocaleDateString("en-IN")
-    }));
-    
-    // NEW: Map the real notifications into the UI format
-    if (realNotifs.length > 0) {
-      S.nts = realNotifs.map(n => ({
-        t: n.title,
-        d: n.body,
-        i: n.icon || "bell",
-        r: n.is_read ? 1 : 0, // Respect DB read status on refresh
-        ts: new Date(n.created_at).getTime()
-      }));
-    }
-
-    // 👇 ADD THIS LINE HERE 👇
+    S.txs = (tx || []).map(t => ({ type: t.type, amount: t.amount, n: t.description || t.note, status: t.status, date: new Date(t.created_at).toLocaleDateString("en-IN") }));
+    if (realNotifs.length > 0) { S.nts = realNotifs.map(n => ({ t: n.title, d: n.body, i: n.icon || "bell", r: n.is_read ? 1 : 0, ts: new Date(n.created_at).getTime() })); }
     initRealtimeSync();
-
     save();
-    render(); // Render Dashboard
+    render();
   })();
   return AUTH_P;
 }
+
 async function doLogout() {
-  /* 1. really end the Supabase session (this is what makes Google ask again next time) */
   try { if (window.CP_DB && CP_DB.authClient) await CP_DB.authClient.auth.signOut(); } catch(e) {}
-  /* 2. fallback: remove any leftover stored Supabase tokens, in case signOut could not reach the server */
   try { Object.keys(localStorage).forEach(k => { if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k); }); } catch(e) {}
   try { localStorage.removeItem("cp_session"); } catch(e) {}
   if (window.CP_DB && CP_DB.ready) { try { CP_DB.auth("logout", null).catch(()=>{}); } catch(e) {} }
@@ -720,13 +796,32 @@ async function doLogout() {
   S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); cleanAuthUrl(); render(); scrollTo(0,0);
 }
 
+// UPDATED LOCK PICKS TO HANDLE REAL MONEY
 function lockPicks(ids) {
   const ok = ids.filter(id => left(mkt(id)) > 0);
   if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
   if (!ok.length) { render(); return; }
-  
+
+  let totalStake = 0;
+  ok.forEach(id => {
+    totalStake += (S.slipStake[id] || 0);
+  });
+
+  if (S.bal < totalStake) {
+    toast(`Insufficient balance. You need ${inr(totalStake)}.`, "alert");
+    return;
+  }
+
+  // Deduct balance
+  S.bal -= totalStake;
+  addTx("stake", totalStake, "Bets placed", "completed");
+
   ok.forEach(id => { 
-    S.preds.push({id:Date.now(), m:id, p:S.slip[id], res:null, pay:0}); 
+    const m = mkt(id);
+    const stake = S.slipStake[id] || 0;
+    const odds = S.slip[id] == "A" ? m.oa : m.ob;
+    
+    S.preds.push({id:Date.now()+Number(id), m:id, p:S.slip[id], stake: stake, odds: odds, res:null, pay:0}); 
     
     // Save vote to Database
     if (window.CP_DB && window.CP_DB.ready && S.user) {
@@ -734,30 +829,82 @@ function lockPicks(ids) {
         user_id: S.user.id, 
         match_id: id, 
         prediction_choice: S.slip[id], 
-        amount: 0 
+        amount: stake
       }).then();
     }
     delete S.slip[id]; 
+    delete S.slipStake[id];
   });
   
-  S.xp += ok.length*10; note(ok.length+" pick"+(ok.length>1?"s":"")+" locked", "+"+ok.length*10+" XP. Results appear in My picks.","lock");
-  save(); closeSheet(); toast("Locked "+ok.length+" pick"+(ok.length>1?"s":"")+". +"+ok.length*10+" XP","lock"); render();
+  note("Bets Locked", "Total stake: " + inr(totalStake), "lock");
+  save(); closeSheet(); toast("Picks locked!", "lock"); render();
 }
+
 function settle(id) {
   const p = S.preds.find(x => x.id == id); if (!p || p.res) return;
   const m = mkt(p.m), win = Math.random()*100 < (p.p=="A"?m.w:100-m.w); let c = null;
   if (win) {
-    p.res = "w"; S.st++; S.best = Math.max(S.best,S.st); S.xp += 50; p.pay = Math.round(10*(p.p=="A"?m.oa:m.ob)); S.bal += p.pay; addTx("win",p.pay,ttl(m),"completed");
+    p.res = "w"; p.pay = Math.round(p.stake * p.odds); S.bal += p.pay; addTx("win",p.pay,ttl(m),"completed");
     const q = RW[Math.floor(Math.random()*RW.length)]; c = {v:q[0],t:q[1],code:q[2],cat:q[3],cl:0}; S.cps.push(c);
-    note("Pick correct", ttl(m)+". "+inr(p.pay)+" added and a reward unlocked.","award");
-  } else { p.res = "l"; S.st = 0; S.xp += 5; note("Pick incorrect", ttl(m)+". You earned 5 XP.","x"); }
+    note("Bet Won", ttl(m)+". "+inr(p.pay)+" added.","award");
+  } else { p.res = "l"; note("Bet Lost", ttl(m)+". You lost "+inr(p.stake)+".","x"); }
   save(); render();
-  sheet(`<h3 style="font-size:17px;margin-bottom:6px">${win?"Pick correct":"Pick incorrect"}</h3><p class="t2" style="margin-bottom:16px">${win?"You earned 50 XP and "+inr(p.pay)+" funds, and unlocked: <b>"+esc(c.t)+"</b>.":"You earned 5 XP for taking part. Try another market."}</p><button class="btn p w" data-a="sgo" data-v="${win?"rewards":"markets"}">${win?"Go to coupons":"Back to markets"}</button>`);
+  sheet(`<h3 style="font-size:17px;margin-bottom:6px">${win?"Correct!":"Incorrect"}</h3><p class="t2" style="margin-bottom:16px">${win?"You won "+inr(p.pay)+" and unlocked a coupon.":"You lost your stake of "+inr(p.stake)+". Try another market."}</p><button class="btn p w" data-a="sgo" data-v="${win?"rewards":"markets"}">${win?"Go to coupons":"Back to markets"}</button>`);
 }
+
+window.updateStake = function(id, val) {
+  let num = parseFloat(val);
+  if (isNaN(num) || num < 10) num = 10;
+  S.slipStake[id] = num;
+  save();
+
+  const m = mkt(id);
+  if (!m) return;
+  
+  const sel = S.slip[id];
+  const odds = sel == "A" ? m.oa : m.ob;
+  const potential = sel ? Math.round(num * odds) : 0;
+  const profit = potential - num;
+
+  const lblStake = document.getElementById(`yc-stake-${id}`);
+  const lblReturn = document.getElementById(`yc-return-${id}`);
+  const lblProfit = document.getElementById(`yc-profit-${id}`);
+  const btn = document.querySelector(`.yc-cta`);
+
+  if (lblStake) lblStake.textContent = inr(num);
+  if (lblReturn) lblReturn.textContent = inr(potential);
+  if (lblProfit) lblProfit.textContent = '+' + inr(profit);
+
+  if (btn) {
+    if (num >= 10 && num <= 10000 && sel) {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }
+  }
+};
+
+window.incrementStake = function(id, add) {
+  let current = S.slipStake[id] || 50;
+  let next = current + add;
+  if (next > 10000) next = 10000;
+  
+  S.slipStake[id] = next;
+  const input = document.getElementById(`stake-input-${id}`);
+  if (input) input.value = next;
+  
+  updateStake(id, next);
+};
+
+window.selectSide = function(id, side) {
+  S.slip[id] = side;
+  if (!S.slipStake[id]) S.slipStake[id] = 50;
+  save();
+  render();
+};
 
 const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••" + s.slice(-2);
 
-/* ZapUPI add funds sheet */
 const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
@@ -767,47 +914,29 @@ function depSheet() {
   <div class="fld">
     <label>Payment method</label>
     <div class="pay-method-grid">
-      <!-- Paytm -->
       <button class="pay-method-btn selected" data-method="paytm" onclick="selectPaymentMethod(this)">
-        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;">
-          <img src="https://cdn.phototourl.com/member/2026-10-29-e8709b5b-04a5-41f6-b500-13544b9d7f26.png" style="width:100%;height:100%;object-fit:contain;" alt="Paytm">
-        </div>
+        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;"><img src="https://cdn.phototourl.com/member/2026-10-29-e8709b5b-04a5-41f6-b500-13544b9d7f26.png" style="width:100%;height:100%;object-fit:contain;" alt="Paytm"></div>
         <div><div class="pm-text">Paytm</div></div>
       </button>
-      
-      <!-- Google Pay -->
       <button class="pay-method-btn" data-method="gpay" onclick="selectPaymentMethod(this)">
-        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;">
-          <img src="https://cdn.phototourl.com/member/2026-10-29-bccfa6b8-5627-4c2e-b8f2-a16864249f20.png" style="width:100%;height:100%;object-fit:contain;" alt="Google Pay">
-        </div>
+        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;"><img src="https://cdn.phototourl.com/member/2026-10-29-bccfa6b8-5627-4c2e-b8f2-a16864249f20.png" style="width:100%;height:100%;object-fit:contain;" alt="Google Pay"></div>
         <div><div class="pm-text">Google Pay</div></div>
       </button>
-
-      <!-- PhonePe -->
       <button class="pay-method-btn" data-method="phonepe" onclick="selectPaymentMethod(this)">
-        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;">
-          <img src="https://cdn.phototourl.com/member/2026-10-29-6bdde4b6-88a4-467d-b0a9-9c857b839bb1.png" style="width:100%;height:100%;object-fit:contain;" alt="PhonePe">
-        </div>
+        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;"><img src="https://cdn.phototourl.com/member/2026-10-29-6bdde4b6-88a4-467d-b0a9-9c857b839bb1.png" style="width:100%;height:100%;object-fit:contain;" alt="PhonePe"></div>
         <div><div class="pm-text">PhonePe</div></div>
       </button>
-
-      <!-- Other UPI -->
       <button class="pay-method-btn" data-method="upi" onclick="selectPaymentMethod(this)">
-        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;">
-          <img src="https://cdn.phototourl.com/member/2026-10-29-1b19ee63-faf3-467e-9ca1-fac1904194f5.png" style="width:100%;height:100%;object-fit:contain;" alt="Other UPI">
-        </div>
+        <div class="pm-icon" style="background:#fff;border:1px solid var(--ln);padding:2px;"><img src="https://cdn.phototourl.com/member/2026-10-29-1b19ee63-faf3-467e-9ca1-fac1904194f5.png" style="width:100%;height:100%;object-fit:contain;" alt="Other UPI"></div>
         <div><div class="pm-text">Other UPI</div></div>
       </button>
     </div>
     <input type="hidden" id="dm" value="paytm">
   </div>
-  
   <div class="card" style="padding:10px;background:var(--s2);border-radius:10px;margin-bottom:10px;display:flex;gap:8px;align-items:center">${ic("shield",16)}<div class="s12"><b>Powered by ZapUPI integration</b><div class="mut">Secure UPI and card payments.</div></div></div>
   <div class="err" id="er"></div>
   <button class="btn p w" data-a="depok">Continue to pay</button>`);
 }
-
-// Function to handle visual selection
 function selectPaymentMethod(btn) {
   document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -815,28 +944,17 @@ function selectPaymentMethod(btn) {
 }
 const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
 const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">${ic(g,18)}${l}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
-
 function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
 
-/* support helpers */
 async function loadTickets() {
   if (!S.user || !window.CP_DB) return;
   try {
     const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
     S.tickets = (data || []).map(t => {
-      // Count admin messages that haven't been read
       const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
       return {
-        id: t.id,
-        subject: t.subject,
-        status: t.status,
-        updated: new Date(t.created_at).toLocaleDateString(),
-        unread: unread,
-        msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({
-          me: m.sender === 'user',
-          text: m.message,
-          at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        }))
+        id: t.id, subject: t.subject, status: t.status, updated: new Date(t.created_at).toLocaleDateString(), unread: unread,
+        msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({ me: m.sender === 'user', text: m.message, at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }))
       };
     });
     save();
@@ -846,27 +964,13 @@ async function loadTickets() {
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
   try {
-    const { data: t, error } = await supabase.from('support_tickets').insert({
-      user_id: S.user.id, subject: "Support request", status: "open"
-    }).select().single();
+    const { data: t, error } = await supabase.from('support_tickets').insert({ user_id: S.user.id, subject: "Support request", status: "open" }).select().single();
     if (error) throw error;
-    
-    // 1. Save user's first message
-    await supabase.from('ticket_messages').insert({
-      ticket_id: t.id, sender: 'user', message: "I need help with my account."
-    });
-
-    // 2. Automatically generate the Support Auto-Reply
+    await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
     const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 60 minutes.`;
-    await supabase.from('ticket_messages').insert({
-      ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false
-    });
-    
+    await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
     await loadTickets();
-    S.ticketOpen = t.id;
-    S.route = "ticket";
-    render();
-    scrollTo(0,0);
+    S.ticketOpen = t.id; S.route = "ticket"; render(); scrollTo(0,0);
     setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
   } catch(e) { toast("Could not create ticket: " + e.message, "x"); }
 }
@@ -892,18 +996,8 @@ document.addEventListener("click", e => {
     case "gmail": {
       if (window.CP_DB && CP_DB.ready) {
         toast("Opening Google...", "clock");
-        // prompt:'select_account' forces Google to show the list of emails every time
-        CP_DB.authClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: authRedirect(),
-            queryParams: { prompt: 'select_account' }
-          }
-        }).then(r => { if (r && r.error) toast(r.error.message, "x"); })
-          .catch(err => toast(err.message, "x"));
-      } else {
-        toast("Supabase not ready", "x");
-      }
+        CP_DB.authClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: authRedirect(), queryParams: { prompt: 'select_account' } } }).then(r => { if (r && r.error) toast(r.error.message, "x"); }).catch(err => toast(err.message, "x"));
+      } else { toast("Supabase not ready", "x"); }
       break;
     }
     case "guest": enter({n:"Guest User", e:"guest@cricpulse.com"}); break;
@@ -912,45 +1006,31 @@ document.addEventListener("click", e => {
       if (S.au == "up" && !fn) { er.textContent = "Enter your full name."; return; }
       if (!/^\S+@\S+\.\S+$/.test(em)) { er.textContent = "Enter a valid email address."; return; }
       if (pw.length < 6) { er.textContent = "Password must be at least 6 characters."; return; }
-      // real Supabase auth if configured; otherwise local account
       if (window.CP_DB && CP_DB.ready) {
         S.authBusy = true; render();
         (async () => {
           try {
-            if (S.au == "up") {
-              await CP_DB.signUp(em, pw, { display_name: fn || em.split("@")[0] });
-              toast("Account created. Please check your email if confirmation is on.","check");
-            } else {
-              const s = await CP_DB.signIn(em, pw);
-              CP_DB.setSession(s);
-            }
+            if (S.au == "up") { await CP_DB.signUp(em, pw, { display_name: fn || em.split("@")[0] }); toast("Account created.","check"); }
+            else { const s = await CP_DB.signIn(em, pw); CP_DB.setSession(s); }
             enter({n:fn || em.split("@")[0], e:em});
-          } catch (err) {
-            S.authBusy = false; render();
-            const er2 = $("er"); if (er2) er2.textContent = err.message || "Authentication failed.";
-          }
+          } catch (err) { S.authBusy = false; render(); const er2 = $("er"); if (er2) er2.textContent = err.message || "Authentication failed."; }
         })();
-      } else {
-        enter({n:fn||em.split("@")[0], e:em});
-      }
+      } else { enter({n:fn||em.split("@")[0], e:em}); }
       break;
     }
     case "theme": S.theme = isDark() ? "light" : "dark"; applyTheme(); save(); closeSheet(); render(); break;
     case "more": moreSheet(); break;
     case "pop": S.pop = S.pop ? 0 : 1; render(); break;
-    case "readall": 
-      S.nts.forEach(n => n.r = 1); 
-      save(); 
-      if (S.user) supabase.from('notifications').update({ is_read: true }).eq('user_id', S.user.id).then(() => render());
-      break;
+    case "readall": S.nts.forEach(n => n.r = 1); save(); if (S.user) supabase.from('notifications').update({ is_read: true }).eq('user_id', S.user.id).then(() => render()); break;
     case "cat": S.cat = v; render(); break;
     case "pick": case "mpick": {
       const [id,k] = v.split(":");
       if (left(mkt(id)) <= 0) { toast("This market has closed.","clock"); return; }
-      if (a == "pick" && S.slip[id] == k) delete S.slip[id]; else S.slip[id] = k;
+      if (a == "pick" && S.slip[id] == k) { delete S.slip[id]; delete S.slipStake[id]; } 
+      else { S.slip[id] = k; if (!S.slipStake[id]) S.slipStake[id] = 50; }
       render(); break;
     }
-    case "rm": delete S.slip[v]; render(); if (!Object.keys(S.slip).length) closeSheet(); else slipSheet(); break;
+    case "rm": delete S.slip[v]; delete S.slipStake[v]; render(); if (!Object.keys(S.slip).length) closeSheet(); else slipSheet(); break;
     case "slipsheet": slipSheet(); break;
     case "lockslip": lockPicks(Object.keys(S.slip)); break;
     case "lockm": lockPicks([v]); break;
@@ -960,32 +1040,19 @@ document.addEventListener("click", e => {
     case "rk": S.rk = v; render(); break;
     case "txf": S.txf = v; render(); break;
     case "settle": settle(v); break;
-    case "claim": { const c = S.cps[Number(v)]; if (!c || c.cl) return; c.cl = 1; S.xp += 20; note("Reward claimed", c.t+". Code: "+c.code, "gift"); save(); toast("Reward claimed. Code ready.","gift"); render(); break; }
+    case "claim": { const c = S.cps[Number(v)]; if (!c || c.cl) return; c.cl = 1; note("Reward claimed", c.t+". Code: "+c.code, "gift"); save(); toast("Reward claimed. Code ready.","gift"); render(); break; }
     case "copy": try{navigator.clipboard.writeText(v)}catch(x){} toast("Code "+v+" copied","copy"); break;
-    case "chk": S.chk = new Date().toDateString(); S.xp += 10; note("Daily check-in","+10 XP","star"); save(); toast("Checked in. +10 XP","star"); render(); break;
+    case "chk": S.chk = new Date().toDateString(); note("Daily check-in","Checked in","star"); save(); toast("Checked in.","star"); render(); break;
     case "pref": S.pf[v] = t.checked ? 1 : 0; save(); break;
     case "saven": { const n = $("dn").value.replace(/[<>"&]/g,"").trim(); if (!n) { toast("Name cannot be empty.","x"); return; } S.user.n = n; save(); toast("Profile updated.","user"); render(); break; }
-    case "logout": {
-      doLogout(); break;
-    }
+    case "logout": doLogout(); break;
     case "support": S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); break;
     case "newticket": createTicket(); break;
     case "openticket": 
-      S.ticketOpen = v; // Don't use Number(v) for UUIDs!
-      S.route = "ticket"; 
-      render(); 
-      loadTickets().then(() => { 
-        render(); 
-        // Mark admin messages as read
-        supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then();
-        setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); 
-      }); 
+      S.ticketOpen = v; S.route = "ticket"; render(); 
+      loadTickets().then(() => { render(); supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); }); 
       break;
-    case "instagram": {
-      const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
-      window.open("https://instagram.com/" + ig, "_blank", "noopener");
-      break;
-    }
+    case "instagram": const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official"; window.open("https://instagram.com/" + ig, "_blank", "noopener"); break;
     case "sendmsg": {
       const ta = $("ti"), t2 = S.tickets.find(x => x.id == S.ticketOpen);
       if (!ta || !t2 || t2.status == "closed") return;
@@ -1002,50 +1069,21 @@ document.addEventListener("click", e => {
       const x = Number($("da").value);
       if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
-      
-      if (typeof ZapUPI === 'undefined') {
-        $("er").textContent = "Payment gateway not loaded. Please refresh.";
-        return;
-      }
-
-      // Get the selected app from the hidden input
+      if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       const selectedApp = $("dm").value; 
-
       const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
       const currentUrl = window.location.origin + window.location.pathname;
-      
-      t.disabled = true;
-      t.textContent = 'Creating payment...';
-
+      t.disabled = true; t.textContent = 'Creating payment...';
       if (window.CP_DB && CP_DB.ready && S.user && S.user.id) {
-        supabase.from('payment_requests').insert({
-          user_id: S.user.id,
-          txn_id: orderId,
-          amount_inr: x,
-          tokens_to_credit: x,
-          status: 'pending'
-        }).then(r => { if (r.error) console.error('Payment request insert failed', r.error); });
+        supabase.from('payment_requests').insert({ user_id: S.user.id, txn_id: orderId, amount_inr: x, tokens_to_credit: x, status: 'pending' }).then(r => { if (r.error) console.error('Payment request insert failed', r.error); });
       }
-
       ZapUPI.createOrder({
-        zap_key: 'zapce570e671e2f07f3bc9837566a44ec4c', 
-        order_id: orderId, 
-        amount: x.toString(),
-        preferred_app: selectedApp === 'upi' ? null : selectedApp, // 👈 THIS OPENS THE SPECIFIC APP
-        success_url: currentUrl + '?status=success&order_id=' + orderId,
-        failed_url: currentUrl + '?status=failed&order_id=' + orderId,
-        timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
+        zap_key: 'zapce570e671e2f07f3bc9837566a44ec4c', order_id: orderId, amount: x.toString(),
+        preferred_app: selectedApp === 'upi' ? null : selectedApp, 
+        success_url: currentUrl + '?status=success&order_id=' + orderId, failed_url: currentUrl + '?status=failed&order_id=' + orderId, timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
       }, {
-        onResponse: function(paymentUrl) {
-          if (paymentUrl) window.open(paymentUrl, '_blank');
-          t.disabled = false;
-          t.textContent = 'Continue to pay';
-        },
-        onError: function(err) {
-          $("er").textContent = err || "Payment failed to initialize.";
-          t.disabled = false;
-          t.textContent = 'Continue to pay';
-        }
+        onResponse: function(paymentUrl) { if (paymentUrl) window.open(paymentUrl, '_blank'); t.disabled = false; t.textContent = 'Continue to pay'; },
+        onError: function(err) { $("er").textContent = err || "Payment failed to initialize."; t.disabled = false; t.textContent = 'Continue to pay'; }
       });
       break;
     }
@@ -1062,14 +1100,9 @@ document.addEventListener("click", e => {
           const { data, error } = await supabase.rpc('create_withdrawal_request', { p_amount: x, p_account: d });
           if (error) throw error;
           if (!data || data.ok === false) throw new Error((data && data.message) || 'Failed');
-          S.bal = data.new_balance;
-          addTx("withdraw", x, "To " + mask(d), "pending");
-          note("Withdrawal requested", inr2(x) + " is being processed.", "wallet");
+          S.bal = data.new_balance; addTx("withdraw", x, "To " + mask(d), "pending"); note("Withdrawal requested", inr2(x) + " is being processed.", "wallet");
           save(); closeSheet(); toast("Withdrawal requested.", "wallet"); render();
-        } catch(e) {
-          er.textContent = e.message || "Could not submit withdrawal.";
-          t.disabled = false; t.textContent = "Request withdrawal";
-        }
+        } catch(e) { er.textContent = e.message || "Could not submit withdrawal."; t.disabled = false; t.textContent = "Request withdrawal"; }
       })();
       break;
     }
@@ -1110,253 +1143,132 @@ setInterval(() => {
   });
 }, 1000);
 
-// ============================================================
-// REAL-TIME LIVE SCORES (Fetches from Supabase Edge Function)
-// ============================================================
 async function fetchLiveScores() {
   if (!MK || MK.length === 0) return;
-  
   try {
-    // 1. Fetch all live cricket matches from your Supabase proxy
     const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score');
     const data = await response.json();
-    
-    if (!data || !data.matches) {
-      console.error("Invalid data from SportScore", data);
-      return;
-    }
+    if (!data || !data.matches) { toast("API Error: Could not load live data", "alert"); return; }
 
-    // 2. Loop through your matches and find the corresponding live data
     for (const m of MK) {
-      if (m.c !== 'cricket') continue;
-
-      // Find the match where home and away team names loosely match your team names
+      if (m.c !== 'cricket' && m.c !== 'football') continue; // Only fetch live score for sports
       const liveMatch = data.matches.find(lm => {
         const homeMatch = lm.home.toLowerCase().includes(m.A[1].toLowerCase()) || m.A[1].toLowerCase().includes(lm.home.toLowerCase());
         const awayMatch = lm.away.toLowerCase().includes(m.B[1].toLowerCase()) || m.B[1].toLowerCase().includes(lm.away.toLowerCase());
         return homeMatch && awayMatch;
       });
 
-        if (liveMatch) {
+       if (liveMatch) {
         const isFinished = liveMatch.status === 'finished';
         m.isFinished = isFinished;
-        
         m.liveData = {
-          scoreA: liveMatch.home_score !== null ? String(liveMatch.home_score) : '-',
-          oversA: '',
-          scoreB: liveMatch.away_score !== null ? String(liveMatch.away_score) : '-',
-          oversB: '',
+          scoreA: liveMatch.home_score !== null ? String(liveMatch.home_score) : '-', oversA: '',
+          scoreB: liveMatch.away_score !== null ? String(liveMatch.away_score) : '-', oversB: '',
           statusText: isFinished ? 'Match Ended' : (liveMatch.status === 'live' ? 'Live' : 'Upcoming')
         };
       }
     }
-  } catch (err) {
-    console.error("Live score fetch failed", err);
-  }
-  
-  // Refresh the UI
-  if (S.route === "match" || S.route === "home" || S.route === "markets") {
-    render();
-  }
+  } catch (err) { console.error("Live score fetch failed", err); }
+  if (S.route === "match" || S.route === "home" || S.route === "markets") { render(); }
 }
-
-// Fetch every 15 seconds (prevents hitting API limits)
 setInterval(fetchLiveScores, 15000);
-setInterval(() => {
-  let ch = 0;
-  S.txs.forEach(t => {
-    if (t.type == "withdraw" && t.status == "pending" && Date.now()-t.ts > 8000) {
-      t.status = "completed"; note("Withdrawal completed", inr2(t.amount)+" sent.", "check"); ch = 1;
-    }
-  });
-  if (ch) { save(); if (S.user && S.route == "wallet") render(); }
-}, 2000);
 
-// AUTO-SYNC: Fetch new matches and notifications from Admin every 10 seconds
 setInterval(async () => {
   if (!window.CP_DB || !CP_DB.ready) return;
   try {
-    // 1. Sync Matches
     const liveMatches = await CP_DB.getMatches();
     if (liveMatches && liveMatches.length > 0) {
        let changed = false;
-       liveMatches.forEach(m => {
-         if (!MK.find(x => x.id === m.id)) changed = true; // New match found
-       });
-       
+       liveMatches.forEach(m => { if (!MK.find(x => x.id === m.id)) changed = true; });
        if (changed) {
          MK = liveMatches.map(m => ({
-          id: m.id,
-          c: m.category,
-          lg: m.league,
-          A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
-          B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
-          q: m.question,
-          s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
-          w: m.crowd_a,
-          oa: m.odds_a,
-          ob: m.odds_b
+          id: m.id, c: m.category, lg: m.league,
+          A: [String(m.team_a || 'Option A').split(' ')[0], m.team_a || 'Option A'], 
+          B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
+          q: m.question, s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
+          w: m.crowd_a, oa: m.odds_a, ob: m.odds_b
         }));
-         fetchLiveScores(); // Fetch real live scores for newly synced matches
+         fetchLiveScores();
        }
     }
-
-    // 2. Sync Notifications
     if (S.user) {
-       const { data: newNotifs } = await supabase.from('notifications')
-         .select('*')
-         .or(`user_id.eq.${S.user.id},user_id.is.null`)
-         .order('created_at', { ascending: false })
-         .limit(20);
-       
+       const { data: newNotifs } = await supabase.from('notifications').select('*').or(`user_id.eq.${S.user.id},user_id.is.null`).order('created_at', { ascending: false }).limit(20);
        if (newNotifs && newNotifs.length > 0) {
          let currentIds = S.nts.map(n => n.ts).join(',');
          let newIds = newNotifs.map(n => new Date(n.created_at).getTime()).join(',');
-         
-         // If a new notification arrived, update the UI
          if (currentIds !== newIds) {
-           S.nts = newNotifs.map(n => ({
-             t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime()
-           }));
+           S.nts = newNotifs.map(n => ({ t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime() }));
            if (S.route === "alerts" || S.pop) render();
          }
        }
     }
   } catch(e) {}
 }, 10000);
-// ============================================================
-// REAL-TIME SYNC (Wallet & Notifications) - Inspired by SkillClash
-// ============================================================
+
 function initRealtimeSync() {
   if (!window.CP_DB || !CP_DB.ready || !S.user) return;
-
-  // 1. REAL-TIME WALLET LISTENER
   supabase.channel('cricpulse-wallet-' + S.user.id)
-    .on('postgres_changes', { 
-      event: 'UPDATE', 
-      schema: 'public', 
-      table: 'wallet', 
-      filter: `user_id=eq.${S.user.id}` 
-    }, (payload) => {
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'wallet', filter: `user_id=eq.${S.user.id}` }, (payload) => {
       const newBal = payload.new.balance;
-      if (typeof newBal === 'number' && newBal !== S.bal) {
-        S.bal = newBal;
-        save();
-        if (S.route === "wallet" || S.route === "home") render();
-      }
-    })
-    .subscribe();
+      if (typeof newBal === 'number' && newBal !== S.bal) { S.bal = newBal; save(); if (S.route === "wallet" || S.route === "home") render(); }
+    }).subscribe();
 
-  // 2. REAL-TIME NOTIFICATIONS LISTENER
   supabase.channel('cricpulse-notifs-' + S.user.id)
-    .on('postgres_changes', { 
-      event: 'INSERT', 
-      schema: 'public', 
-      table: 'notifications' 
-    }, (payload) => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
       const n = payload.new;
-      // Only show if it's for this user OR for everyone (null)
       if (n.user_id === S.user.id || n.user_id === null) {
         const exists = S.nts.some(x => x.ts === new Date(n.created_at).getTime());
         if (!exists) {
-          S.nts.unshift({
-            t: n.title, 
-            d: n.body, 
-            i: n.icon || "bell", 
-            r: 0, 
-            ts: new Date(n.created_at).getTime()
-          });
-          save();
-          render(); // Force render on ALL pages so the bell count updates instantly
-          toast("New notification received!", "bell");
+          S.nts.unshift({ t: n.title, d: n.body, i: n.icon || "bell", r: 0, ts: new Date(n.created_at).getTime() });
+          save(); render(); toast("New notification received!", "bell");
         }
       }
-    })
-    .subscribe();
+    }).subscribe();
 
-  // 3. REAL-TIME TICKET REPLIES LISTENER
   supabase.channel('cricpulse-tickets-' + S.user.id)
-    .on('postgres_changes', { 
-      event: 'INSERT', 
-      schema: 'public', 
-      table: 'ticket_messages' 
-    }, (payload) => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
       const msg = payload.new;
       if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
-        loadTickets().then(() => {
-          render();
-          setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
-        });
+        loadTickets().then(() => { render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); });
       } else {
-         // Update the unread badge on the support page
-         loadTickets().then(() => {
-            if (S.route === "support") render();
-         });
+         loadTickets().then(() => { if (S.route === "support") render(); });
       }
-    })
-    .subscribe();
+    }).subscribe();
 }
 
-// Call this function when the user logs in
-// Find: `applySession(session)` inside index.html. Add this at the end of it:
-// initRealtimeSync();
-
-                                                                                                   
-/* init — avoids white flash */
-/* init — avoids white flash & fixes the login loop */
 window.addEventListener("load", async () => {
   try {
     applyTheme();
-    
-    if (!window.CP_DB || !CP_DB.authClient) {
-      render();
-      return;
-    }
+    if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
-    // 1. Listen for login (Catches the Google Redirect)
-    //    The handler only schedules work (no awaits inside), so the Supabase client is never blocked.
     CP_DB.authClient.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        setTimeout(() => applySession(session), 0);
-      } else if (event === "SIGNED_OUT") {
-        AUTHED_ID = null; AUTH_P = null;
-        if (S.user && S.user.id) { S.user = null; save(); render(); } // Render Landing Page
-      }
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) { setTimeout(() => applySession(session), 0); } 
+      else if (event === "SIGNED_OUT") { AUTHED_ID = null; AUTH_P = null; if (S.user && S.user.id) { S.user = null; save(); render(); } }
     });
 
-     // 2. Fetch Live Matches from Supabase
     try {
       const liveMatches = await CP_DB.getMatches();
-      // Only replace the hardcoded matches if there are matches in the database
       if (liveMatches && liveMatches.length > 0) {
         MK = liveMatches.map(m => ({
-          id: m.id,
-          c: m.category,
-          lg: m.league,
-          A: [String(m.team_a || 'Team A').split(' ')[0], m.team_a || 'Team A'], 
-          B: [String(m.team_b || 'Team B').split(' ')[0], m.team_b || 'Team B'],
-          q: m.question,
-          s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
-          w: m.crowd_a,
-          oa: m.odds_a,
-          ob: m.odds_b
+          id: m.id, c: m.category, lg: m.league,
+          A: [String(m.team_a || 'Option A').split(' ')[0], m.team_a || 'Option A'], 
+          B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
+          q: m.question, s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
+          w: m.crowd_a, oa: m.odds_a, ob: m.odds_b
         }));
-        
-        // Initialize Live Feed for the new matches
-        
-
+      } else {
+        // Fallback to demo data if Supabase returns empty
+        MK = [...DEMO_MK];
       }
-      fetchLiveScores(); // Trigger the live score fetch immediately
-    } catch(e) { console.log("Using fallback matches (DB empty or unreachable)", e); }
-    // 3. Check current session
-    const { data: { session } } = await CP_DB.authClient.auth.getSession();
-    
-    if (session) {
-      await applySession(session);
-    } else {
-      render();
+      fetchLiveScores();
+    } catch(e) { 
+      console.log("DB empty or unreachable, using demo data", e); 
+      MK = [...DEMO_MK];
     }
-    /* AUTO-APPROVE PAYMENT AFTER ZAPUPI REDIRECTS BACK */
+
+    const { data: { session } } = await CP_DB.authClient.auth.getSession();
+    if (session) { await applySession(session); } else { render(); }
+    
     async function checkPaymentReturn() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -1364,26 +1276,14 @@ window.addEventListener("load", async () => {
         const orderId = params.get('order_id');
         if (!orderId) return;
         if (status === 'success' && S.user && S.user.id) {
-          const { error } = await supabase.from('payment_requests')
-            .update({ status: 'approved' })
-            .eq('txn_id', orderId)
-            .eq('user_id', S.user.id);
-          if (!error) {
-            toast('Payment successful. Wallet updated.', 'check');
-            const p = await CP_DB.getProfile(S.user.id);
-            if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); }
-          }
-        } else if (status === 'failed' || status === 'timeout') {
-          toast('Payment ' + status + '. Try again.', 'x');
-        }
+          const { error } = await supabase.from('payment_requests').update({ status: 'approved' }).eq('txn_id', orderId).eq('user_id', S.user.id);
+          if (!error) { toast('Payment successful. Wallet updated.', 'check'); const p = await CP_DB.getProfile(S.user.id); if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); } }
+        } else if (status === 'failed' || status === 'timeout') { toast('Payment ' + status + '. Try again.', 'x'); }
         history.replaceState({}, document.title, window.location.pathname);
       } catch(e) { console.error('Payment return check failed', e); }
     }
     checkPaymentReturn();
-  } catch (err) {
-    console.error("Init error:", err);
-    render(); 
-  }
+  } catch (err) { console.error("Init error:", err); render(); }
 });
 </script>
 </body>
