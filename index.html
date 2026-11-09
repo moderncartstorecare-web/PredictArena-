@@ -166,7 +166,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 22px 28px !important; /* Forces text 28px away from edges */
+  padding: 22px 28px !important;
   border-radius: 18px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, var(--sf)), color-mix(in srgb, var(--ac) 2%, var(--sf)));
   border: 1.5px solid color-mix(in srgb, var(--ac) 25%, var(--ln));
@@ -231,7 +231,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 /* Rating Stars */
 .stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
 .stars .star { transition: color 0.2s; }
-.stars .star.active { color: var(--am); }
+.stars .star.active { color: #facc15; }
 </style>
 </head>
 <body>
@@ -635,8 +635,9 @@ function ticketV() {
         <h3 style="font-size:16px;">Ticket Closed</h3>
         <p class="mut s12" style="margin-bottom:12px;">Please rate your support experience.</p>
         <div class="stars" style="justify-content:center; font-size:32px; display:flex; gap:8px;">
-            ${[1,2,3,4,5].map(i => `<span onclick="rateTicket('${t.id}', ${i})" class="${(t.rating||0) >= i ? 'active' : ''}" style="cursor:pointer;">★</span>`).join('')}
+            ${[1,2,3,4,5].map(i => `<span onclick="rateTicket('${t.id}', ${i})" style="cursor:pointer; color: ${(t.rating||0) >= i ? '#facc15' : 'var(--ln2)'}">★</span>`).join('')}
         </div>
+        ${t.close_note ? `<div style="background:var(--ams); color:var(--am); padding:10px; border-radius:8px; margin-top:12px; font-size:13px;"><b>Admin Note:</b> ${esc(t.close_note)}</div>` : ''}
         ${t.rating ? `<p class="ok s12" style="margin-top:12px;">Thanks for your feedback!</p>` : ''}
     </div>`;
   }
@@ -827,11 +828,14 @@ function shell() {
   
   const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>`;
 
+  // Check for unread support messages
+  const unreadSupport = S.tickets.some(t => t.unread > 0 && t.status !== 'closed');
+
   return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
 <div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
 <main class="pg">${VIEWS[R]()}</main></div></div>
-<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
+<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}${i[0]=="more" && unreadSupport ? `<span class="dot" style="top:4px;right:calc(50% - 14px);"></span>` : ''}</button>`; }).join("")}</nav>`;
 }
 
 function render() {
@@ -1063,7 +1067,7 @@ async function loadTickets() {
       const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
       return {
         id: t.id, subject: t.subject, status: t.status, updated: new Date(t.created_at).toLocaleDateString(), unread: unread,
-        rating: t.rating || 0,
+        rating: t.rating || 0, close_note: t.close_note || '',
         msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({ me: m.sender === 'user', text: m.message, at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }))
       };
     });
@@ -1073,6 +1077,21 @@ async function loadTickets() {
 
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
+  
+  const openTicket = S.tickets.find(t => t.status !== 'closed');
+  if (openTicket) {
+      sheet(`<div style="text-align:center;padding:10px 0;">
+          <div style="width:60px;height:60px;border-radius:50%;background:var(--acs);color:var(--ac);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            ${ic("chat",30)}
+          </div>
+          <h3 style="font-size:18px;margin-bottom:4px;">Active Ticket Found</h3>
+          <p class="mut s12" style="margin-bottom:20px;">You already have an open ticket: "${esc(openTicket.subject)}". Please continue the existing chat.</p>
+          <button class="btn p w" data-a="openticket" data-v="${openTicket.id}">Continue Chat</button>
+          <button class="btn w" style="margin-top:8px" data-a="closemore">Cancel</button>
+      </div>`);
+      return;
+  }
+
   try {
     const { data: t, error } = await supabase.from('support_tickets').insert({ user_id: S.user.id, subject: "Support request", status: "open" }).select().single();
     if (error) throw error;
@@ -1166,6 +1185,7 @@ document.addEventListener("click", e => {
     case "support": S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); break;
     case "newticket": createTicket(); break;
     case "openticket": 
+      closeSheet();
       S.ticketOpen = v; S.route = "ticket"; render(); 
       loadTickets().then(() => { render(); supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); }); 
       break;
@@ -1351,7 +1371,7 @@ function initRealtimeSync() {
       if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
         loadTickets().then(() => { render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); });
       } else {
-         loadTickets().then(() => { if (S.route === "support") render(); });
+         loadTickets().then(() => { if (S.route === "support") render(); else render(); }); // Render to update dot
       }
     }).subscribe();
 }
