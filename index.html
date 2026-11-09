@@ -420,8 +420,16 @@ function liveText(m) {
   }
   return "Match yet to start";
 }
-const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';
-  
+function liveBoard(m) {
+    if (!m) return '';
+    // Safe fallback to prevent the white screen crash
+    return `<div style="padding:12px;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px;">${esc(m.A[1])} vs ${esc(m.B[1])}</div>
+        <div style="font-size:12px;color:var(--i3);">${esc(m.lg || 'Live Match')}</div>
+        <div style="margin-top:8px;"><span class="pill no" style="background:var(--nos);color:var(--no);font-weight:700;">LIVE</span></div>
+    </div>`;
+}
+const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';  
 /* ui helpers */
 const toast = (m,g="check") => {
   const n = document.createElement("div"); n.className = "ts";
