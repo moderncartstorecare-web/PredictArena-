@@ -32,7 +32,7 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 .sb .brand{color:#fff;padding:0 10px 18px}.sb h6{margin:14px 10px 4px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#6b7694;font-weight:600}
 .nv{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:7px;font-weight:500;color:inherit;width:100%;text-align:left}
 .nv:hover{background:rgba(255,255,255,.06);color:#fff}.nv.on{background:rgba(255,255,255,.12);color:#fff}
-.cn{margin-left:auto;background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;font-weight:600}
+.cn{margin-left:auto;background:#ef4444;color:#fff;border-radius:99px;font-size:11px;padding:2px 8px;font-weight:600;min-width:20px;text-align:center;}
 .main{flex:1;min-width:0}
 .tp{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:6}
 .sp{flex:1}.av{width:34px;height:34px;border-radius:50%;background:var(--pr);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
@@ -127,7 +127,7 @@ function normWd(v){v=String(v==null?"pending":v).toLowerCase();return(v==="appro
 function normTk(v){v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":v==="pending"||v==="answered"?"pending":"open"}
 function mapUser(r){var c=COLS.users;return{id:String(r[c.id]),name:r[c.name]||r.full_name||r[c.email]||"User",email:r[c.email]||"",city:r[c.city]||"",wal:Number((r.wallet&&(Array.isArray(r.wallet)?(r.wallet[0]||{}).balance:r.wallet.balance))||r[c.wallet]||0),pts:Number(r[c.points]||0),st:normSt(r[c.status]),joined:fd(r[c.created],1),kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0}}
 function mapWd(r){var c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),st:normWd(r[c.status])}}
-function mapTk(r){var c=COLS.tk;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),d:fd(r[c.created]),msgs:null}}
+function mapTk(r){var c=COLS.tk;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),d:fd(r[c.created]),msgs:null,rating:r.rating||0}}
 function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
 
 async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*",cnt?{count:"exact"}:{});if(o&&oc)x=x.order(oc,{ascending:false});return x.limit(lim)};var r=await q(true);if(r.error)r=await q(false);return r}
@@ -233,6 +233,26 @@ async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta
   if(TICKET_STATUS_AFTER_REPLY){if(await upd("support_tickets",COLS.tk.id,t.id,P(COLS.tk.status,TICKET_STATUS_AFTER_REPLY)))t.st=normTk(TICKET_STATUS_AFTER_REPLY)}
   act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
 
+window.closeTicket = async function(id) {
+    if(!confirm("Close this ticket?")) return;
+    const t = TK(id);
+    await db.from('support_tickets').update({status: 'closed'}).eq('id', id);
+    if (t) {
+        await db.from('notifications').insert({
+            user_id: t.uid,
+            title: 'Ticket Closed',
+            body: 'Your support ticket has been closed. Please rate your experience.',
+            icon: 'check-circle'
+        });
+    }
+    toast('Ticket closed'); TKM = null; render(); loadAll();
+}
+window.reopenTicket = async function(id) {
+    if(!confirm("Reopen this ticket?")) return;
+    await db.from('support_tickets').update({status: 'open'}).eq('id', id);
+    toast('Ticket reopened'); TKM = null; render(); loadAll();
+}
+
 function authRedirect(){return location.origin+location.pathname}
 function cleanUrl(){if(/access_token|code=|error/.test(location.hash+location.search))history.replaceState(null,"",location.pathname)}
 async function doLogin(){
@@ -291,7 +311,13 @@ function supV() {
     var t = TK(TKM);
     if (!t) { TKM = null; return supV(); }
     var u = U(t.uid);
-    return `<div class="hd"><div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div><div class="sp"></div><button class="btn g" data-a="closeticket">${ic("arrow-left")} Back to tickets</button></div>
+    return `<div class="hd"><div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div>
+    <div class="sp"></div>
+    <div class="ac">
+        ${t.st === 'closed' ? `<button class="btn k" onclick="reopenTicket('${t.id}')">Reopen</button>` : `<button class="btn r" onclick="closeTicket('${t.id}')">Close Ticket</button>`}
+        <button class="btn g" data-a="closeticket">${ic("arrow-left")} Back to tickets</button>
+    </div></div>
+    ${t.rating ? `<div class="card" style="background:var(--was); border-color:var(--wa); color:var(--wa); text-align:center; font-weight:bold; font-size:16px;">Customer Rating: ${'⭐'.repeat(t.rating)}</div>` : ''}
     <div class="cols" style="grid-template-columns: 1fr 2fr;">
       <div class="card">
         <h3>Customer Details</h3>
@@ -309,10 +335,11 @@ function supV() {
         <div style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;" id="admin-chat-msgs">
            ${(t.msgs||[]).map(function(m){ return '<div style="align-self:'+(m.admin?'flex-end':'flex-start')+'; background:'+(m.admin?'var(--pr)':'var(--bg)')+'; color:'+(m.admin?'#fff':'var(--tx)')+'; padding:10px 14px; border-radius:12px; max-width:80%;">'+esc(m.b)+'<br><small style="opacity:0.7;font-size:10px;">'+esc(m.t)+'</small></div>'; }).join('')}
         </div>
+        ${t.st === 'closed' ? `<div style="padding:12px; text-align:center; border-top:1px solid var(--bd); color:var(--mu);">Ticket is closed.</div>` : `
         <div style="padding:12px; border-top:1px solid var(--bd); display:flex; gap:8px; background:var(--card);">
            <input type="text" class="in" id="admin-reply-input" placeholder="Type your reply..." style="flex:1;" onkeydown="if(event.key==='Enter') adminReply('${t.id}')">
            <button class="btn" onclick="adminReply('${t.id}')">Send</button>
-        </div>
+        </div>`}
       </div>
     </div>`;
   }
@@ -330,7 +357,7 @@ function nav(){
     if(n[0]==="H") return '<h6>'+n[1]+'</h6>';
     var badge = '';
     if(n[0]==="wd" && pendW().length) badge = '<span class="cn">'+pendW().length+'</span>';
-    if(n[0]==="sup" && S.tickets.filter(function(t){return t.st==="open"}).length) badge = '<span class="cn" style="background:#ef4444; color:white; border-radius:50%; padding:2px 6px; font-size:10px;">'+S.tickets.filter(function(t){return t.st==="open"}).length+'</span>';
+    if(n[0]==="sup" && S.tickets.filter(function(t){return t.st==="open"}).length) badge = '<span class="cn">'+S.tickets.filter(function(t){return t.st==="open"}).length+'</span>';
     return '<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+badge+'</button>';
   }).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>';
 }
@@ -479,6 +506,16 @@ document.addEventListener("submit",function(e){
   e.preventDefault();var id=e.target.id;
   if(id==="lf"){doLogin();return}
   else if(id==="tf"){sendReply();return}
+  else if(id==="modal-notif-form"){
+    var uid = $("mn-userid").value;
+    var title = $("mn-title").value;
+    var msg = $("mn-msg").value;
+    db.from('notifications').insert({ title: title, body: msg, icon: 'bell', user_id: uid }).then(function(res) {
+        if(res.error) return toast(res.error.message, "circle-alert");
+        toast("Notification sent"); closeM();
+    });
+    return;
+  }
   else if(id==="mf"){
     var dbId = $("mid_db").value;
     var timeVal = $("mtime").value; 
@@ -555,8 +592,21 @@ else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span
   else if(d.kf)TKF=d.kf;
   else if(d.tk){openTicket(d.tk);return}
   else if(d.a==="closeticket"){TKM=null;render();return}
-  else if(d.a==="notify-user"){TKM=null;CPS.aud="one";CPS.uid=d.v;S.page="not";render();return}
-  else if(d.a==="wallet-user"){TKM=null;var u=U(d.v);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
+  else if(d.a==="notify-user"){
+      TKM=null; var u=U(d.v);
+      modal(`<h3>Notify ${esc(u.name)}</h3><form id="modal-notif-form">
+          <input type="hidden" id="mn-userid" value="${u.id}">
+          <label class="f">Title<input class="in" id="mn-title" required></label>
+          <label class="f">Message<textarea class="in" id="mn-msg" rows="3" required></textarea></label>
+          <div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button type="submit" class="btn">Send</button></div>
+      </form>`);
+      return;
+  }
+  else if(d.a==="wallet-user"){
+      TKM=null; var u=U(d.v); MOD=u.id;
+      modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');
+      return;
+  }
   else if(d.wd){var p=d.wd.split("|");doWd(p[0],p[1]);return}
   else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
   save();render();
