@@ -161,17 +161,18 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .yc-chip:hover{border-color:var(--ac);background:var(--acs);color:var(--ac)}
 .yc-chip:active{transform:scale(.96)}
 
-/* FORCED PADDING FIX */
+/* FORCED PADDING FIX - NOW BULLETPROOF */
 .yc-sum {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 20px 24px !important; /* Force padding to prevent text touching edges */
+  padding: 22px 28px !important; /* Forces text 28px away from edges */
   border-radius: 18px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, var(--sf)), color-mix(in srgb, var(--ac) 2%, var(--sf)));
   border: 1.5px solid color-mix(in srgb, var(--ac) 25%, var(--ln));
-  box-sizing: border-box;
+  box-sizing: border-box !important;
   width: 100%;
+  margin: 0;
 }
 .yc-sum > div {
   display: flex;
@@ -179,16 +180,21 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
   align-items: center;
   gap: 12px;
   width: 100%;
+  box-sizing: border-box;
 }
 .yc-sum dt {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--i2);
+  margin: 0;
+  padding: 0;
 }
 .yc-sum dd {
   font-size: 15px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  margin: 0;
+  padding: 0;
 }
 .yc-sum .yc-return dd {
   font-size: 20px;
@@ -221,6 +227,11 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 @container (max-width:340px){.yc-head{padding:14px}.yc-form{padding:14px;gap:18px}.yc-card{padding:12px;gap:12px}.yc-odds b{font-size:24px}.yc-amt{font-size:28px}.yc-cur{font-size:23px}}
 @container (min-width:460px){.yc-head{padding:18px 20px 16px}.yc-form{padding:20px;gap:22px}.yc-card{padding:16px}.yc-odds b{font-size:32px}}
 @media (prefers-reduced-motion:reduce){.yc *,.yc *::before,.yc *::after{transition:none!important}}
+
+/* Rating Stars */
+.stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
+.stars .star { transition: color 0.2s; }
+.stars .star.active { color: var(--am); }
 </style>
 </head>
 <body>
@@ -616,28 +627,48 @@ function supportV() {
 function ticketV() {
   const t = S.tickets.find(x => x.id == S.ticketOpen);
   if (!t) return '<div class="card empty">Ticket not found.</div>';
-  return `<div class="chat">
-    <div class="msgs" id="msgs">
-      ${t.msgs.map(m => `
-        <div class="msg ${m.me?"me":"them"}">
-          ${m.img ? `<img src="${esc(m.img)}" alt="attachment">` : ""}
-          ${esc(m.text)}
-          <small>${esc(m.at)}${m.me?"":" · Support"}</small>
+  
+  let ratingHtml = '';
+  if (t.status === 'closed') {
+    ratingHtml = `
+    <div class="card mb-4" style="text-align:center; padding:20px; background:var(--s2);">
+        <h3 style="font-size:16px;">Ticket Closed</h3>
+        <p class="mut s12" style="margin-bottom:12px;">Please rate your support experience.</p>
+        <div class="stars" style="justify-content:center; font-size:32px; display:flex; gap:8px;">
+            ${[1,2,3,4,5].map(i => `<span onclick="rateTicket('${t.id}', ${i})" class="${(t.rating||0) >= i ? 'active' : ''}" style="cursor:pointer;">★</span>`).join('')}
         </div>
-      `).join("")}
-      ${t.status=="closed"?'<div class="msg them">This ticket is closed. Create a new one for further help.</div>':""}
+        ${t.rating ? `<p class="ok s12" style="margin-top:12px;">Thanks for your feedback!</p>` : ''}
+    </div>`;
+  }
+
+  return `<div class="stack">
+    <div class="card" style="padding:14px 16px; background:var(--s2); border-radius:12px;">
+      <div class="bt"><b>${esc(t.subject)}</b> <span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span></div>
     </div>
-    ${t.status=="closed"
-      ? `<div class="chatbar"><button class="btn p w" data-a="support">Back to Support</button></div>`
-      : `<div class="chatbar">
-          <label class="ib" for="img" title="Attach image" style="width:44px;height:44px;border-radius:50%;">
-            ${ic("img",18)}
-            <input id="img" type="file" accept="image/*" hidden data-a="upload">
-          </label>
-          <textarea id="ti" placeholder="Type your message…" aria-label="Message" rows="1" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.querySelector('[data-a=\'sendmsg\']').click(); }"></textarea>
-          <button class="ib" data-a="sendmsg" style="background:var(--ac);border-color:var(--ac);color:#fff;width:44px;height:44px;border-radius:50%;">${ic("send",17)}</button>
-        </div>`
-    }
+    ${ratingHtml}
+    <div class="chat">
+      <div class="msgs" id="msgs">
+        ${t.msgs.map(m => `
+          <div class="msg ${m.me?"me":"them"}">
+            ${m.img ? `<img src="${esc(m.img)}" alt="attachment">` : ""}
+            ${esc(m.text)}
+            <small>${esc(m.at)}${m.me?"":" · Support"}</small>
+          </div>
+        `).join("")}
+        ${t.status=="closed"?'<div class="msg them">This ticket is closed. Create a new one for further help.</div>':""}
+      </div>
+      ${t.status=="closed"
+        ? `<div class="chatbar"><button class="btn p w" data-a="support">Back to Support</button></div>`
+        : `<div class="chatbar">
+            <label class="ib" for="img" title="Attach image" style="width:44px;height:44px;border-radius:50%;">
+              ${ic("img",18)}
+              <input id="img" type="file" accept="image/*" hidden data-a="upload">
+            </label>
+            <textarea id="ti" placeholder="Type your message…" aria-label="Message" rows="1" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.querySelector('[data-a=\'sendmsg\']').click(); }"></textarea>
+            <button class="ib" data-a="sendmsg" style="background:var(--ac);border-color:var(--ac);color:#fff;width:44px;height:44px;border-radius:50%;">${ic("send",17)}</button>
+          </div>`
+      }
+    </div>
   </div>`;
 }
 
@@ -971,6 +1002,16 @@ window.selectSide = function(id, side) {
   render();
 };
 
+window.rateTicket = async function(id, rating) {
+  if (!S.user) return;
+  const { error } = await supabase.from('support_tickets').update({ rating: rating }).eq('id', id);
+  if (error) return toast('Error submitting rating', 'x');
+  toast('Thanks for your feedback!', 'star');
+  const t = S.tickets.find(x => x.id == id);
+  if (t) t.rating = rating;
+  render();
+};
+
 const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••" + s.slice(-2);
 
 const PRESETS = [50, 100, 300, 500, 1000];
@@ -1022,6 +1063,7 @@ async function loadTickets() {
       const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
       return {
         id: t.id, subject: t.subject, status: t.status, updated: new Date(t.created_at).toLocaleDateString(), unread: unread,
+        rating: t.rating || 0,
         msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({ me: m.sender === 'user', text: m.message, at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }))
       };
     });
@@ -1057,7 +1099,14 @@ document.addEventListener("click", e => {
   switch(a) {
     case "nav": S.route = v; S.pop = 0; closeSheet(); render(); scrollTo(0,0); break;
     case "sgo": closeSheet(); S.route = v; render(); scrollTo(0,0); break;
-    case "back": S.pop = 0; closeSheet(); S.route = S.user ? "home" : "land"; render(); scrollTo(0,0); break;
+    case "back": 
+      S.pop = 0; closeSheet(); 
+      if (S.route === "ticket") {
+        S.route = "support";
+      } else {
+        S.route = S.user ? "home" : "land";
+      }
+      render(); scrollTo(0,0); break;
     case "page": S.pub = v; if (S.user) S.route = v; closeSheet(); render(); scrollTo(0,0); break;
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
@@ -1296,6 +1345,9 @@ function initRealtimeSync() {
   supabase.channel('cricpulse-tickets-' + S.user.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
       const msg = payload.new;
+      if (msg.sender === 'admin') {
+        toast("Support is active: " + msg.message.substring(0, 30) + "...", "chat");
+      }
       if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
         loadTickets().then(() => { render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); });
       } else {
