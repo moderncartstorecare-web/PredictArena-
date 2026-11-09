@@ -1078,6 +1078,12 @@ async function loadTickets() {
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
   
+  // PREVENT GUESTS FROM TRIGGERING RLS ERRORS
+  if (!S.user.id) {
+      toast("Please log in with Google to create a support ticket.", "alert");
+      return;
+  }
+  
   const openTicket = S.tickets.find(t => t.status !== 'closed');
   if (openTicket) {
       sheet(`<div style="text-align:center;padding:10px 0;">
@@ -1098,12 +1104,14 @@ async function createTicket() {
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
     const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 60 minutes.`;
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
+    
     await loadTickets();
     S.ticketOpen = t.id; S.route = "ticket"; render(); scrollTo(0,0);
     setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
-  } catch(e) { toast("Could not create ticket: " + e.message, "x"); }
+  } catch(e) { 
+    toast("Could not create ticket: " + e.message, "x"); 
+  }
 }
-
 /* one-click handlers */
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-a]");
@@ -1381,7 +1389,7 @@ window.addEventListener("load", async () => {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
-    // 1. Setup the Auth Listener FIRST to catch initial session safely
+    // 1. Setup Auth Listener FIRST to catch initial session safely
     CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
@@ -1414,7 +1422,7 @@ window.addEventListener("load", async () => {
       MK = [...DEMO_MK];
     }
 
-    // 3. Fallback Session Check (Ensures the page renders even if the listener is slow)
+    // 3. Safe Session Check (Ensures PC screen doesn't stay blank)
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     if (session) { 
       await applySession(session); 
@@ -1446,7 +1454,7 @@ window.addEventListener("load", async () => {
 
   } catch (err) { 
     console.error("Init error:", err); 
-    render(); 
+    render(); // Forces the screen to render even if there's an error
   }
 });
 </script>
