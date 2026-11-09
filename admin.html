@@ -119,6 +119,13 @@ function TU(){return S.ucount||S.users.length}
 function AU(){return S.users.filter(function(u){return u.st==="active"}).length}
 function tkUser(t){var u=S.users.filter(function(x){return x.id===t.uid})[0];return u?u.name:(t.nm||("User "+String(t.uid).slice(0,6)))}
 function P(k,v){var o={};o[k]=v;return o}
+function timeAgo(date) {
+    const s = Math.floor((new Date() - date) / 1000);
+    if (s < 60) return s + 's ago';
+    if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's ago';
+    if (s < 86400) return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm ago';
+    return Math.floor(s/86400) + 'd ago';
+}
 
 function fd(v,y){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})}
 function fdt(v){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
@@ -127,7 +134,20 @@ function normWd(v){v=String(v==null?"pending":v).toLowerCase();return(v==="appro
 function normTk(v){v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":v==="pending"||v==="answered"?"pending":"open"}
 function mapUser(r){var c=COLS.users;return{id:String(r[c.id]),name:r[c.name]||r.full_name||r[c.email]||"User",email:r[c.email]||"",city:r[c.city]||"",wal:Number((r.wallet&&(Array.isArray(r.wallet)?(r.wallet[0]||{}).balance:r.wallet.balance))||r[c.wallet]||0),pts:Number(r[c.points]||0),st:normSt(r[c.status]),joined:fd(r[c.created],1),kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0}}
 function mapWd(r){var c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),st:normWd(r[c.status])}}
-function mapTk(r){var c=COLS.tk;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),d:fd(r[c.created]),msgs:null,rating:r.rating||0}}
+function mapTk(r){
+  var c=COLS.tk;
+  var msgs = (r.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  var lastMsg = msgs[msgs.length - 1];
+  var lastMsgTime = lastMsg ? timeAgo(new Date(lastMsg.created_at)) : '';
+  var lastSender = lastMsg ? lastMsg.sender : '';
+  var unread = msgs.filter(m => m.sender === 'user' && !m.is_read).length;
+  
+  return {
+    id:String(r[c.id]), uid:String(r[c.user]==null?"":r[c.user]), nm:r.user_name||r.name||r.email||"",
+    sub:r[c.subject]||"(no subject)", st:normTk(r[c.status]), pr:String(r[c.priority]||"normal").toLowerCase(), d:fd(r[c.created]),
+    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTime: lastMsgTime, lastSender: lastSender
+  }
+}
 function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
 
 async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*",cnt?{count:"exact"}:{});if(o&&oc)x=x.order(oc,{ascending:false});return x.limit(lim)};var r=await q(true);if(r.error)r=await q(false);return r}
@@ -140,7 +160,7 @@ async function loadAll(){
       fetchT("wallet",null,500,0),
       fetchT("withdrawal_requests",COLS.wd.created,300),
       fetchT("notifications","created_at",100),
-      fetchT("support_tickets",COLS.tk.created,300),
+      fetchT("support_tickets","created_at",300), // Changed order to match created_at
       fetchT("matches","created_at",500),
       fetchT("predictions", "created_at", 500, 1)
     ]);
@@ -161,7 +181,11 @@ async function loadAll(){
         return { t: x.title, m: x.body, aud: x.user_id ? "Particular user" : "All users", ty: x.icon === 'alert' ? 'Alert' : 'Promo', time: fdt(x.created_at), r: x.user_id ? 1 : TU() };
       });
     }
-    if(!r[4].error)S.tickets=(r[4].data||[]).map(mapTk);
+    if(!r[4].error){
+        // Need to fetch ticket_messages separately because Supabase joins can be tricky if not specified as a relation
+        const { data: ticketsData } = await db.from('support_tickets').select('*, ticket_messages(*)').order('created_at', {ascending: false});
+        if(ticketsData) S.tickets = ticketsData.map(mapTk);
+    }
     if(!r[6].error){
       S.totalPreds = r[6].count || 0;
     }
@@ -225,28 +249,19 @@ async function adminReply(ticketId) {
   render();
   setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
 }
-async function sendReply(){var t=TK(TKM),ta=$("tr");if(!t||!ta)return;var txt=ta.value.trim();if(!txt)return;if(!db){toast("Supabase is not configured","circle-alert");return}
-  var row={};row[COLS.msg.ticket]=t.id;row[COLS.msg.sender]="admin";row[COLS.msg.body]=txt;
-  if(COLS.msg.senderId){var g=await db.auth.getUser();if(g.data&&g.data.user)row[COLS.msg.senderId]=g.data.user.id}
-  var r=await db.from("ticket_messages").insert(row).select();if(r.error){toast("Reply failed: "+r.error.message,"circle-alert");return}
-  if(!t.msgs)t.msgs=[];t.msgs.push({admin:true,b:txt,t:fdt(new Date())});ta.value="";renderChat();
-  if(TICKET_STATUS_AFTER_REPLY){if(await upd("support_tickets",COLS.tk.id,t.id,P(COLS.tk.status,TICKET_STATUS_AFTER_REPLY)))t.st=normTk(TICKET_STATUS_AFTER_REPLY)}
-  act("Replied to ticket "+t.id.slice(0,8));toast("Reply sent");save();render()}
 
 window.closeTicket = async function(id) {
-    if(!confirm("Close this ticket?")) return;
-    const t = TK(id);
-    await db.from('support_tickets').update({status: 'closed'}).eq('id', id);
-    if (t) {
-        await db.from('notifications').insert({
-            user_id: t.uid,
-            title: 'Ticket Closed',
-            body: 'Your support ticket has been closed. Please rate your experience.',
-            icon: 'check-circle'
-        });
-    }
-    toast('Ticket closed'); TKM = null; render(); loadAll();
+    var t = TK(id);
+    if (!t) return;
+    modal(`<h3>Close Ticket</h3>
+        <p class="mut s12" style="margin-bottom:12px;">Are you sure you want to close this ticket? You can optionally add a note for the customer.</p>
+        <form id="close-ticket-form">
+            <input type="hidden" id="close-ticket-id" value="${id}">
+            <label class="f">Closing Note (Optional)<textarea class="in" id="close-ticket-note" rows="3" placeholder="e.g. Issue resolved. Let us know if you need anything else."></textarea></label>
+            <div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button type="submit" class="btn r">Close Ticket</button></div>
+        </form>`);
 }
+
 window.reopenTicket = async function(id) {
     if(!confirm("Reopen this ticket?")) return;
     await db.from('support_tickets').update({status: 'open'}).eq('id', id);
@@ -318,6 +333,7 @@ function supV() {
         <button class="btn g" data-a="closeticket">${ic("arrow-left")} Back to tickets</button>
     </div></div>
     ${t.rating ? `<div class="card" style="background:var(--was); border-color:var(--wa); color:var(--wa); text-align:center; font-weight:bold; font-size:16px;">Customer Rating: ${'⭐'.repeat(t.rating)}</div>` : ''}
+    ${t.close_note ? `<div class="card" style="background:var(--bads); border-color:var(--bad); color:var(--bad); font-size:14px;"><b>Close Note:</b> ${esc(t.close_note)}</div>` : ''}
     <div class="cols" style="grid-template-columns: 1fr 2fr;">
       <div class="card">
         <h3>Customer Details</h3>
@@ -344,7 +360,9 @@ function supV() {
     </div>`;
   }
   var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});
-  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th></th></tr>'+(l.map(function(t){return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><span class="chip '+(t.pr==="high"||t.pr==="urgent"?"no":t.pr==="medium"?"wa":"")+'">'+esc(t.pr)+'</span></td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td>'+esc(t.d)+'</td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
+  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Last Response</th><th>Rating</th><th>Status</th><th></th></tr>'+(l.map(function(t){
+      return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><small>'+esc(t.lastMsgTime)+'</small></td><td>'+'⭐'.repeat(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
+  }).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
 }
 function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
 function rewV(){return '<div class="hd"><div><h1>Rewards and coupons</h1><small>Manage coupons that users claim with points</small></div><div class="sp"></div><button class="btn" data-a="addc">'+ic("plus")+'Create coupon</button></div><div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>'+S.cp.map(function(c,i){return '<tr><td><b>'+esc(c.n)+'</b></td><td><span class="chip">'+esc(c.code)+'</span></td><td>'+esc(c.dc)+'</td><td>'+c.used+' / '+c.tot+'</td><td><span class="chip '+(c.on?"ok":"")+'">'+(c.on?"Active":"Paused")+'</span></td><td><div class="ac"><button class="btn s g" data-ct="'+i+'">'+(c.on?"Pause":"Activate")+'</button></div></td></tr>'}).join("")+'</table></div>'}
@@ -357,7 +375,7 @@ function nav(){
     if(n[0]==="H") return '<h6>'+n[1]+'</h6>';
     var badge = '';
     if(n[0]==="wd" && pendW().length) badge = '<span class="cn">'+pendW().length+'</span>';
-    if(n[0]==="sup" && S.tickets.filter(function(t){return t.st==="open"}).length) badge = '<span class="cn">'+S.tickets.filter(function(t){return t.st==="open"}).length+'</span>';
+    if(n[0]==="sup" && S.tickets.filter(function(t){return t.st==="open" && t.unread > 0}).length) badge = '<span class="cn">'+S.tickets.filter(function(t){return t.st==="open" && t.unread > 0}).length+'</span>';
     return '<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+badge+'</button>';
   }).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>';
 }
@@ -506,6 +524,24 @@ document.addEventListener("submit",function(e){
   e.preventDefault();var id=e.target.id;
   if(id==="lf"){doLogin();return}
   else if(id==="tf"){sendReply();return}
+  else if(id==="close-ticket-form"){
+      var ticketId = $("close-ticket-id").value;
+      var note = $("close-ticket-note").value;
+      (async () => {
+          const { error } = await db.from('support_tickets').update({ status: 'closed', close_note: note }).eq('id', ticketId);
+          if (error) return toast(error.message, "circle-alert");
+          
+          // Notify user
+          const t = TK(ticketId);
+          if (t) {
+              await db.from('notifications').insert({
+                  user_id: t.uid, title: 'Ticket Closed', body: 'Your support ticket has been closed. Please rate your experience.', icon: 'check-circle'
+              });
+          }
+          toast('Ticket closed'); closeM(); TKM = null; render(); loadAll();
+      })();
+      return;
+  }
   else if(id==="modal-notif-form"){
     var uid = $("mn-userid").value;
     var title = $("mn-title").value;
@@ -652,6 +688,15 @@ async function boot(){
   }catch(e){render()}
 }
 function initAdminRealtime() {
+  db.channel('admin-users-update')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, (payload) => {
+        const u = S.users.find(x => x.id === payload.new.id);
+        if(u) { 
+            u.name = payload.new.full_name || payload.new.email; 
+            save(); render(); 
+        }
+    }).subscribe();
+
   db.channel('admin-preds')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'predictions' }, (payload) => {
       if (document.querySelector('.ov') && document.getElementById('admin-preds-list')) {
