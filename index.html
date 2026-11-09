@@ -1406,8 +1406,16 @@ window.addEventListener("load", async () => {
       MK = [...DEMO_MK];
     }
 
-    const { data: { session } } = await CP_DB.authClient.auth.getSession();
-    if (session) { await applySession(session); } else { render(); }
+   // Ensure the UI waits for the auth session to be fully restored before rendering
+CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION') {
+        if (session) {
+            await applySession(session);
+        } else {
+            render();
+        }
+    }
+});
     
     async function checkPaymentReturn() {
       try {
