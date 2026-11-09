@@ -1078,8 +1078,8 @@ async function loadTickets() {
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
   
-  // PREVENT GUESTS FROM TRIGGERING RLS ERRORS
-  if (!S.user.id) {
+  // Strict check: Ensure the user has a valid UUID from Supabase Auth
+  if (!S.user.id || S.user.id === "Guest User") {
       toast("Please log in with Google to create a support ticket.", "alert");
       return;
   }
@@ -1099,16 +1099,28 @@ async function createTicket() {
   }
 
   try {
-    const { data: t, error } = await supabase.from('support_tickets').insert({ user_id: S.user.id, subject: "Support request", status: "open" }).select().single();
-    if (error) throw error;
+    // 1. Insert the ticket
+    const { data: t, error: insertError } = await supabase
+        .from('support_tickets')
+        .insert({ user_id: S.user.id, subject: "Support request", status: "open" })
+        .select()
+        .single();
+
+    if (insertError) throw insertError;
+    
+    // 2. Insert the first message from the user
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
+    
+    // 3. Insert the auto-reply from admin
     const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 60 minutes.`;
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
     
+    // 4. Reload tickets and open the chat
     await loadTickets();
     S.ticketOpen = t.id; S.route = "ticket"; render(); scrollTo(0,0);
     setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
   } catch(e) { 
+    console.error("Ticket creation failed:", e);
     toast("Could not create ticket: " + e.message, "x"); 
   }
 }
