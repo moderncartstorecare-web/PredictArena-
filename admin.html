@@ -119,12 +119,24 @@ function TU(){return S.ucount||S.users.length}
 function AU(){return S.users.filter(function(u){return u.st==="active"}).length}
 function tkUser(t){var u=S.users.filter(function(x){return x.id===t.uid})[0];return u?u.name:(t.nm||("User "+String(t.uid).slice(0,6)))}
 function P(k,v){var o={};o[k]=v;return o}
+
 function timeAgo(date) {
-    const s = Math.floor((new Date() - date) / 1000);
+    if (!date) return '';
+    const s = Math.floor((new Date() - new Date(date)) / 1000);
+    if (s < 0) return 'Just now';
     if (s < 60) return s + 's ago';
     if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's ago';
     if (s < 86400) return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm ago';
     return Math.floor(s/86400) + 'd ago';
+}
+
+function renderRating(r) {
+    if (!r || r === 0) return '<span class="mut s12">Not rated</span>';
+    var stars = '';
+    for (var i = 1; i <= 5; i++) {
+        stars += '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (i <= r ? '#eab308' : 'none') + '" stroke="' + (i <= r ? '#eab308' : 'var(--bd)') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+    }
+    return '<div style="display:flex; align-items:center; gap:2px;">' + stars + '</div>';
 }
 
 function fd(v,y){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})}
@@ -138,14 +150,15 @@ function mapTk(r){
   var c=COLS.tk;
   var msgs = (r.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
   var lastMsg = msgs[msgs.length - 1];
-  var lastMsgTime = lastMsg ? timeAgo(new Date(lastMsg.created_at)) : '';
+  var lastMsgDate = lastMsg ? new Date(lastMsg.created_at) : null;
+  var lastMsgTimeFormatted = lastMsgDate ? lastMsgDate.toLocaleTimeString("en-IN", {hour: '2-digit', minute:'2-digit', hour12: true}) : '-';
   var lastSender = lastMsg ? lastMsg.sender : '';
   var unread = msgs.filter(m => m.sender === 'user' && !m.is_read).length;
   
   return {
     id:String(r[c.id]), uid:String(r[c.user]==null?"":r[c.user]), nm:r.user_name||r.name||r.email||"",
     sub:r[c.subject]||"(no subject)", st:normTk(r[c.status]), pr:String(r[c.priority]||"normal").toLowerCase(), d:fd(r[c.created]),
-    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTime: lastMsgTime, lastSender: lastSender
+    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTimeFormatted: lastMsgTimeFormatted, lastMsgDate: lastMsgDate, lastSender: lastSender
   }
 }
 function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
@@ -221,6 +234,7 @@ async function doWallet(uid,a,cr,why){
 async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
 function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
 function renderChat(){var t=TK(TKM),el=$("tkc");if(!t||!el)return;el.innerHTML=(t.msgs&&t.msgs.length)?t.msgs.map(function(m){return '<div class="ls"><div class="ico">'+ic(m.admin?"shield-check":"user")+'</div><div><b>'+esc(m.admin?"Support":tkUser(t))+'</b><small>'+esc(m.t)+'</small><div style="white-space:pre-wrap;margin-top:2px">'+esc(m.b)+'</div></div></div>'}).join(""):'<small>No messages yet.</small>';el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
+
 async function openTicket(id){
   var t=TK(id);if(!t)return;
   TKM=id;
@@ -231,8 +245,14 @@ async function openTicket(id){
   // Mark user messages as read in DB
   db.from('ticket_messages').update({ is_read: true }).eq('ticket_id', id).eq('sender', 'user').then(function(){});
   render();
-  setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
+  setTimeout(function(){ 
+      var el = document.getElementById('admin-chat-msgs'); 
+      if(el) el.scrollTop = el.scrollHeight; 
+      var inp = document.getElementById('admin-reply-input');
+      if(inp) inp.focus();
+  }, 50);
 }
+
 async function adminReply(ticketId) {
   var input = document.getElementById('admin-reply-input');
   var txt = input ? input.value.trim() : '';
@@ -247,7 +267,12 @@ async function adminReply(ticketId) {
   }
   input.value = '';
   render();
-  setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
+  setTimeout(function(){ 
+      var el = document.getElementById('admin-chat-msgs'); 
+      if(el) el.scrollTop = el.scrollHeight; 
+      var inp = document.getElementById('admin-reply-input');
+      if(inp) inp.focus();
+  }, 50);
 }
 
 window.closeTicket = async function(id) {
@@ -321,18 +346,22 @@ function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>C
 function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of '+num(TU())+' registered users</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
 function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,[0].concat(S.users.map(function(u){return u.wal}))))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+esc(t.d)+'</td></tr>'}).join("")+'</table></div>'}
 function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+esc(w.id.slice(0,8))+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+esc(w.m)+'<br><small>'+esc(w.ac)+'</small></td><td>'+esc(w.d)+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
+
 function supV() {
   if (TKM) {
     var t = TK(TKM);
     if (!t) { TKM = null; return supV(); }
     var u = U(t.uid);
-    return `<div class="hd"><div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div>
-    <div class="sp"></div>
-    <div class="ac">
-        ${t.st === 'closed' ? `<button class="btn k" onclick="reopenTicket('${t.id}')">Reopen</button>` : `<button class="btn r" onclick="closeTicket('${t.id}')">Close Ticket</button>`}
-        <button class="btn g" data-a="closeticket">${ic("arrow-left")} Back to tickets</button>
-    </div></div>
-    ${t.rating ? `<div class="card" style="background:var(--was); border-color:var(--wa); color:var(--wa); text-align:center; font-weight:bold; font-size:16px;">Customer Rating: ${'⭐'.repeat(t.rating)}</div>` : ''}
+    return `<div class="hd" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+        <button class="btn g s" data-a="closeticket" style="margin-bottom: 8px;">${ic("arrow-left")} Back to tickets</button>
+        <div style="display: flex; width: 100%; justify-content: space-between; align-items: flex-end;">
+            <div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div>
+            <div class="ac">
+                ${t.st === 'closed' ? `<button class="btn k" onclick="reopenTicket('${t.id}')">Reopen</button>` : `<button class="btn r" onclick="closeTicket('${t.id}')">Close Ticket</button>`}
+            </div>
+        </div>
+    </div>
+    ${t.rating ? `<div class="card" style="background:var(--was); border-color:var(--wa); color:var(--wa); text-align:center; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">Customer Rating: ${renderRating(t.rating)}</div>` : ''}
     ${t.close_note ? `<div class="card" style="background:var(--bads); border-color:var(--bad); color:var(--bad); font-size:14px;"><b>Close Note:</b> ${esc(t.close_note)}</div>` : ''}
     <div class="cols" style="grid-template-columns: 1fr 2fr;">
       <div class="card">
@@ -360,8 +389,8 @@ function supV() {
     </div>`;
   }
   var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});
-  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["open","pending","closed","all"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Last Response</th><th>Rating</th><th>Status</th><th></th></tr>'+(l.map(function(t){
-      return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><small>'+esc(t.lastMsgTime)+'</small></td><td>'+'⭐'.repeat(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
+  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["all","open","pending","closed"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+(f==="all"?"All":f[0].toUpperCase()+f.slice(1))+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Last Response</th><th>Rating</th><th>Status</th><th></th></tr>'+(l.map(function(t){
+      return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><b>'+esc(t.lastMsgTimeFormatted)+'</b><br><small>'+(t.lastMsgDate ? timeAgo(t.lastMsgDate) : '-')+'</small></td><td>'+renderRating(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
   }).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
 }
 function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
@@ -707,18 +736,38 @@ function initAdminRealtime() {
   db.channel('admin-tickets')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, () => { loadAll(); })
     .subscribe();
+  
   db.channel('admin-messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
-      if (S.page === 'sup' && TKM === payload.new.ticket_id) {
-        fetchMsgs(TKM).then(function(r) { 
-          if(!r.error) { 
-            TK(TKM).msgs = r.data.map(mapMsg); 
-            render(); 
-            setTimeout(function(){ var el = document.getElementById('admin-chat-msgs'); if(el) el.scrollTop = el.scrollHeight; }, 50);
-          } 
-        });
+      const newMsg = payload.new;
+      if (S.page === 'sup') {
+        if (TKM === newMsg.ticket_id) {
+          // Inside chat, refresh chat
+          fetchMsgs(TKM).then(function(r) { 
+            if(!r.error) { 
+              TK(TKM).msgs = r.data.map(mapMsg); 
+              render(); 
+              setTimeout(function(){ 
+                  var el = document.getElementById('admin-chat-msgs'); 
+                  if(el) el.scrollTop = el.scrollHeight; 
+                  var inp = document.getElementById('admin-reply-input');
+                  if(inp) inp.focus();
+              }, 50);
+            } 
+          });
+        } else {
+          // Outside chat, update the list view for that specific ticket
+          var t = S.tickets.find(x => x.id === newMsg.ticket_id);
+          if (t) {
+            t.lastMsgDate = new Date(newMsg.created_at);
+            t.lastMsgTimeFormatted = t.lastMsgDate.toLocaleTimeString("en-IN", {hour: '2-digit', minute:'2-digit', hour12: true});
+            if (newMsg.sender === 'user') t.unread = (t.unread || 0) + 1;
+            render();
+          }
+        }
       }
     }).subscribe();
+
   db.channel('admin-wallets')
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'wallet' }, (payload) => {
       const user = S.users.find(u => u.id === payload.new.user_id);
@@ -729,6 +778,15 @@ function initAdminRealtime() {
       }
     }).subscribe();
 }
+
+// Update time ago strings dynamically every 30 seconds if on the support page
+setInterval(function() {
+  if (typeof LOGIN !== 'undefined' && LOGIN && S.page === 'sup' && !TKM) {
+    if (S.tickets && S.tickets.length > 0) {
+      render();
+    }
+  }
+}, 30000);
 
 boot();
 </script>
