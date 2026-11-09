@@ -1381,11 +1381,21 @@ window.addEventListener("load", async () => {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
-    CP_DB.authClient.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) { setTimeout(() => applySession(session), 0); } 
-      else if (event === "SIGNED_OUT") { AUTHED_ID = null; AUTH_P = null; if (S.user && S.user.id) { S.user = null; save(); render(); } }
+    // 1. Setup the Auth Listener FIRST to catch initial session safely
+    CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        if (session) {
+          await applySession(session);
+        } else {
+          if (!S.user) render(); // Render login/landing page if no session
+        }
+      } else if (event === "SIGNED_OUT") {
+        AUTHED_ID = null; AUTH_P = null; 
+        if (S.user && S.user.id) { S.user = null; save(); render(); }
+      }
     });
 
+    // 2. Load Matches Data
     try {
       const liveMatches = await CP_DB.getMatches();
       if (liveMatches && liveMatches.length > 0) {
@@ -1397,26 +1407,22 @@ window.addEventListener("load", async () => {
           w: m.crowd_a, oa: m.odds_a, ob: m.odds_b
         }));
       } else {
-        // Fallback to demo data if Supabase returns empty
         MK = [...DEMO_MK];
       }
       fetchLiveScores();
     } catch(e) { 
-      console.log("DB empty or unreachable, using demo data", e); 
       MK = [...DEMO_MK];
     }
 
-   // Ensure the UI waits for the auth session to be fully restored before rendering
-CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'INITIAL_SESSION') {
-        if (session) {
-            await applySession(session);
-        } else {
-            render();
-        }
+    // 3. Fallback Session Check (Ensures the page renders even if the listener is slow)
+    const { data: { session } } = await CP_DB.authClient.auth.getSession();
+    if (session) { 
+      await applySession(session); 
+    } else { 
+      render(); 
     }
-});
     
+    // 4. Payment Return Handler
     async function checkPaymentReturn() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -1425,13 +1431,23 @@ CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
         if (!orderId) return;
         if (status === 'success' && S.user && S.user.id) {
           const { error } = await supabase.from('payment_requests').update({ status: 'approved' }).eq('txn_id', orderId).eq('user_id', S.user.id);
-          if (!error) { toast('Payment successful. Wallet updated.', 'check'); const p = await CP_DB.getProfile(S.user.id); if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); } }
-        } else if (status === 'failed' || status === 'timeout') { toast('Payment ' + status + '. Try again.', 'x'); }
+          if (!error) { 
+            toast('Payment successful. Wallet updated.', 'check'); 
+            const p = await CP_DB.getProfile(S.user.id); 
+            if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); } 
+          }
+        } else if (status === 'failed' || status === 'timeout') { 
+          toast('Payment ' + status + '. Try again.', 'x'); 
+        }
         history.replaceState({}, document.title, window.location.pathname);
       } catch(e) { console.error('Payment return check failed', e); }
     }
     checkPaymentReturn();
-  } catch (err) { console.error("Init error:", err); render(); }
+
+  } catch (err) { 
+    console.error("Init error:", err); 
+    render(); 
+  }
 });
 </script>
 </body>
