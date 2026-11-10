@@ -3,804 +3,1251 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CricPulse Admin – Control Panel </title>
-<link rel="icon" type="image/png" href="https://plain-apac-prod-public.komododecks.com/202610/29/6aKR6o1HOsaHTUWqryJe/image.png">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1a5cff">
+<title>CricPulse Admin – Control Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e5ea;--pr:#2347c5;--prs:#eaeffd;--ok:#0f8a5f;--oks:#e4f4ed;--bad:#c8323c;--bads:#fbe9ea;--wa:#a16207;--was:#fdf3dc;--sb:#0f172a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#131a2e;--tx:#e8ecf6;--mu:#8b96b3;--bd:#232c47;--prs:#1b2850;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#080c18;--pr:#5b7cf5}}
-:root[data-theme="dark"]{--bg:#0b1020;--card:#131a2e;--tx:#e8ecf6;--mu:#8b96b3;--bd:#232c47;--prs:#1b2850;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#080c18;--pr:#5b7cf5}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:50}
-button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
-svg.lucide{width:16px;height:16px;stroke-width:1.9;flex:none}
-small{color:var(--mu);font-size:12px}h3{margin:0 0 12px;font-size:15px;font-weight:600}h1{margin:0;font-size:20px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;background:var(--pr);color:#fff;white-space:nowrap}
-.btn:hover{opacity:.9}.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.btn.s{padding:5px 10px;font-size:12px}.btn.r{background:var(--bads);color:var(--bad)}.btn.k{background:var(--oks);color:var(--ok)}.btn.w{width:100%}.btn[disabled]{opacity:.45;pointer-events:none}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:16px}
-.in{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 12px;background:var(--card);outline:0}.in:focus{border-color:var(--pr)}
-label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bottom:12px}label.f .in{margin-top:4px;color:var(--tx)}
-#lg{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--sb)}
-#lg form{background:var(--card);border-radius:12px;padding:30px;width:100%;max-width:380px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}.brand span{width:32px;height:32px;border-radius:8px;background:var(--pr);display:grid;place-items:center;color:#fff}
-#app{display:flex;min-height:100vh}
-.sb{width:230px;background:var(--sb);color:#aab4cf;padding:20px 12px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-.sb .brand{color:#fff;padding:0 10px 18px}.sb h6{margin:14px 10px 4px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#6b7694;font-weight:600}
-.nv{display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:7px;font-weight:500;color:inherit;width:100%;text-align:left}
-.nv:hover{background:rgba(255,255,255,.06);color:#fff}.nv.on{background:rgba(255,255,255,.12);color:#fff}
-.cn{margin-left:auto;background:#ef4444;color:#fff;border-radius:99px;font-size:11px;padding:2px 8px;font-weight:600;min-width:20px;text-align:center;}
-.main{flex:1;min-width:0}
-.tp{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:6}
-.sp{flex:1}.av{width:34px;height:34px;border-radius:50%;background:var(--pr);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
-.ib{width:36px;height:36px;border-radius:8px;border:1px solid var(--bd);display:grid;place-items:center;position:relative}
-.pg{padding:24px;max-width:1240px;margin:0 auto;animation:fi .2s}@keyframes fi{from{opacity:0}}
-.hd{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}.g4 .card{margin:0;padding:14px 16px}.g4 b{display:block;font-size:21px;font-weight:700;margin-top:2px}
-.cols{display:grid;grid-template-columns:3fr 2fr;gap:16px}@media(max-width:1000px){.cols{grid-template-columns:1fr}}
-.big{font-size:32px;font-weight:700;line-height:1.1}.mk{transition:filter .15s}.bl{filter:blur(7px);user-select:none}
-.erow{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between}
-.src{display:flex;gap:26px;flex-wrap:wrap}.src b{display:block;font-size:16px}
-.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--prs);color:var(--pr);white-space:nowrap}.chip.ok{background:var(--oks);color:var(--ok)}.chip.no{background:var(--bads);color:var(--bad)}.chip.wa{background:var(--was);color:var(--wa)}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}td{padding:10px;border-bottom:1px solid var(--bd);vertical-align:middle}tr:last-child td{border:0}.ac{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
-.tb2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.tb2 .in{max-width:260px}
-.tabs{display:flex;gap:6px}.tabs button{padding:7px 14px;border:1px solid var(--bd);border-radius:7px;background:var(--card);font-weight:500}.tabs .on{background:var(--pr);color:#fff;border-color:var(--pr)}
-.ls{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}.ls:last-child{border:0}.ls>div:last-child{flex:1}.ls small{display:block}
-.ico{width:34px;height:34px;border-radius:8px;background:var(--prs);color:var(--pr);display:grid;place-items:center;flex:none}
-.kv{display:grid;grid-template-columns:130px 1fr}.kv>*{padding:8px 0;border-bottom:1px solid var(--bd)}.kv>:nth-child(odd){color:var(--mu)}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-.ov{position:fixed;inset:0;background:rgba(8,12,24,.55);display:grid;place-items:center;z-index:60;padding:16px;animation:fi .15s;overflow-y:auto}.md{background:var(--card);border-radius:12px;padding:24px;max-width:480px;width:100%}.md h3{font-size:17px}
-.toast{position:fixed;right:20px;top:calc(18px + env(safe-area-inset-top,0px));background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:8px;font-weight:500;z-index:80;display:flex;gap:9px;align-items:center;animation:fi .2s}
-.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--bd);border-radius:9px;padding:11px 12px;margin-bottom:8px;cursor:pointer}.opt:has(input:checked){border-color:var(--pr);background:var(--prs)}
-.unread-row { background-color: var(--prs) !important; }
-@media(max-width:860px){.sb{position:static;height:auto;width:100%;flex-direction:row;overflow-x:auto;padding:8px}.sb h6,.sb .brand,.sb>small{display:none}.nv{width:auto;white-space:nowrap}#app{flex-direction:column}.pg{padding:14px}.tp{padding:10px 14px}.fg{grid-template-columns:1fr}}
+:root{
+  --bg:#f4f6fa;--sf:#ffffff;--s2:#eef1f7;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;
+  --ln:#e3e7ee;--ln2:#d0d6e2;--ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
+  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
+  --sb:#090d16;--sb-tx:#9aa5be;
+}
+:root[data-theme="dark"]{
+  --bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;
+  --ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;
+  --ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211;
+  --sb:#06080d;--sb-tx:#8b95ad;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;text-align:left}
+svg.lucide{width:16px;height:16px;stroke-width:2;flex:none}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:6px}
+.mut{color:var(--i3)}.t2{color:var(--i2)}.s12{font-size:12px}.s11{font-size:11px}.ok{color:var(--ok)}.no{color:var(--no)}.b{font-weight:600}.grow{flex:1;min-width:0}
+.row{display:flex;align-items:center;gap:10px}.bt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stack>*+*{margin-top:12px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:13px;border:1px solid var(--ln2);background:var(--sf);white-space:nowrap;text-align:center;transition:background .15s}
+.btn:hover{background:var(--s2)}.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.p:hover{background:var(--ac2)}
+.btn.d{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,var(--ln2))}.btn.d:hover{background:var(--nos)}
+.btn.k{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--ln2))}.btn.k:hover{background:var(--oks)}
+.btn.sm{height:30px;padding:0 10px;font-size:12px;border-radius:8px}.btn.w{width:100%}.btn:disabled{opacity:.45;cursor:not-allowed}
+.ib{width:36px;height:36px;border-radius:9px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);position:relative;flex:none}
+.ib:hover{background:var(--s2)}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:16px;margin-bottom:14px}
+.card>h3,.card .bt>h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.inp,select.inp,textarea.inp{width:100%;height:38px;padding:0 12px;background:var(--sf);border:1px solid var(--ln2);border-radius:9px;font-size:13.5px}
+textarea.inp{height:auto;padding:10px 12px;resize:vertical;min-height:70px}
+.inp:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
+.fld{margin-bottom:12px}.fld label{display:block;font-size:12px;font-weight:500;color:var(--i2);margin-bottom:4px}
+.err{min-height:18px;color:var(--no);font-size:12px;margin-bottom:6px}
+.badge{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--s2);color:var(--i2);white-space:nowrap;text-transform:capitalize}
+.b-ok{background:var(--oks);color:var(--ok)}.b-no{background:var(--nos);color:var(--no)}.b-am{background:var(--ams);color:var(--am)}.b-ac{background:var(--acs);color:var(--ac)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--ln2);background:var(--sf);color:var(--i2);font-size:12px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.tool .srch{position:relative;flex:1;min-width:180px}.srch svg{position:absolute;left:11px;top:11px;color:var(--i3)}.srch .inp{padding-left:34px}
+.av{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:14px}
+.kpi{padding:14px}.kpi small{display:block;font-size:11px;font-weight:600;color:var(--i3);text-transform:uppercase;letter-spacing:.05em}
+.kpi b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:2px}.kpi span{font-size:12px;color:var(--i3)}
+.list{background:var(--sf);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.r{display:grid;grid-template-columns:var(--m);align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln);width:100%}.r:last-child{border:0}
+button.r:hover{background:var(--s2)}
+.rh{display:none;font-size:11px;font-weight:600;color:var(--i3);text-transform:uppercase;letter-spacing:.05em;background:var(--s2);cursor:default}
+.hm{display:none}.mob{display:inline}
+.dot{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--no);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+.empty{padding:26px;text-align:center;color:var(--i3)}
+.bars{display:flex;gap:8px;align-items:flex-end;height:140px;padding-top:8px}
+.bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;font-size:11px;color:var(--i3);min-width:0}
+.bars i{display:block;width:100%;background:var(--ac);border-radius:5px 5px 0 0;opacity:.88}.bars b{color:var(--ink);font-size:11px}
+.sw{position:relative;width:40px;height:22px;flex:none}.sw input{position:absolute;inset:0;opacity:0;margin:0;z-index:1;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:11px;background:var(--ln2);transition:background .15s}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw input:checked+i{background:var(--ac)}.sw input:checked+i:after{transform:translateX(18px)}
+.ln{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--ln)}.ln:last-child{border:0}
+.bl{filter:blur(6px);user-select:none;transition:filter .2s}
+.shell{display:flex;min-height:100vh}
+.nav{width:240px;background:var(--sb);color:var(--sb-tx);display:flex;flex-direction:column;padding:16px 10px;position:sticky;top:0;height:100vh;flex:none;overflow-y:auto;z-index:40}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;padding:4px 8px 16px;letter-spacing:-.02em}
+.mark{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.brand small{font-size:10px;font-weight:700;color:var(--ac);background:var(--acs);padding:1px 6px;border-radius:4px;margin-left:auto}
+.ng{padding:12px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#55617a}
+.nl{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sb-tx);transition:background .15s,color .15s}
+.nl:hover{background:rgba(255,255,255,.05);color:#fff}.nl.on{background:var(--ac);color:#fff;font-weight:600}
+.nl .cnt{margin-left:auto;background:var(--no);color:#fff;border-radius:9px;font-size:10.5px;font-weight:700;min-width:18px;height:18px;display:grid;place-items:center;padding:0 5px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 24px;background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
+.top h1{font-size:18px;font-weight:700;letter-spacing:-.02em}.top .sub{display:none;color:var(--i3);font-size:13px}
+.pg{padding:20px 24px 60px;max-width:1200px;width:100%;margin:0 auto}
+.scrim{position:fixed;inset:0;z-index:70;background:rgba(9,12,18,.5);backdrop-filter:blur(2px)}
+.dr{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:540px;background:var(--sf);z-index:100;display:flex;flex-direction:column;border-left:1px solid var(--ln);box-shadow:-20px 0 50px rgba(0,0,0,.25)}
+.dr>header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--ln)}
+.dr .bd{padding:16px;overflow:auto;flex:1}
+.chat-container{display:flex;flex-direction:column;height:520px;border:1px solid var(--ln);border-radius:12px;background:var(--sf);overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:13px;word-break:break-word;position:relative}
+.msg small{display:block;font-size:10px;opacity:.75;margin-top:4px}
+.msg.user{background:var(--s2);color:var(--ink);border-bottom-left-radius:3px}
+.msg.admin{background:var(--ac);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
+.msg.note{background:var(--ams);color:var(--am);border:1px dashed var(--am);align-self:center;max-width:94%;font-size:12px}
+.chat-box{padding:10px;border-top:1px solid var(--ln);background:var(--sf);display:flex;flex-direction:column;gap:8px}
+.tw{position:fixed;left:0;right:0;bottom:18px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.ts{background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:9px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 10px 25px rgba(0,0,0,.25)}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--sb)}
+.login .card{width:100%;max-width:380px;padding:28px;background:var(--sf);border:1px solid var(--ln)}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--no);display:inline-block;margin-right:6px}
+@media(max-width:900px){
+  .shell{flex-direction:column}
+  .nav{position:fixed;inset:0 auto 0 0;transform:translateX(-100%);transition:transform .2s;z-index:80;width:260px}
+  .nav.open{transform:none}
+  .top{padding:12px 16px}.pg{padding:14px}
+  .two{grid-template-columns:1fr}
+  .mob{display:inline}.hm{display:none}
+}
+@media(min-width:900px){
+  .r{grid-template-columns:var(--c)}
+  .rh{display:grid}.hm{display:block}.mob{display:none}
+  .top .sub{display:block}
+}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app"></div>
+<div id="dr"></div>
+<div class="tw" id="tw"></div>
+<input type="file" id="imp" accept="application/json" hidden>
+
 <script>
-var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
+var SUPABASE_URL = "https://hmiyhdekyqpzkxqiukvb.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
 
-var ADMIN_EMAILS=["moderncartstore.care@gmail.com"];
-var COLS={
-  users:{id:"id",name:"full_name",email:"email",city:"city",wallet:"wallet_balance",points:"points",status:"status",kyc:"kyc_verified",created:"created_at"},
-  wd:{id:"id",user:"user_id",amount:"amount",method:"method",account:"account",status:"status",created:"created_at"},
-  tk:{id:"id",user:"user_id",subject:"subject",status:"status",priority:"priority",created:"created_at"},
-  msg:{id:"id",ticket:"ticket_id",sender:"sender",body:"message",created:"created_at",senderId:""}
-};
-var REFUND_ON_REJECT=false;
+var MASTER_PASS_HASH = "8f1a17951a8f94ff8a3852084c8d5045db47ff57e4e11fa7a49dd29b4fa03290"; // SHA256 of "cp:Vishal@123"
 
-var LEAGUES = {
-  cricket: ["Indian Premier League (IPL)", "T20 World Cup", "ODI Series", "Test Championship", "Big Bash League (BBL)", "The Hundred"],
-  football: ["Premier League", "La Liga", "Champions League", "FIFA World Cup", "Serie A"],
-  kabaddi: ["Pro Kabaddi League", "Kabaddi World Cup"],
-  indian: ["Entertainment", "Economy", "Politics"],
-  esports: ["BGMI Pro Series", "Valorant Champions", "CS:GO Major"]
-};
-var TICKET_STATUS_AFTER_REPLY="";
-
-var db=null;
-try{
-  if(typeof supabase!=="undefined" && SUPABASE_URL.indexOf("YOUR-")<0){
-    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { detectSessionInUrl: true, persistSession: true }
-    });
-  }
-}catch(e){ console.error("Supabase init failed", e); db=null; }
-
-var MS=["October 2026","September 2026","August 2026","July 2026","June 2026","May 2026"],DD=[29,30,31,31,30,31];
-var D0={mi:0,page:"dash",users:[],matches:[],wd:[],tx:[],txl:[],tickets:[],ucount:0,sent:[],cp:[],act:[],sel:0,nt:0};
-var LOCAL_KEYS=["mi","page","matches","sent","cp","act","txl"];
-var D1=JSON.stringify(D0),S=JSON.parse(D1);
-try{var sv=localStorage.getItem("pxa1");if(sv){var o0=JSON.parse(sv);LOCAL_KEYS.forEach(function(k){if(o0[k]!==undefined)S[k]=o0[k]})}}catch(e){}
-
-var EYE=0,LOGIN=0,UQ="",WF="pending",TF="All",TKF="all",TKM=null,CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""},MOD=null,AD=0;
-
-// Restore Open Ticket on Refresh
+var db = null;
 try {
-  var savedTkm = localStorage.getItem("admin_tkm");
-  if (savedTkm) { TKM = savedTkm; S.page = "sup"; }
-} catch(e) {}
-
-function save(){try{var o={};LOCAL_KEYS.forEach(function(k){o[k]=S[k]});localStorage.setItem("pxa1",JSON.stringify(o))}catch(e){}}
-function saveTkm(id){ TKM = id; try { if(id) localStorage.setItem("admin_tkm", id); else localStorage.removeItem("admin_tkm"); } catch(e){} }
-
-function $(i){return document.getElementById(i)}
-function ic(n){return '<i data-lucide="'+n+'"></i>'}
-function num(n){return n.toLocaleString("en-IN")}
-function fm(n){return "₹"+num(n)}
-function mk(n){return '<span class="mk'+(EYE?"":" bl")+'">'+(EYE?fm(n):"₹ 00,00,000")+'</span>'}
-function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function ini(n){return n.split(" ").map(function(w){return w[0]}).join("").slice(0,2).toUpperCase()}
-function U(i){return S.users.filter(function(u){return u.id===i})[0]||{id:i,name:"Unknown user",email:"",city:"",wal:0,pts:0,st:"active",joined:"",kyc:0,ghost:1}}
-function MM(i){return S.matches.filter(function(m){return m.id==i})[0]}
-function TK(i){return S.tickets.filter(function(t){return t.id===i})[0]}
-function WDR(i){return S.wd.filter(function(w){return w.id===i})[0]}
-function now(){return new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
-function act(t){S.act.unshift([t,now()]);S.act=S.act.slice(0,12)}
-function toast(t,k){var e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+esc(t);document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(function(){e.remove()},2800)}
-function pendW(){return S.wd.filter(function(w){return w.st==="pending"})}
-function chipM(s){return '<span class="chip '+({live:"no",upcoming:"",closed:"wa",settled:"ok"}[s])+'">'+s[0].toUpperCase()+s.slice(1)+'</span>'}
-function TU(){return S.ucount||S.users.length}
-function AU(){return S.users.filter(function(u){return u.st==="active"}).length}
-function tkUser(t){var u=S.users.filter(function(x){return x.id===t.uid})[0];return u?u.name:(t.nm||("User "+String(t.uid).slice(0,6)))}
-function P(k,v){var o={};o[k]=v;return o}
-
-function timeAgo(date) {
-    if (!date) return '';
-    const s = Math.floor((new Date() - new Date(date)) / 1000);
-    if (s < 0) return 'Just now';
-    if (s < 60) return s + 's ago';
-    if (s < 3600) return Math.floor(s/60) + 'm ' + (s%60) + 's ago';
-    if (s < 86400) return Math.floor(s/3600) + 'h ' + Math.floor((s%3600)/60) + 'm ago';
-    return Math.floor(s/86400) + 'd ago';
-}
-
-function renderRating(r) {
-    if (!r || r === 0) return '<span class="mut s12">Not rated</span>';
-    var stars = '';
-    for (var i = 1; i <= 5; i++) {
-        stars += '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (i <= r ? '#eab308' : 'none') + '" stroke="' + (i <= r ? '#eab308' : 'var(--bd)') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
-    }
-    return '<div style="display:flex; align-items:center; gap:2px;">' + stars + '</div>';
-}
-
-function renderMsgBody(b) {
-    if (b && b.startsWith('data:image')) {
-        return `<img src="${b}" style="max-width:100%; border-radius:6px; margin-top:4px;" />`;
-    }
-    return esc(b);
-}
-
-function fd(v,y){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})}
-function fdt(v){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})}
-function normSt(v){v=String(v==null?"active":v).toLowerCase();return(v==="blocked"||v==="banned"||v==="suspended")?"blocked":"active"}
-function normWd(v){v=String(v==null?"pending":v).toLowerCase();return(v==="approved"||v==="completed"||v==="paid"||v==="success")?"approved":(v==="rejected"||v==="declined"||v==="failed"||v==="cancelled")?"rejected":"pending"}
-function normTk(v){v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":v==="pending"||v==="answered"?"pending":"open"}
-function mapUser(r){var c=COLS.users;return{id:String(r[c.id]),name:r[c.name]||r.full_name||r[c.email]||"User",email:r[c.email]||"",city:r[c.city]||"",wal:Number((r.wallet&&(Array.isArray(r.wallet)?(r.wallet[0]||{}).balance:r.wallet.balance))||r[c.wallet]||0),pts:Number(r[c.points]||0),st:normSt(r[c.status]),joined:fd(r[c.created],1),kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0}}
-function mapWd(r){var c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),st:normWd(r[c.status])}}
-function mapTk(r){
-  var c=COLS.tk;
-  var msgs = (r.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-  var lastMsg = msgs[msgs.length - 1];
-  var lastMsgDate = lastMsg ? new Date(lastMsg.created_at) : null;
-  var lastMsgTimeFormatted = lastMsgDate ? lastMsgDate.toLocaleTimeString("en-IN", {hour: '2-digit', minute:'2-digit', hour12: true}) : '-';
-  var unread = msgs.filter(m => m.sender === 'user' && !m.is_read).length;
-  
-  return {
-    id:String(r[c.id]), uid:String(r[c.user]==null?"":r[c.user]), nm:r.user_name||r.name||r.email||"",
-    sub:r[c.subject]||"(no subject)", st:normTk(r[c.status]), pr:String(r[c.priority]||"normal").toLowerCase(), d:fd(r[c.created]),
-    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTimeFormatted: lastMsgTimeFormatted, lastMsgDate: lastMsgDate
+  if (typeof supabase !== "undefined" && SUPABASE_URL.indexOf("YOUR-") < 0) {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true }
+    });
   }
-}
-function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
+} catch(e) { console.error("Supabase init failed", e); }
 
-async function fetchT(t,oc,lim,cnt){var q=function(o){var x=db.from(t).select("*",cnt?{count:"exact"}:{});if(o&&oc)x=x.order(oc,{ascending:false});return x.limit(lim)};var r=await q(true);if(r.error)r=await q(false);return r}
-
-async function loadAll(){
-  if(!db)return;
-  try{
-    var r=await Promise.all([
-      fetchT("users",COLS.users.created,500,1),
-      fetchT("wallet",null,500,0),
-      fetchT("withdrawal_requests",COLS.wd.created,300),
-      fetchT("notifications","created_at",100),
-      fetchT("support_tickets","created_at",300), 
-      fetchT("matches","created_at",500),
-      fetchT("predictions", "created_at", 500, 1)
-    ]);
-    var names=["users","wallet","withdrawal_requests","notifications","support_tickets","matches"],er=[];
-    r.forEach(function(x,i){if(x.error && i!==1)er.push(names[i]+": "+x.error.message)}); 
-    if(er.length)toast("Could not load "+er[0],"circle-alert");
-
-    if(!r[0].error){
-      var usersData = r[0].data || [];
-      var walletData = (r[1] && r[1].data) ? r[1].data : [];
-      usersData.forEach(function(u){ var w = walletData.find(function(x){return x.user_id === u.id}); if(w) u.wallet = w; });
-      S.users=usersData.map(mapUser);
-      S.ucount=r[0].count||S.users.length;
-    }
-    if(!r[2].error)S.wd=(r[2].data||[]).map(mapWd);
-    if(!r[3].error){
-      S.sent = (r[3].data || []).map(function(x){
-        return { t: x.title, m: x.body, aud: x.user_id ? "Particular user" : "All users", ty: x.icon === 'alert' ? 'Alert' : 'Promo', time: fdt(x.created_at), r: x.user_id ? 1 : TU() };
-      });
-    }
-    if(!r[4].error){
-        const { data: ticketsData } = await db.from('support_tickets').select('*, ticket_messages(*)').order('created_at', {ascending: false});
-        if(ticketsData) S.tickets = ticketsData.map(mapTk);
-    }
-    if(!r[6].error){
-      S.totalPreds = r[6].count || 0;
-    }
-    if(!r[5].error){
-      S.matches=(r[5].data||[]).map(function(x){
-        return { id:x.id, c:x.category, l:x.league, a:x.team_a, b:x.team_b, closes_at:x.closes_at, when:x.closes_at ? new Date(x.closes_at).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"}) : "", st: (x.closes_at && new Date(x.closes_at) < new Date()) ? "closed" : "upcoming", win:null, pa:x.crowd_a||50, n:0 };
-      });
-    }
-  }catch(e){ console.error(e); toast("Network error while loading data","circle-alert"); }
-  rebuildTx(); render();
-}
-async function upd(table,idcol,id,patch){if(!db){toast("Supabase is not configured","circle-alert");return false}var r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
-async function doBlock(id){var u=S.users.filter(function(x){return x.id===id})[0];if(!u){toast("User not found","circle-alert");return}var ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,P(COLS.users.status,ns))))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
-async function doWd(id,st){var w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,P(COLS.wd.status,st))))return;w.st=st;var u=S.users.filter(function(x){return x.id===w.uid})[0];
-  if(st==="rejected"&&REFUND_ON_REJECT&&u){var nw=u.wal+w.amt;if(await upd("users",COLS.users.id,u.id,P(COLS.users.wallet,nw))){u.wal=nw;S.txl.unshift({uid:u.id,ty:"Refund",amt:"+"+w.amt,n:"Rejected "+w.id.slice(0,8),d:fd(new Date())})}}
-  act("Withdrawal "+w.id.slice(0,8)+" "+st+" ("+(u?u.name:"unknown user")+")");toast("Withdrawal "+st);rebuildTx();save();render()}
-async function doWallet(uid,a,cr,why){
-  var u=S.users.filter(function(x){return x.id===uid})[0];
-  if(!u){toast("User not found","circle-alert");return}
-  if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}
-  if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}
-  
-  var r = await db.rpc("admin_adjust_balance", { p_user_id: u.id, p_delta: cr ? a : -a, p_reason: why || "Admin update" });
-  if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return}
-  if(!r.data || r.data.ok === false){toast((r.data && r.data.message) || "Update failed","circle-alert");return}
-  
-  u.wal = r.data.new_balance;
-  S.txl.unshift({uid:u.id,ty:cr?"Credit":"Debit",amt:(cr?"+":"-")+a,n:why,d:fd(new Date())});
-  act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);
-  closeM();toast("Wallet updated");rebuildTx();save();render();
-}
-
-async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
-function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
-
-async function openTicket(id){
-  var t=TK(id);if(!t)return;
-  saveTkm(id);
-  if(!db){toast("Supabase not configured","circle-alert");return}
-  var r=await fetchMsgs(t.id);
-  if(r.error){toast("Error loading messages","circle-alert");return}
-  t.msgs=(r.data||[]).map(mapMsg);
-  // Mark user messages as read in DB
-  db.from('ticket_messages').update({ is_read: true }).eq('ticket_id', id).eq('sender', 'user').then(function(){});
-  // Instantly mark as read in UI
-  t.unread = 0;
-  render();
-  setTimeout(function(){ 
-      var el = document.getElementById('admin-chat-msgs'); 
-      if(el) el.scrollTop = el.scrollHeight; 
-      var inp = document.getElementById('admin-reply-input');
-      if(inp) inp.focus();
-  }, 50);
-}
-
-async function adminReply(ticketId) {
-  var input = document.getElementById('admin-reply-input');
-  var txt = input ? input.value.trim() : '';
-  if (!txt) return;
-  var row = { ticket_id: ticketId, sender: 'admin', message: txt, is_read: false };
-  var r = await db.from('ticket_messages').insert(row).select();
-  if (r.error) { toast("Failed to send: " + r.error.message, "circle-alert"); return; }
-  var t = TK(ticketId);
-  if (t) {
-    if (!t.msgs) t.msgs = [];
-    t.msgs.push({ admin: true, b: txt, t: fdt(new Date()) });
-  }
-  input.value = '';
-  render();
-  setTimeout(function(){ 
-      var el = document.getElementById('admin-chat-msgs'); 
-      if(el) el.scrollTop = el.scrollHeight; 
-      var inp = document.getElementById('admin-reply-input');
-      if(inp) inp.focus();
-  }, 50);
-}
-
-window.closeTicket = async function(id) {
-    var t = TK(id);
-    if (!t) return;
-    modal(`<h3>Close Ticket</h3>
-        <p class="mut s12" style="margin-bottom:12px;">Are you sure you want to close this ticket? You can optionally add a note for the customer.</p>
-        <form id="close-ticket-form">
-            <input type="hidden" id="close-ticket-id" value="${id}">
-            <label class="f">Closing Note (Optional)<textarea class="in" id="close-ticket-note" rows="3" placeholder="e.g. Issue resolved. Let us know if you need anything else."></textarea></label>
-            <div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button type="submit" class="btn r">Close Ticket</button></div>
-        </form>`);
-}
-
-window.reopenTicket = async function(id) {
-    if(!confirm("Reopen this ticket?")) return;
-    await db.from('support_tickets').update({status: 'open'}).eq('id', id);
-    toast('Ticket reopened'); render(); loadAll();
-}
-
-function authRedirect(){return location.origin+location.pathname}
-function cleanUrl(){if(/access_token|code=|error/.test(location.hash+location.search))history.replaceState(null,"",location.pathname)}
-async function doLogin(){
-  if(!db){toast("Supabase is not configured","circle-alert");return}
-  var check = await db.auth.getSession();
-  if(check.data && check.data.session){
-      var em = check.data.session.user.email;
-      if(ADMIN_EMAILS.length && ADMIN_EMAILS.map(function(x){return x.toLowerCase()}).indexOf(em.toLowerCase()) < 0){
-          toast("This Google account is not an admin. Logging out...","circle-alert");
-          await db.auth.signOut();
-          return;
-      }
-  }
-  toast("Opening Google sign in…","log-in");
-  var r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:authRedirect(),queryParams:{prompt:"select_account"}}});
-  if(r.error)toast("Sign in failed: "+r.error.message,"circle-alert");
-}
-async function doLogout(){
-  try{if(db)await db.auth.signOut()}catch(e){}
-  LOGIN=0;
-  history.replaceState(null,"",location.pathname);
-  location.reload();
-}
-
-function dashV(){
-  var pw=pendW(),aw=S.matches.filter(function(m){return m.st==="live"||m.st==="closed"});
-  
-  return '<div class="hd"><div><h1>Overview</h1><small>Platform summary</small></div></div>'+
-  '<div class="g4">'+[
-    ["Total users",num(TU()),"users"],
-    ["Total Predictions",num(S.totalPreds || 0),"target"],
-    ["Pending withdrawals",pw.length+" · "+fm(pw.reduce(function(a,w){return a+w.amt},0)),"landmark"],
-    ["Wallet balance (listed)",fm(S.users.reduce(function(a,u){return a+u.wal},0)),"wallet"]
-  ].map(function(k){return '<div class="card"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>'}).join("")+'</div>'+
-  
-  '<div class="cols"><div><div class="card"><h3>Needs attention</h3>'+(aw.length?aw.map(function(m){return '<div class="ls"><div class="ico">'+ic("trophy")+'</div><div><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><small>'+esc(m.l)+' · '+m.n+' predictions · awaiting result</small></div><button class="btn s" data-win="'+m.id+'">Set winner</button></div>'}).join(""):'<small>No matches waiting for a result.</small>')+pw.map(function(w){var u=U(w.uid);return '<div class="ls"><div class="ico">'+ic("landmark")+'</div><div><b>'+esc(w.id.slice(0,8))+' · '+fm(w.amt)+'</b><small>'+esc(u.name)+' · '+esc(w.m)+'</small></div><div class="ac"><button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button></div></div>'}).join("")+'</div></div><div class="card"><h3>Recent activity</h3>'+(S.act.length?S.act.slice(0,7).map(function(a){return '<div class="ls"><div class="ico">'+ic("activity")+'</div><div><b style="font-weight:500">'+esc(a[0])+'</b><small>'+a[1]+'</small></div></div>'}).join(""):'<small>No activity yet.</small>')+'</div></div>'
-}
-  function matchesV(){return '<div class="hd"><div><h1>Matches</h1><small>Create matches, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-a="addm">'+ic("plus")+'Add match</button></div><div class="card tw"><table><tr><th>Match</th><th>Start</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>'+S.matches.map(function(m){
-  var actionBtns = '';
-  if (m.st === 'settled') {
-    actionBtns = '<button class="btn s" data-manage="'+m.id+'">Manage</button>';
-  } else if (m.st === 'upcoming') {
-    actionBtns = '<button class="btn s g" data-cl="'+m.id+'">Close picks</button>';
-  } else if (m.st === 'closed') {
-    actionBtns = '<button class="btn s k" data-reopen="'+m.id+'">Reopen</button><button class="btn s" data-win="'+m.id+'">Set winner</button>';
-  }
-  
-  return '<tr><td><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><br><small>'+esc(m.l)+'</small></td><td>'+esc(m.when)+'</td><td>'+num(m.n)+'</td><td><small>'+m.pa+'% / '+(100-m.pa)+'%</small></td><td>'+chipM(m.st)+(m.win?'<br><small>Winner: '+(m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b))+'</small>':'')+'</td><td><div class="ac"><button class="btn s" data-manage="'+m.id+'">Manage</button><button class="btn s g" data-editm="'+m.id+'">'+ic("pencil")+'</button>'+actionBtns+'<button class="btn s g" data-dm="'+m.id+'" aria-label="Delete">'+ic("trash-2")+'</button></div></td></tr>'
-}).join("")+'</table></div>'}
-function usersTbl(){var q=UQ.toLowerCase();return '<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>'+S.users.filter(function(u){return!q||(u.name+u.email+u.city).toLowerCase().indexOf(q)>-1}).map(function(u){return '<tr><td><b>'+esc(u.name)+'</b><br><small>'+esc(u.email)+'</small></td><td>'+esc(u.city)+'</td><td>'+fm(u.wal)+'</td><td>'+u.pts+'</td><td><span class="chip '+(u.kyc?"ok":"wa")+'">'+(u.kyc?"Verified":"Pending")+'</span></td><td><span class="chip '+(u.st==="active"?"ok":"no")+'">'+u.st+'</span></td><td><div class="ac"><button class="btn s g" data-uv="'+esc(u.id)+'">View</button><button class="btn s g" data-un="'+esc(u.id)+'" aria-label="Notify">'+ic("bell")+'</button><button class="btn s g" data-uw="'+esc(u.id)+'" aria-label="Wallet">'+ic("wallet")+'</button><button class="btn s '+(u.st==="active"?"r":"k")+'" data-ub="'+esc(u.id)+'">'+(u.st==="active"?"Block":"Unblock")+'</button></div></td></tr>'}).join("")+'</table>'}
-function usersV(){return '<div class="hd"><div><h1>Users</h1><small>Showing '+S.users.length+' of '+num(TU())+' registered users</small></div></div><div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="'+esc(UQ)+'"></div><div class="card tw" id="ut">'+usersTbl()+'</div>'}
-function walletsV(){var ty=["All","Credit","Debit","Reward","Withdrawal","Refund"];return '<div class="hd"><div><h1>Wallet transactions</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in" style="width:auto" data-sel="tf">'+ty.map(function(t){return '<option'+(t===TF?" selected":"")+'>'+t+'</option>'}).join("")+'</select></div><div class="g4"><div class="card"><small>Wallet balance (listed users)</small><b>'+fm(S.users.reduce(function(a,u){return a+u.wal},0))+'</b></div><div class="card"><small>Highest balance</small><b>'+fm(Math.max.apply(null,[0].concat(S.users.map(function(u){return u.wal}))))+'</b></div></div><div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>'+S.tx.filter(function(t){return TF==="All"||t.ty===TF}).map(function(t){return '<tr><td>'+esc(U(t.uid).name)+'</td><td>'+t.ty+'</td><td style="color:var(--'+(t.amt[0]==="+"?"ok":"bad")+');font-weight:600">'+t.amt[0]+"₹"+num(+t.amt.slice(1))+'</td><td>'+esc(t.n)+'</td><td>'+esc(t.d)+'</td></tr>'}).join("")+'</table></div>'}
-function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});return '<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div></div><div class="tabs" style="margin-bottom:12px">'+["pending","approved","rejected","all"].map(function(f){return '<button class="'+(WF===f?"on":"")+'" data-wf="'+f+'">'+f[0].toUpperCase()+f.slice(1)+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>'+(l.map(function(w){var u=U(w.uid);return '<tr><td><b>'+esc(w.id.slice(0,8))+'</b></td><td>'+esc(u.name)+'</td><td>'+fm(w.amt)+'</td><td>'+esc(w.m)+'<br><small>'+esc(w.ac)+'</small></td><td>'+esc(w.d)+'</td><td><span class="chip '+({pending:"wa",approved:"ok",rejected:"no"}[w.st])+'">'+w.st+'</span></td><td><div class="ac">'+(w.st==="pending"?'<button class="btn s k" data-wd="'+esc(w.id)+'|approved">Approve</button><button class="btn s r" data-wd="'+esc(w.id)+'|rejected">Reject</button>':'')+'</div></td></tr>'}).join("")||'<tr><td colspan="7"><small>No requests in this view.</small></td></tr>')+'</table></div>'}
-
-function supV() {
-  if (TKM) {
-    var t = TK(TKM);
-    if (!t) { saveTkm(null); return supV(); }
-    var u = U(t.uid);
-    return `<div class="hd" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-        <button class="btn g s" data-a="closeticket" style="margin-bottom: 8px;">${ic("arrow-left")} Back to tickets</button>
-        <div style="display: flex; width: 100%; justify-content: space-between; align-items: flex-end;">
-            <div><h1>Support · ${esc(t.sub)}</h1><small>${esc(u.name)} · ${esc(t.st)}</small></div>
-            <div class="ac">
-                ${t.st === 'closed' ? `<button class="btn k" onclick="reopenTicket('${t.id}')">Reopen</button>` : `<button class="btn r" onclick="closeTicket('${t.id}')">Close Ticket</button>`}
-            </div>
-        </div>
-    </div>
-    ${t.rating ? `<div class="card" style="background:var(--was); border-color:var(--wa); color:var(--wa); text-align:center; font-weight:bold; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px;">Customer Rating: ${renderRating(t.rating)}</div>` : ''}
-    ${t.close_note ? `<div class="card" style="background:var(--bads); border-color:var(--bad); color:var(--bad); font-size:14px;"><b>Close Note:</b> ${esc(t.close_note)}</div>` : ''}
-    <div class="cols" style="grid-template-columns: 1fr 2fr;">
-      <div class="card">
-        <h3>Customer Details</h3>
-        <div class="kv">
-          <span>Name</span><span>${esc(u.name)}</span>
-          <span>Email</span><span>${esc(u.email)}</span>
-          <span>Wallet</span><span>${fm(u.wal)}</span>
-          <span>City</span><span>${esc(u.city)}</span>
-          <span>Joined</span><span>${esc(u.joined)}</span>
-        </div>
-        <button class="btn w" style="margin-top:12px" data-a="notify-user" data-v="${u.id}">${ic("bell")} Send Notification</button>
-        <button class="btn w g" style="margin-top:8px" data-a="wallet-user" data-v="${u.id}">${ic("wallet")} Adjust Wallet</button>
-      </div>
-      <div class="card" style="display:flex; flex-direction: column; height: 600px; padding:0;">
-        <div style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;" id="admin-chat-msgs">
-           ${(t.msgs||[]).map(function(m){ return '<div style="align-self:'+(m.admin?'flex-end':'flex-start')+'; background:'+(m.admin?'var(--pr)':'var(--bg)')+'; color:'+(m.admin?'#fff':'var(--tx)')+'; padding:10px 14px; border-radius:12px; max-width:80%;">'+renderMsgBody(m.b)+'<br><small style="opacity:0.7;font-size:10px;">'+esc(m.t)+'</small></div>'; }).join('')}
-        </div>
-        ${t.st === 'closed' ? `<div style="padding:12px; text-align:center; border-top:1px solid var(--bd); color:var(--mu);">Ticket is closed.</div>` : `
-        <div style="padding:12px; border-top:1px solid var(--bd); display:flex; gap:8px; background:var(--card);">
-           <input type="text" class="in" id="admin-reply-input" placeholder="Type your reply..." style="flex:1;" onkeydown="if(event.key==='Enter') adminReply('${t.id}')">
-           <button class="btn" onclick="adminReply('${t.id}')">Send</button>
-        </div>`}
-      </div>
-    </div>`;
-  }
-  var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});
-  return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["all","open","pending","closed"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+(f==="all"?"All":f[0].toUpperCase()+f.slice(1))+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Last Response</th><th>Rating</th><th>Status</th><th></th></tr>'+(l.map(function(t){
-      // Highlight unread rows
-      var rowClass = t.unread > 0 ? 'class="unread-row"' : '';
-      var badge = t.unread > 0 ? `<span style="background:var(--bad);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:6px;">NEW</span>` : '';
-      
-      return '<tr '+rowClass+'><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+' '+badge+'</td><td><b>'+esc(t.lastMsgTimeFormatted)+'</b><br><small>'+(t.lastMsgDate ? timeAgo(t.lastMsgDate) : '-')+'</small></td><td>'+renderRating(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
-  }).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
-}
-function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
-function rewV(){return '<div class="hd"><div><h1>Rewards and coupons</h1><small>Manage coupons that users claim with points</small></div><div class="sp"></div><button class="btn" data-a="addc">'+ic("plus")+'Create coupon</button></div><div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>'+S.cp.map(function(c,i){return '<tr><td><b>'+esc(c.n)+'</b></td><td><span class="chip">'+esc(c.code)+'</span></td><td>'+esc(c.dc)+'</td><td>'+c.used+' / '+c.tot+'</td><td><span class="chip '+(c.on?"ok":"")+'">'+(c.on?"Active":"Paused")+'</span></td><td><div class="ac"><button class="btn s g" data-ct="'+i+'">'+(c.on?"Pause":"Activate")+'</button></div></td></tr>'}).join("")+'</table></div>'}
-function setV(){return '<div class="hd"><div><h1>Settings</h1></div></div><div class="card"><h3>Admin account</h3><div class="kv"><span>Name</span><span>Administrator</span><span>Email</span><span>'+esc(S.adm||"admin@CricPulse.edu")+'</span><span>Role</span><span>Super admin</span></div></div><div class="card"><h3>Preferences</h3><div class="ls"><div><b>Appearance</b><small>Switch between light and dark</small></div><button class="btn g" data-a="theme">Toggle theme</button></div><div class="ls"><div><b>Reset demo data</b><small>Restore all sample data</small></div><button class="btn r" data-a="reset">Reset</button></div></div><div class="card"><button class="btn g" data-a="out">'+ic("log-out")+'Sign out</button></div><small>Prototype with sample data. No real payments or personal data are processed.</small>'}
-var NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
-var VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
-
-function nav(){
-  return NV.map(function(n){
-    if(n[0]==="H") return '<h6>'+n[1]+'</h6>';
-    var badge = '';
-    if(n[0]==="wd" && pendW().length) badge = '<span class="cn">'+pendW().length+'</span>';
-    if(n[0]==="sup" && S.tickets.filter(function(t){return t.st==="open" && t.unread > 0}).length) badge = '<span class="cn">'+S.tickets.filter(function(t){return t.st==="open" && t.unread > 0}).length+'</span>';
-    return '<button class="nv'+(S.page===n[0]?" on":"")+'" data-p="'+n[0]+'">'+ic(n[1])+n[2]+badge+'</button>';
-  }).join("")+'<button class="nv" data-a="logout">'+ic("log-out")+'Logout</button>';
-}
-
-function loginV(){return '<div id="lg"><form id="lf"><div class="brand" style="margin-bottom:18px"><span>'+ic("shield-check")+'</span>CricPulse Admin</div><h1 style="margin-bottom:4px">Admin sign in</h1><small>Authorised administrators only.</small><div style="height:16px"></div><button class="btn w" type="submit">Sign in with Google</button></form></div>'}
-function render(){
-  var r=$("root");
-  if(!LOGIN){r.innerHTML=loginV()}
-  else{
-    var v=VT[S.page]||VT.dash;
-    r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">@CricPulse Admin</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small style="white-space:nowrap;padding-right:10px;">Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>';
-  }
-  try{lucide.createIcons()}catch(e){}
-}
-  async function manageMatch(id) {
-  var m = MM(id);
-  if (!m) return;
-  
-  modal('<div style="text-align:center;padding:20px"><small>Loading votes...</small></div>');
-  
-  var r = await db.from('predictions').select('*, users(full_name, email)').eq('match_id', id);
-  var preds = r.data || [];
-  
-  var votesA = preds.filter(function(p){ return p.prediction_choice === 'A'; }).length;
-  var votesB = preds.filter(function(p){ return p.prediction_choice === 'B'; }).length;
-  var total = votesA + votesB || 1;
-  var pctA = Math.round((votesA / total) * 100);
-  var pctB = 100 - pctA;
-  
-  var predsHtml = preds.length ? preds.map(function(p){
-    var uName = p.users ? (p.users.full_name || p.users.email) : 'Unknown';
-    var choice = p.prediction_choice === 'A' ? m.a : m.b;
-    return '<div class="ls"><div class="ico">'+ic("user")+'</div><div><b>'+esc(uName)+'</b><small>Voted for <b>'+esc(choice)+'</b></small></div><span class="chip ok">'+esc(p.prediction_choice)+'</span></div>';
-  }).join('') : '<small>No votes yet.</small>';
-  
-   var html = '<h3>Manage Match</h3>'+
-  '<div class="kv" style="margin-bottom:16px">'+
-    '<span>Match</span><span><b>'+esc(m.a)+' vs '+esc(m.b)+'</b></span>'+
-    '<span>League</span><span>'+esc(m.l)+'</span>'+
-    '<span>CricAPI ID</span><span style="display:flex;gap:8px;align-items:center;"><input class="in" id="edit-api-id" data-match-id="'+id+'" value="'+esc(m.api_id || '')+'" style="height:30px;padding:0 8px;width:200px;"><button class="btn s" onclick="saveApiId(\''+id+'\')">Save</button></span>'+
-  '</div>'+
-  '<div class="g4" style="grid-template-columns:1fr 1fr;margin-bottom:16px">'+
-    '<div class="card" style="margin:0;text-align:center"><small>'+esc(m.a)+' Votes</small><b>'+votesA+' ('+pctA+'%)</b></div>'+
-    '<div class="card" style="margin:0;text-align:center"><small>'+esc(m.b)+' Votes</small><b>'+votesB+' ('+pctB+'%)</b></div>'+
-  '</div>'+
-  '<h3 style="margin-top:20px">User Votes ('+preds.length+')</h3>'+
-  '<div style="max-height:300px;overflow-y:auto;" id="admin-preds-list">'+predsHtml+'</div>'+
-  '<div class="ac" style="margin-top:16px"><button type="button" class="btn g" data-close>Close</button></div>';
-  
-  modal(html);
-  try{lucide.createIcons()}catch(e){}
-}
-
-window.saveApiId = async function(matchId) {
-  var val = document.getElementById('edit-api-id').value.trim();
-  var r = await db.from('matches').update({ cricket_match_id: val }).eq('id', matchId);
-  if (r.error) { toast("Error saving ID: " + r.error.message, "circle-alert"); return; }
-  toast("CricAPI ID updated!");
-  loadAll();
+var esc = function(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); };
+var $ = function(i){ return document.getElementById(i); };
+var inr = function(n){ return "₹" + Number(n || 0).toLocaleString("en-IN", {maximumFractionDigits: 0}); };
+var NOW = Date.now(), DAY = 864e5, HR = 36e5;
+var uid = function(){ return Math.random().toString(36).slice(2, 8); };
+var ago = function(t){
+  var s = (Date.now() - new Date(t).getTime()) / 1e3;
+  return s < 60 ? "just now" : s < 3600 ? Math.floor(s/60) + "m ago" : s < 86400 ? Math.floor(s/3600) + "h ago" : Math.floor(s/86400) + "d ago";
 };
-function openMatchModal(match = null) {
-  var isEdit = match !== null;
-  var cat = isEdit ? match.c : 'cricket';
-  var leagues = LEAGUES[cat] || [];
-  var leagueOpts = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
-  
-  var dtVal = "";
-  if (isEdit && match.closes_at) {
-    var d = new Date(match.closes_at);
-    dtVal = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-  }
+var dt = function(t){ return new Date(t).toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"}); };
 
-  var html = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:16px;">
-      <div style="width:44px;height:44px;border-radius:12px;background:var(--prs);color:var(--pr);display:grid;place-items:center;">
-         <i data-lucide="${isEdit ? 'edit' : 'plus'}" style="width:24px;height:24px;"></i>
-      </div>
-      <div>
-        <h3 style="margin:0;font-size:18px;">${isEdit ? 'Edit Match' : 'Create New Match'}</h3>
-        <small style="color:var(--mu);">Fill in the details below to publish</small>
-      </div>
-    </div>
-    
-    <form id="mf" style="display:flex;flex-direction:column;gap:16px;">
-      <div class="fg" style="gap:16px;">
-        <label class="f">Category
-          <select class="in" id="mc" onchange="updateLeagues(this.value)" style="padding:12px;">
-            <option value="cricket" ${cat==='cricket'?'selected':''}>🏏 Cricket</option>
-            <option value="football" ${cat==='football'?'selected':''}>⚽ Football</option>
-            <option value="kabaddi" ${cat==='kabaddi'?'selected':''}>🤼 Kabaddi</option>
-            <option value="esports" ${cat==='esports'?'selected':''}>🎮 Esports</option>
-            <option value="indian" ${cat==='indian'?'selected':''}>🇮🇳 Indian Events</option>
-          </select>
-        </label>
-        <label class="f">League / Event
-          <input class="in" id="ml" list="league-list" value="${isEdit?esc(match.l):''}" placeholder="e.g. IPL 2026" required style="padding:12px;">
-          <datalist id="league-list">${leagueOpts}</datalist>
-        </label>
-      </div>
-      
-      <div class="fg" style="gap:16px;">
-        <label class="f">Team A / Option A
-          <input class="in" id="ma" value="${isEdit?esc(match.a):''}" placeholder="e.g. India" required style="padding:12px;">
-        </label>
-        <label class="f">Team B / Option B
-          <input class="in" id="mb" value="${isEdit?esc(match.b):''}" placeholder="e.g. Australia" required style="padding:12px;">
-        </label>
-      </div>
-
-      <div class="fg" style="gap:16px;">
-        <label class="f">Match Start Time (Betting closes here)
-          <input class="in" type="datetime-local" id="mtime" value="${dtVal}" required style="padding:12px;">
-        </label>
-        <div style="display:flex;align-items:center;">
-           <div style="background:var(--was);border:1px solid var(--wa);padding:10px 12px;border-radius:8px;font-size:12px;color:var(--wa);width:100%;">
-             <b>Heads up:</b> Make sure the team names exactly match SportScore to get live scores.
-           </div>
-        </div>
-      </div>
-
-      <div class="ac" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);">
-        <button type="button" class="btn g" data-close style="padding:10px 20px;">Cancel</button>
-        <button class="btn" type="submit" style="padding:10px 20px;">${isEdit ? 'Save Changes' : 'Publish Match'}</button>
-      </div>
-      <input type="hidden" id="mid_db" value="${isEdit?match.id:''}">
-    </form>
-  `;
-  modal(html);
-  try{lucide.createIcons()}catch(e){}
-}
-
-window.updateLeagues = function(cat) {
-  var leagues = LEAGUES[cat] || [];
-  document.getElementById('league-list').innerHTML = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
+var bd = function(t, c){ return '<span class="badge ' + (c || "") + '">' + esc(t) + '</span>'; };
+var CS = {
+  active:"b-ok", suspended:"b-am", blocked:"b-no", banned:"b-no",
+  open:"b-ac", pending:"b-am", resolved:"b-ok", closed:"",
+  high:"b-no", medium:"b-am", low:"",
+  approved:"b-ok", rejected:"b-no", completed:"b-ok", verified:"b-ok", none:""
 };
-function modal(h){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+h+'</div>';document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
-function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null;}
-function fld(l,id,v,t){return '<label class="f">'+l+'<input class="in" id="'+id+'" type="'+(t||"text")+'" value="'+(v||"")+'" required></label>'}
+var sb = function(s){ return bd(s, CS[s] || ""); };
 
-document.addEventListener("input",function(e){var t=e.target;if(t.id==="uq"){UQ=t.value;$("ut").innerHTML=usersTbl();try{lucide.createIcons()}catch(x){}}if(t.dataset.cp&&(t.dataset.cp==="t"||t.dataset.cp==="m"))CPS[t.dataset.cp]=t.value});
-document.addEventListener("change",function(e){var t=e.target;if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}else if(t.dataset.sel==="tf"){TF=t.value;render()}else if(t.dataset.cp){CPS[t.dataset.cp]=t.value;if(t.dataset.cp==="aud"||t.dataset.cp==="uid")render()}});
-document.addEventListener("submit",function(e){
-  e.preventDefault();var id=e.target.id;
-  if(id==="lf"){doLogin();return}
-  else if(id==="tf"){sendReply();return}
-  else if(id==="close-ticket-form"){
-      var ticketId = $("close-ticket-id").value;
-      var note = $("close-ticket-note").value;
-      (async () => {
-          const { error } = await db.from('support_tickets').update({ status: 'closed', close_note: note }).eq('id', ticketId);
-          if (error) return toast(error.message, "circle-alert");
-          
-          const t = TK(ticketId);
-          if (t) {
-              await db.from('notifications').insert({
-                  user_id: t.uid, title: 'Ticket Closed', body: 'Your support ticket has been closed. Please rate your experience.', icon: 'check-circle'
-              });
-          }
-          toast('Ticket closed'); closeM(); render(); loadAll();
-      })();
-      return;
-  }
-  else if(id==="modal-notif-form"){
-    var uid = $("mn-userid").value;
-    var title = $("mn-title").value;
-    var msg = $("mn-msg").value;
-    db.from('notifications').insert({ title: title, body: msg, icon: 'bell', user_id: uid }).then(function(res) {
-        if(res.error) return toast(res.error.message, "circle-alert");
-        toast("Notification sent"); closeM();
-    });
-    return;
-  }
-  else if(id==="mf"){
-    var dbId = $("mid_db").value;
-    var timeVal = $("mtime").value; 
-    var closesAt = timeVal ? new Date(timeVal).toISOString() : new Date(Date.now() + 86400000).toISOString();
-    
-    var matchData = { 
-      category: $("mc").value.toLowerCase(), 
-      league: $("ml").value, 
-      team_a: $("ma").value, 
-      team_b: $("mb").value, 
-      closes_at: closesAt, 
-      crowd_a: 50, odds_a: 1.85, odds_b: 2.10 
-    };
+var toast = function(m, icon) {
+  var n = document.createElement("div");
+  n.className = "ts";
+  n.innerHTML = '<i data-lucide="' + (icon || "check-circle") + '" style="width:16px;height:16px"></i><span>' + esc(m) + '</span>';
+  $("tw").appendChild(n);
+  try { lucide.createIcons(); } catch(e){}
+  setTimeout(function(){ n.remove(); }, 2800);
+};
 
-    if (dbId) {
-      db.from('matches').update(matchData).eq('id', dbId).then(function(res) {
-        if (res.error) { toast("Error updating: " + res.error.message, "circle-alert"); return; }
-        toast("Match updated successfully!"); closeM(); loadAll(); 
-      });
-    } else {
-      db.from('matches').insert(matchData).then(function(res) {
-        if (res.error) { toast("Error saving match: " + res.error.message, "circle-alert"); return; }
-        toast("Match published to website!"); closeM(); loadAll(); 
-      });
-    }
-  }
-  else if(id==="sw"){var m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!w)return;m.win=w.value;m.st="settled";var n=Math.round(m.n*(w.value==="void"?0:(w.value==="a"?m.pa:100-m.pa))/100);act("Match settled: "+m.a+" vs "+m.b+" ("+(w.value==="void"?"void, refunds issued":n+" winners rewarded")+")");S.sent.unshift({t:"Result declared",m:m.a+" vs "+m.b+" has been settled.",aud:"Participants",ty:"Result",time:now(),r:m.n});closeM();toast("Winner saved. Participants notified")}
-  else if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
-  else if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});closeM();toast("Coupon created")}
-  else if(id==="nf"){
-    if(!CPS.t||!CPS.m){toast("Add a title and message","circle-alert");return}
-    var targetUser = (CPS.aud === "one") ? CPS.uid : null; 
-    db.from('notifications').insert({ title: CPS.t, body: CPS.m, icon: CPS.ty === 'Alert' ? 'alert' : 'bell', user_id: targetUser }).then(function(res) {
-      if (res.error) { toast("Error sending: " + res.error.message, "circle-alert"); return; }
-      toast("Notification sent!"); CPS.t=""; CPS.m=""; render();
-    });
-  }
-  save();render();
-});
-
-document.addEventListener("click",function(e){
-var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-reopen],[data-dm],[data-uv],[data-un],[data-uw],[data-ub],[data-wf],[data-wd],[data-ct],[data-close],[data-tk],[data-kf],[data-manage],[data-editm]");if(!t)return;var d=t.dataset;
-  if(d.close!==undefined){closeM();return}
-  if(d.p){S.page=d.p;window.scrollTo(0,0)}
-  else if(d.manage){manageMatch(d.manage);return}
-  else if(d.a==="eye")EYE=!EYE;
-  else if(d.a==="theme"){var h=document.documentElement,cur=h.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");h.setAttribute("data-theme",cur==="dark"?"light":"dark")}
-  else if(d.a==="out"||d.a==="logout"){doLogout();return}
-  else if(d.a==="refresh"){toast("Refreshing…","refresh-cw");loadAll();return}
-  else if(d.a==="reset"){localStorage.removeItem("pxa1");var adm=S.adm;S=JSON.parse(D1);S.adm=adm;toast("Demo data restored");loadAll()}
-  else if(d.a==="addm"){ openMatchModal(); return; }
-  else if(d.editm){ openMatchModal(MM(d.editm)); return; }
-  else if(d.a==="addc"){modal('<h3>Create coupon</h3><form id="cf">'+fld("Reward name","cn")+'<div class="fg">'+fld("Code","cc")+fld("Benefit","cd")+'</div>'+fld("Total available","ct","100","number")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Create</button></div></form>');return}
-  else if(d.win){var m=MM(d.win);MOD=m.id;modal('<h3>Declare winner</h3><small>'+esc(m.l)+'. This settles all '+num(m.n)+' predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> '+esc(m.a)+'</label><label class="opt"><input type="radio" name="w" value="b"> '+esc(m.b)+'</label><label class="opt"><input type="radio" name="w" value="void"> Void match (refund entries)</label><div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>');return}
-  else if(d.cl){ MM(d.cl).st="closed"; act("Predictions closed: "+MM(d.cl).a+" vs "+MM(d.cl).b); toast("Predictions closed"); save(); render(); }
-   else if(d.reopen){ db.from('matches').update({ closes_at: new Date(Date.now() + 86400000).toISOString() }).eq('id', d.reopen).then(function(r) { if(r.error) return toast(r.error.message,"circle-alert"); toast("Match reopened!"); loadAll(); }); return; }
-  else if(d.editm){ openMatchModal(MM(d.editm)); return; }
-  else if(d.dm){
-    if(!confirm("Are you sure you want to permanently delete this match?")) return;
-    db.from('matches').delete().eq('id', d.dm).then(function(r) {
-      if (r.error) { toast("Error deleting: " + r.error.message, "circle-alert"); return; }
-      toast("Match deleted successfully", "check");
-      loadAll();
-    });
-  }
-else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
-  else if(d.un){CPS.aud="one";CPS.uid=d.un;S.page="not"}
-  else if(d.uw){var u=U(d.uw);MOD=u.id;modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');return}
-  else if(d.ub){doBlock(d.ub);return}
-  else if(d.wf)WF=d.wf;
-  else if(d.kf)TKF=d.kf;
-  else if(d.tk){openTicket(d.tk);return}
-  else if(d.a==="closeticket"){saveTkm(null);render();return}
-  else if(d.a==="notify-user"){
-      var u=U(d.v);
-      modal(`<h3>Notify ${esc(u.name)}</h3><form id="modal-notif-form">
-          <input type="hidden" id="mn-userid" value="${u.id}">
-          <label class="f">Title<input class="in" id="mn-title" required></label>
-          <label class="f">Message<textarea class="in" id="mn-msg" rows="3" required></textarea></label>
-          <div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button type="submit" class="btn">Send</button></div>
-      </form>`);
-      return;
-  }
-  else if(d.a==="wallet-user"){
-      var u=U(d.v); MOD=u.id;
-      modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');
-      return;
-  }
-  else if(d.wd){var p=d.wd.split("|");doWd(p[0],p[1]);return}
-  else if(d.ct!==undefined){S.cp[d.ct].on=S.cp[d.ct].on?0:1}
-  save();render();
-});
-
-var BOOTED=0;
-async function enter(session){
-  var em = String(session.user.email || "").toLowerCase();
-  
-  if(ADMIN_EMAILS.length && ADMIN_EMAILS.map(function(x){return x.toLowerCase()}).indexOf(em) < 0){
-    toast("This Google account is not an admin","circle-alert");
-    await db.auth.signOut();
-    return;
-  }
-  
-  if(BOOTED && LOGIN) return;
-  BOOTED = 1; 
-  LOGIN = 1; 
-  S.adm = session.user.email;
-  
-  cleanUrl();
-  render(); 
-  
+var hp = async function(s) {
   try {
-    await loadAll(); 
-    initAdminRealtime(); 
-    if(TKM) openTicket(TKM);
-  } catch (e) {
-    console.error("Dashboard load error:", e);
-    toast("Loaded with some errors: " + e.message, "circle-alert");
+    var b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("cp:" + s));
+    return [...new Uint8Array(b)].map(function(x){ return x.toString(16).padStart(2, "0"); }).join("");
+  } catch(e) {
+    var h = 5381;
+    for (var c of ("cp:" + s)) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0;
+    return "x" + h;
+  }
+};
+
+var S = {
+  users: [],
+  matches: [],
+  wds: [],
+  txs: [],
+  tickets: [],
+  coupons: [],
+  notifs: [],
+  audit: [],
+  cfg: {
+    maint: 0,
+    regOpen: 1,
+    manualWd: 1,
+    minDep: 50,
+    minWd: 100,
+    banner: "Welcome to CricPulse! Instant UPI payouts are operational."
+  }
+};
+
+var U = {
+  route: "dash",
+  nav: 0,
+  dr: null,
+  q: "",
+  uf: "all",
+  tf: "open",
+  tp: "all",
+  wf: "pending",
+  wt: "w",
+  xf: "all",
+  eye: false
+};
+
+var ttl = function(m){ return m.question || (m.team_a + " vs " + m.team_b); };
+var pendW = function(){ return S.wds.filter(function(w){ return w.status === "pending"; }); };
+var kpi = function(l, v, s, isMoney) {
+  return '<div class="card kpi"><small>' + l + '</small><b class="' + (isMoney && !U.eye ? 'bl' : '') + '">' + v + '</b><span>' + (s || "&nbsp;") + '</span></div>';
+};
+var chips = function(a, cur, L) {
+  return '<div class="chips">' + L.map(function(item){
+    return '<button class="chip' + (cur === item[0] ? " on" : "") + '" data-a="' + a + '" data-v="' + item[0] + '">' + item[1] + '</button>';
+  }).join("") + '</div>';
+};
+var row = function(cols, inner, attr) {
+  return '<' + (attr ? "button" : "div") + ' class="r" style="--m:' + cols[0] + ';--c:' + cols[1] + '" ' + (attr || "") + '>' + inner + '</' + (attr ? "button" : "div") + '>';
+};
+
+var log = function(a, t) {
+  S.audit.unshift({ ts: Date.now(), a: a, t: t, by: "Admin" });
+  S.audit = S.audit.slice(0, 150);
+};
+
+async function loadAll() {
+  if (!db) return;
+  try {
+    var [uRes, wRes, wdRes, mRes, pRes, tkRes, txRes, cpRes, nRes] = await Promise.all([
+      db.from("users").select("*, wallet(balance, points)").order("created_at", { ascending: false }),
+      db.from("wallet").select("*"),
+      db.from("withdrawal_requests").select("*").order("created_at", { ascending: false }),
+      db.from("matches").select("*").order("created_at", { ascending: false }),
+      db.from("predictions").select("*"),
+      db.from("support_tickets").select("*, ticket_messages(*)").order("created_at", { ascending: false }),
+      db.from("transactions").select("*").order("created_at", { ascending: false }).limit(200),
+      db.from("coupons").select("*").order("created_at", { ascending: false }),
+      db.from("notifications").select("*").order("created_at", { ascending: false }).limit(50)
+    ]);
+
+    if (uRes.data) {
+      S.users = uRes.data.map(function(u){
+        var wal = Array.isArray(u.wallet) ? (u.wallet[0] || {}) : (u.wallet || {});
+        return {
+          id: u.id,
+          name: u.full_name || u.email.split("@")[0],
+          email: u.email,
+          city: u.city || "Unknown",
+          status: u.status || "active",
+          kyc: u.kyc_verified ? "verified" : "none",
+          bal: Number(wal.balance != null ? wal.balance : (u.wallet_balance || 0)),
+          xp: Number(wal.points || 0),
+          joined: u.created_at,
+          last: u.created_at,
+          picks: 0,
+          wins: 0
+        };
+      });
+    }
+
+    if (pRes.data) {
+      var userMap = {};
+      pRes.data.forEach(function(p){
+        userMap[p.user_id] = (userMap[p.user_id] || 0) + 1;
+      });
+      S.users.forEach(function(u){ u.picks = userMap[u.id] || 0; });
+    }
+
+    if (wdRes.data) S.wds = wdRes.data;
+    if (mRes.data) S.matches = mRes.data;
+    if (tkRes.data) {
+      S.tickets = tkRes.data.map(function(t){
+        var msgs = (t.ticket_messages || []).sort(function(a, b){ return new Date(a.created_at) - new Date(b.created_at); });
+        var unread = msgs.filter(function(m){ return m.sender === "user" && !m.is_read; }).length;
+        var u = S.users.find(function(x){ return x.id === t.user_id; });
+        return {
+          id: t.id,
+          user_id: t.user_id,
+          subject: t.subject || "Support Request",
+          user: u ? u.name : "Member " + String(t.user_id).slice(0, 6),
+          email: u ? u.email : "user@cricpulse.in",
+          cat: "General",
+          prio: t.priority || "medium",
+          status: t.status || "open",
+          rating: t.rating || 0,
+          close_note: t.close_note || "",
+          created: t.created_at,
+          updated: msgs.length ? msgs[msgs.length - 1].created_at : t.created_at,
+          unread: unread,
+          msgs: msgs.map(function(m){
+            return {
+              id: m.id,
+              f: (m.sender === "admin" || m.sender === "staff") ? "admin" : (m.sender === "note" ? "note" : "user"),
+              text: m.message,
+              ts: m.created_at
+            };
+          })
+        };
+      });
+    }
+    if (txRes.data) S.txs = txRes.data;
+    if (cpRes.data) S.coupons = cpRes.data;
+    if (nRes.data) {
+      S.notifs = nRes.data.map(function(n){
+        return {
+          id: n.id,
+          t: n.title,
+          d: n.body,
+          aud: n.user_id ? "Individual User" : "All Users",
+          n: n.user_id ? 1 : S.users.length,
+          ts: n.created_at
+        };
+      });
+    }
+    render();
+  } catch(e) {
+    console.error("Data load failed", e);
+    toast("Database sync error", "alert-circle");
   }
 }
 
-async function boot(){
-  if(!db){render();return}
-  db.auth.onAuthStateChange(function(ev,session){
-    if(session&&(ev==="SIGNED_IN"||ev==="INITIAL_SESSION")){setTimeout(function(){enter(session)},0)}
-    else if(ev==="SIGNED_OUT"){LOGIN=0;BOOTED=0;render()}
-  });
-  try{
-    var s=await db.auth.getSession();
-    if(s.data&&s.data.session)enter(s.data.session);
-    else render();
-  }catch(e){render()}
-}
-function initAdminRealtime() {
-  db.channel('admin-users-update')
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, (payload) => {
-        const u = S.users.find(x => x.id === payload.new.id);
-        if(u) { 
-            u.name = payload.new.full_name || payload.new.email; 
-            save(); render(); 
-        }
-    }).subscribe();
-
-  db.channel('admin-preds')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'predictions' }, (payload) => {
-      if (document.querySelector('.ov') && document.getElementById('admin-preds-list')) {
-        loadAll(); 
-      }
-    }).subscribe();
+function initRealtime() {
   if (!db) return;
-  db.channel('admin-tickets')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, () => { loadAll(); })
+  db.channel("admin-realtime")
+    .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, function(){ loadAll(); })
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "ticket_messages" }, function(pl){
+      var t = S.tickets.find(function(x){ return x.id === pl.new.ticket_id; });
+      if (t) {
+        t.msgs.push({
+          id: pl.new.id,
+          f: pl.new.sender === "admin" ? "admin" : "user",
+          text: pl.new.message,
+          ts: pl.new.created_at
+        });
+        if (pl.new.sender === "user") t.unread++;
+        render();
+        var cs = $("chat-stream");
+        if (cs) cs.scrollTop = cs.scrollHeight;
+      } else {
+        loadAll();
+      }
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "withdrawal_requests" }, function(){ loadAll(); })
+    .on("postgres_changes", { event: "*", schema: "public", table: "wallet" }, function(){ loadAll(); })
     .subscribe();
-  
-  db.channel('admin-messages')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
-      const newMsg = payload.new;
-      if (S.page === 'sup') {
-        if (TKM === newMsg.ticket_id) {
-          fetchMsgs(TKM).then(function(r) { 
-            if(!r.error) { 
-              TK(TKM).msgs = r.data.map(mapMsg); 
-              render(); 
-              setTimeout(function(){ 
-                  var el = document.getElementById('admin-chat-msgs'); 
-                  if(el) el.scrollTop = el.scrollHeight; 
-                  var inp = document.getElementById('admin-reply-input');
-                  if(inp) inp.focus();
-              }, 50);
-            } 
-          });
-        } else {
-          var t = S.tickets.find(x => x.id === newMsg.ticket_id);
-          if (t) {
-            t.lastMsgDate = new Date(newMsg.created_at);
-            t.lastMsgTimeFormatted = t.lastMsgDate.toLocaleTimeString("en-IN", {hour: '2-digit', minute:'2-digit', hour12: true});
-            if (newMsg.sender === 'user') t.unread = (t.unread || 0) + 1;
-            render();
-          }
-        }
-      }
-    }).subscribe();
-
-  db.channel('admin-wallets')
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'wallet' }, (payload) => {
-      const user = S.users.find(u => u.id === payload.new.user_id);
-      if (user && user.wal !== payload.new.balance) {
-        user.wal = payload.new.balance;
-        save();
-        if (S.page === 'users' || S.page === 'dash') render();
-      }
-    }).subscribe();
 }
 
-// Update time ago strings dynamically every 30 seconds if on the support page
-setInterval(function() {
-  if (typeof LOGIN !== 'undefined' && LOGIN && S.page === 'sup' && !TKM) {
-    if (S.tickets && S.tickets.length > 0) {
+var NAV = [
+  ["Overview", [["dash", "Dashboard", "layout-dashboard"], ["reports", "Reports & CSV", "bar-chart-3"]]],
+  ["Operations", [["users", "User Profiles", "users"], ["markets", "Match Fixtures", "trophy"], ["wallet", "Payouts & Ledger", "wallet"], ["coupons", "Vouchers & Codes", "gift"]]],
+  ["Engagement", [["notify", "Push Broadcasts", "bell"], ["tickets", "Support Desk", "headset"]]],
+  ["System", [["settings", "Configuration", "sliders"], ["audit", "Audit Trail", "file-text"]]]
+];
+
+var META = {
+  dash: ["Dashboard", "Platform operations, real-time balances, and pending actions."],
+  reports: ["Reports & Data", "Export ledger CSV files and view distribution stats."],
+  users: ["User Management", "View balances, adjust credits, review KYC, and moderate."],
+  markets: ["Matches & Fixtures", "Create matches, sync CricAPI, close betting, and settle."],
+  wallet: ["Wallet & Withdrawals", "Approve or reject withdrawal requests and monitor flows."],
+  coupons: ["Vouchers & Rewards", "Manage promotional codes and track redemptions."],
+  notify: ["Notifications", "Send targeted or sitewide announcements directly."],
+  tickets: ["Support Chat Desk", "Live ticket chat, canned responses, ratings, and resolution."],
+  settings: ["Site Controls", "Configure platform operational flags and manage admin credentials."],
+  audit: ["Audit Records", "Chronological history of administrative actions."]
+};
+
+function dash() {
+  var pw = pendW(), ot = S.tickets.filter(function(t){ return t.status === "open" || t.status === "pending"; });
+  var totalDep = S.txs.filter(function(t){ return t.type === "deposit" || t.type === "credit"; }).reduce(function(a, t){ return a + Number(t.amount || 0); }, 0);
+  var totalBal = S.users.reduce(function(a, u){ return a + u.bal; }, 0);
+  var kycPend = S.users.filter(function(u){ return u.kyc === "pending"; }).length;
+
+  return `
+    <div class="kpis">
+      ${kpi("Total Platform Users", S.users.length, "Registered members")}
+      ${kpi("System Balances Held", inr(totalBal), "User wallet pool", true)}
+      ${kpi("Pending Withdrawals", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
+      ${kpi("Open Inquiries", ot.length, S.tickets.filter(function(t){ return t.unread > 0; }).length + " unread responses")}
+    </div>
+
+    <div class="two">
+      <div class="card">
+        <div class="bt"><h3>Action Items</h3><span class="badge b-ac">Urgent</span></div>
+        <div class="ln"><span>Pending Payout Requests</span><div class="row">${bd(pw.length, pw.length ? "b-am" : "b-ok")}<button class="btn sm" data-a="go" data-v="wallet">Review</button></div></div>
+        <div class="ln"><span>Open Support Tickets</span><div class="row">${bd(ot.length, ot.length ? "b-no" : "b-ok")}<button class="btn sm" data-a="go" data-v="tickets">Respond</button></div></div>
+        <div class="ln"><span>Active Match Markets</span><div class="row">${bd(S.matches.filter(function(m){ return m.status !== "settled"; }).length, "b-ok")}<button class="btn sm" data-a="go" data-v="markets">Manage</button></div></div>
+        <div class="ln"><span>Maintenance Shield</span><div class="row">${S.cfg.maint ? bd("Enabled", "b-no") : bd("Disabled", "b-ok")}<button class="btn sm" data-a="go" data-v="settings">Toggle</button></div></div>
+      </div>
+      <div class="card">
+        <h3>Recent Administrative Actions</h3>
+        ${S.audit.length ? S.audit.slice(0, 5).map(function(a){
+          return `<div class="ln"><div class="grow"><div class="b ell">${esc(a.a)}</div><div class="mut s12">${esc(a.t)} · ${esc(a.by)}</div></div><span class="mut s12">${ago(a.ts)}</span></div>`;
+        }).join("") : '<div class="empty">No recent action logs.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function reports() {
+  return `
+    <div class="card">
+      <h3>Data Archival & Exports (Supabase Direct)</h3>
+      <p class="mut s12" style="margin-bottom:14px">Generate real-time CSV exports directly from your production database records.</p>
+      <div class="row" style="flex-wrap:wrap">
+        <button class="btn" data-a="exp" data-v="users"><i data-lucide="download"></i> Export Users (${S.users.length})</button>
+        <button class="btn" data-a="exp" data-v="txs"><i data-lucide="download"></i> Export Transactions (${S.txs.length})</button>
+        <button class="btn" data-a="exp" data-v="tickets"><i data-lucide="download"></i> Export Support Tickets (${S.tickets.length})</button>
+        <button class="btn" data-a="exp" data-v="matches"><i data-lucide="download"></i> Export Matches (${S.matches.length})</button>
+      </div>
+    </div>
+  `;
+}
+
+function users_() {
+  var q = U.q.toLowerCase();
+  var L = S.users.filter(function(u){
+    return (U.uf === "all" || u.status === U.uf) && (u.name + u.email + u.id).toLowerCase().includes(q);
+  });
+
+  return `
+    <div class="tool">
+      <div class="srch">
+        <i data-lucide="search"></i>
+        <input class="inp" id="q" placeholder="Search user name, email, or UUID..." value="${esc(U.q)}">
+      </div>
+    </div>
+    ${chips("uf", U.uf, [["all", "All Members"], ["active", "Active"], ["blocked", "Blocked"]])}
+    <div style="height:10px"></div>
+    <div class="list">
+      <div class="r rh" style="--c:2fr 1.2fr 90px 90px 80px 30px">
+        <span>User / Contact</span>
+        <span>City</span>
+        <span>Balance</span>
+        <span>XP</span>
+        <span>Status</span>
+        <span></span>
+      </div>
+      ${L.length ? L.map(function(u){
+        return row(["1fr auto", "2fr 1.2fr 90px 90px 80px 30px"], `
+          <div class="row" style="min-width:0">
+            <span class="av">${esc(u.name.charAt(0))}</span>
+            <div class="grow">
+              <div class="b ell">${esc(u.name)}</div>
+              <div class="mut s12 ell">${esc(u.email)}</div>
+            </div>
+          </div>
+          <span class="hm mut ell">${esc(u.city)}</span>
+          <span class="b ${!U.eye ? 'bl' : ''}">${inr(u.bal)}</span>
+          <span class="hm">${u.xp} pts</span>
+          <span>${sb(u.status)}</span>
+          <span class="hm"><i data-lucide="chevron-right"></i></span>
+        `, `data-a="user" data-v="${u.id}"`);
+      }).join("") : '<div class="empty">No matching users found in database.</div>'}
+    </div>
+  `;
+}
+
+function markets_() {
+  var q = U.q.toLowerCase();
+  var L = S.matches.filter(function(m){
+    return ttl(m).toLowerCase().includes(q) || (m.league || "").toLowerCase().includes(q);
+  });
+
+  return `
+    <div class="tool">
+      <div class="srch">
+        <i data-lucide="search"></i>
+        <input class="inp" id="q" placeholder="Search fixtures, leagues..." value="${esc(U.q)}">
+      </div>
+      <button class="btn p" data-a="market" data-v="new"><i data-lucide="plus"></i> Create Match</button>
+    </div>
+    <div class="list">
+      <div class="r rh" style="--c:2.5fr 1.2fr 90px 90px 100px 30px">
+        <span>Match / Teams</span>
+        <span>League</span>
+        <span>Odds (A/B)</span>
+        <span>Crowd A</span>
+        <span>Status</span>
+        <span></span>
+      </div>
+      ${L.length ? L.map(function(m){
+        return row(["1fr auto", "2.5fr 1.2fr 90px 90px 100px 30px"], `
+          <div class="grow">
+            <div class="b ell">${esc(ttl(m))}</div>
+            <div class="mut s12 ell">${m.team_a} vs ${m.team_b}</div>
+          </div>
+          <span class="hm mut ell">${esc(m.league)}</span>
+          <span class="hm">${m.odds_a || 1.85} / ${m.odds_b || 2.10}</span>
+          <span class="hm">${m.crowd_a || 50}%</span>
+          <span>${sb(m.status || "open")}</span>
+          <span class="hm"><i data-lucide="chevron-right"></i></span>
+        `, `data-a="market" data-v="${m.id}"`);
+      }).join("") : '<div class="empty">No matches found.</div>'}
+    </div>
+  `;
+}
+
+function wallet() {
+  var L = S.wds.filter(function(w){ return U.wf === "all" || w.status === U.wf; });
+  var pw = pendW();
+
+  return `
+    <div class="kpis">
+      ${kpi("Pending Review", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
+      ${kpi("Approved Total", S.wds.filter(function(w){ return w.status === "approved" || w.status === "completed"; }).length, "Disbursed")}
+      ${kpi("Rejected Total", S.wds.filter(function(w){ return w.status === "rejected"; }).length, "Returned to user")}
+    </div>
+    ${chips("wt", U.wt, [["w", "Withdrawal Requests"], ["x", "Transactions Ledger"]])}
+    <div style="height:10px"></div>
+    ${U.wt === "w" ? `
+      ${chips("wf", U.wf, [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"], ["all", "All"]])}
+      <div style="height:10px"></div>
+      <div class="list">
+        <div class="r rh" style="--c:1.4fr 100px 1.2fr 90px 180px">
+          <span>User / ID</span>
+          <span>Amount</span>
+          <span>Payment Account</span>
+          <span>Status</span>
+          <span style="text-align:right">Action</span>
+        </div>
+        ${L.length ? L.map(function(w){
+          var u = S.users.find(function(x){ return x.id === w.user_id; });
+          var uName = u ? u.name : "User " + String(w.user_id).slice(0, 6);
+          return row(["1fr auto", "1.4fr 100px 1.2fr 90px 180px"], `
+            <div class="grow">
+              <div class="b ell">${esc(uName)}</div>
+              <div class="mut s12">${String(w.id).slice(0, 8)} · ${ago(w.created_at)}</div>
+            </div>
+            <b class="${!U.eye ? 'bl' : ''}">${inr(w.amount)}</b>
+            <span class="hm mut ell">${esc(w.account || w.method || "UPI")}</span>
+            <span class="hm">${sb(w.status)}</span>
+            <div class="row" style="justify-content:flex-end">
+              ${w.status === "pending" ? `
+                <button class="btn sm p" data-a="wok" data-v="${w.id}">Approve</button>
+                <button class="btn sm d" data-a="wno" data-v="${w.id}">Reject</button>
+              ` : `<span>${sb(w.status)}</span>`}
+            </div>
+          `);
+        }).join("") : '<div class="empty">No requests match this filter.</div>'}
+      </div>
+    ` : `
+      <div class="list">
+        <div class="r rh" style="--c:1.4fr 100px 110px 1.4fr">
+          <span>User / Ref</span>
+          <span>Type</span>
+          <span>Amount</span>
+          <span>Description</span>
+        </div>
+        ${S.txs.slice(0, 50).map(function(t){
+          var u = S.users.find(function(x){ return x.id === t.user_id; });
+          return row(["1fr auto", "1.4fr 100px 110px 1.4fr"], `
+            <div class="grow">
+              <div class="b ell">${esc(u ? u.name : String(t.user_id).slice(0, 6))}</div>
+              <div class="mut s12">${String(t.id).slice(0, 8)} · ${ago(t.created_at)}</div>
+            </div>
+            <span class="hm" style="text-transform:capitalize">${t.type}</span>
+            <b class="${t.type === 'withdraw' ? 'no' : 'ok'} ${!U.eye ? 'bl' : ''}">${t.type === 'withdraw' ? '-' : '+'}${inr(t.amount)}</b>
+            <span class="hm mut ell">${esc(t.description || "-")}</span>
+          `);
+        }).join("") || '<div class="empty">No transactions found.</div>'}
+      </div>
+    `}
+  `;
+}
+
+function coupons() {
+  return `
+    <div class="tool">
+      <button class="btn p" data-a="coupon" data-v="new"><i data-lucide="plus"></i> Add Coupon</button>
+    </div>
+    <div class="list">
+      <div class="r rh" style="--c:90px 2fr 1.2fr 100px 80px">
+        <span>Discount</span>
+        <span>Title & Code</span>
+        <span>Category</span>
+        <span>Claimed</span>
+        <span></span>
+      </div>
+      ${S.coupons.map(function(c){
+        return row(["auto 1fr", "90px 2fr 1.2fr 100px 80px"], `
+          <span class="badge b-am">${esc(c.value)}</span>
+          <div class="grow">
+            <div class="b ell">${esc(c.title)}</div>
+            <div class="mut s12 font-mono">${esc(c.code)}</div>
+          </div>
+          <span class="hm mut">${esc(c.category || "General")}</span>
+          <span class="hm">${c.is_claimed ? bd("Claimed", "b-am") : bd("Available", "b-ok")}</span>
+          <button class="btn sm d" data-a="cdel" data-v="${c.id}"><i data-lucide="trash-2"></i></button>
+        `);
+      }).join("")}
+    </div>
+  `;
+}
+
+function notify() {
+  return `
+    <div class="two">
+      <div class="card">
+        <h3>Broadcast Push Announcement</h3>
+        <div class="fld">
+          <label for="nt">Notification Title</label>
+          <input class="inp" id="nt" maxlength="70" placeholder="e.g. Special odds for today's match!">
+        </div>
+        <div class="fld">
+          <label for="nd">Message Body</label>
+          <textarea class="inp" id="nd" maxlength="240" placeholder="Type notification content..."></textarea>
+        </div>
+        <div class="fld">
+          <label for="na">Target</label>
+          <select class="inp" id="na">
+            <option value="all">All registered users</option>
+            ${S.users.map(function(u){ return `<option value="${u.id}">${esc(u.name)} (${esc(u.email)})</option>`; }).join("")}
+          </select>
+        </div>
+        <div class="err" id="er"></div>
+        <button class="btn p" data-a="nsend"><i data-lucide="send"></i> Dispatch Notification</button>
+      </div>
+
+      <div class="card">
+        <h3>Broadcast History</h3>
+        ${S.notifs.length ? S.notifs.map(function(n){
+          return `<div class="ln"><div class="grow"><b class="ell" style="display:block">${esc(n.t)}</b><span class="mut s12 ell" style="display:block">${esc(n.d)}</span><span class="mut s11">${esc(n.aud)}</span></div><span class="mut s12">${ago(n.ts)}</span></div>`;
+        }).join("") : '<div class="empty">No notifications sent yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function tickets() {
+  var q = U.q.toLowerCase();
+  var L = S.tickets.filter(function(t){
+    return (U.tf === "all" || t.status === U.tf) && (U.tp === "all" || t.prio === U.tp) && (t.subject + t.user + t.id).toLowerCase().includes(q);
+  });
+
+  return `
+    <div class="tool">
+      <div class="srch">
+        <i data-lucide="search"></i>
+        <input class="inp" id="q" placeholder="Search ticket subject, user name, or ID..." value="${esc(U.q)}">
+      </div>
+      <select class="inp" style="width:auto" id="tpf" data-a="tpf">
+        <option value="all">All Priorities</option>
+        ${["high", "medium", "low"].map(function(p){ return `<option value="${p}" ${U.tp === p ? "selected" : ""}>${p.charAt(0).toUpperCase() + p.slice(1)} Priority</option>`; }).join("")}
+      </select>
+    </div>
+    ${chips("tf", U.tf, [["open", "Open"], ["pending", "Pending"], ["resolved", "Resolved"], ["closed", "Closed"], ["all", "All"]])}
+    <div style="height:10px"></div>
+    <div class="list">
+      <div class="r rh" style="--c:80px 2.2fr 1.2fr 90px 90px 90px 80px 30px">
+        <span>Ticket ID</span>
+        <span>Subject</span>
+        <span>Customer</span>
+        <span>Priority</span>
+        <span>Status</span>
+        <span>Rating</span>
+        <span>Updated</span>
+        <span></span>
+      </div>
+      ${L.length ? L.map(function(t){
+        return row(["1fr auto", "80px 2.2fr 1.2fr 90px 90px 90px 80px 30px"], `
+          <span class="hm mut">${String(t.id).slice(0, 8)}</span>
+          <div class="grow">
+            <div class="b ell">${t.unread ? '<span class="unread-dot"></span>' : ''}${esc(t.subject)}</div>
+            <div class="mut s12 ell">${esc(t.user)} · ${ago(t.updated)}</div>
+          </div>
+          <span class="hm ell">${esc(t.user)}</span>
+          <span class="hm">${sb(t.prio)}</span>
+          <span>${sb(t.status)}</span>
+          <span class="hm">${t.rating ? "★".repeat(t.rating) : '<span class="mut">None</span>'}</span>
+          <span class="hm mut s12">${ago(t.updated)}</span>
+          <span class="hm"><i data-lucide="chevron-right"></i></span>
+        `, `data-a="ticket" data-v="${t.id}"`);
+      }).join("") : '<div class="empty">No tickets match this view.</div>'}
+    </div>
+  `;
+}
+
+function settings() {
+  return `
+    <div class="two">
+      <div class="card">
+        <h3>Platform Configuration</h3>
+        <div class="ln"><div><b>Maintenance Mode</b><div class="mut s12">Temporarily close website markets for maintenance</div></div><label class="sw"><input type="checkbox" id="cfg-maint" ${S.cfg.maint ? "checked" : ""}><i data-a="sw-maint"></i></label></div>
+        <div class="ln"><div><b>User Registrations</b><div class="mut s12">Allow new users to sign up</div></div><label class="sw"><input type="checkbox" id="cfg-reg" ${S.cfg.regOpen ? "checked" : ""}><i data-a="sw-reg"></i></label></div>
+        <div class="fld" style="margin-top:14px"><label for="cfg-banner">Sitewide Announcement Banner</label><input class="inp" id="cfg-banner" value="${esc(S.cfg.banner)}"></div>
+        <button class="btn p" data-a="save-cfg"><i data-lucide="save"></i> Save System Config</button>
+      </div>
+
+      <div class="card">
+        <h3>Admin Access & Master Passcode</h3>
+        <p class="mut s12" style="margin-bottom:12px">Update your administrative master passcode.</p>
+        <div class="fld"><label for="p1">Current Passcode</label><input class="inp" id="p1" type="password" placeholder="Current passcode"></div>
+        <div class="fld"><label for="p2">New Passcode (Min 6 chars)</label><input class="inp" id="p2" type="password" placeholder="New passcode"></div>
+        <div class="err" id="er"></div>
+        <button class="btn" data-a="pw"><i data-lucide="key"></i> Update Passcode</button>
+      </div>
+    </div>
+  `;
+}
+
+function audit() {
+  return `
+    <div class="list">
+      <div class="r rh" style="--c:2.5fr 1.2fr 100px 140px">
+        <span>Action</span>
+        <span>Category</span>
+        <span>Author</span>
+        <span>Timestamp</span>
+      </div>
+      ${S.audit.length ? S.audit.map(function(a){
+        return row(["1fr auto", "2.5fr 1.2fr 100px 140px"], `
+          <div class="grow"><div class="b ell">${esc(a.a)}</div><div class="mut s12">${esc(a.t)}</div></div>
+          <span class="hm mut">${esc(a.t)}</span>
+          <span class="hm mut">${esc(a.by)}</span>
+          <span class="mut s12">${ago(a.ts)}</span>
+        `);
+      }).join("") : '<div class="empty">No actions logged yet.</div>'}
+    </div>
+  `;
+}
+
+var PAGES = {
+  dash: dash, reports: reports, users: users_, markets: markets_, wallet: wallet, coupons: coupons, notify: notify, tickets: tickets, settings: settings, audit: audit
+};
+
+function dhead(t, x) {
+  return `
+    <header>
+      <button class="ib" data-a="dx" aria-label="Close"><i data-lucide="x"></i></button>
+      <div class="grow"><b class="ell" style="display:block">${t}</b>${x ? `<span class="mut s12">${x}</span>` : ""}</div>
+    </header>
+  `;
+}
+
+function drawer() {
+  var d = U.dr;
+  if (!d) return "";
+  var h = "";
+
+  if (d.t === "user") {
+    var u = S.users.find(function(x){ return x.id === d.id; });
+    if (!u) return "";
+    var tx = S.txs.filter(function(t){ return t.user_id === u.id; }).slice(0, 5);
+
+    h = dhead(esc(u.name), esc(u.email) + " · " + u.id) + `
+      <div class="bd stack">
+        <div class="row">${sb(u.status)}${bd("KYC: " + u.kyc, u.kyc === "verified" ? "b-ok" : "b-am")}</div>
+        <div class="g2">
+          <div class="card kpi"><small>Wallet Balance</small><b class="${!U.eye ? 'bl' : ''}">${inr(u.bal)}</b></div>
+          <div class="card kpi"><small>Reward XP</small><b>${u.xp} pts</b></div>
+          <div class="card kpi"><small>Predictions</small><b>${u.picks}</b></div>
+          <div class="card kpi"><small>City</small><b>${esc(u.city)}</b></div>
+        </div>
+
+        <div class="card">
+          <h3>Balance Adjustment</h3>
+          <div class="g2">
+            <div class="fld"><label for="ba">Delta Amount (+ or -)</label><input class="inp" id="ba" type="number" placeholder="e.g. 500 or -200"></div>
+            <div class="fld"><label for="br">Reason</label><input class="inp" id="br" placeholder="Manual bonus / correction"></div>
+          </div>
+          <div class="err" id="er"></div>
+          <button class="btn sm p" data-a="uadj" data-v="${u.id}">Apply Adjustment</button>
+        </div>
+
+        <div class="card">
+          <h3>User Moderation</h3>
+          <div class="row">
+            <button class="btn sm ${u.status === 'active' ? 'd' : 'k'}" data-a="ublock" data-v="${u.id}">${u.status === 'active' ? 'Block Account' : 'Unblock Account'}</button>
+            <button class="btn sm" data-a="ukyc" data-v="${u.id}">${u.kyc === 'verified' ? 'Revoke KYC' : 'Verify KYC'}</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent Transactions</h3>
+          ${tx.length ? tx.map(function(t){
+            return `<div class="ln"><div><div class="b" style="text-transform:capitalize">${t.type}</div><div class="mut s12">${ago(t.created_at)}</div></div><b class="${t.type === 'withdraw' ? 'no' : 'ok'} ${!U.eye ? 'bl' : ''}">${t.type === 'withdraw' ? '-' : '+'}${inr(t.amount)}</b></div>`;
+          }).join("") : '<div class="mut s12">No transactions recorded.</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  if (d.t === "market") {
+    var isNew = d.id === "new";
+    var m = isNew ? { id: "", category: "cricket", league: "", team_a: "", team_b: "", question: "", crowd_a: 50, odds_a: 1.85, odds_b: 2.10, status: "open", cricket_match_id: "" } : S.matches.find(function(x){ return x.id === d.id; });
+    if (!m) return "";
+
+    h = dhead(isNew ? "Create Fixture" : esc(ttl(m)), isNew ? "New Event" : "Status: " + m.status) + `
+      <div class="bd stack">
+        <div class="g2">
+          <div class="fld">
+            <label for="mc">Category</label>
+            <select class="inp" id="mc">
+              ${["cricket", "football", "kabaddi", "esports", "indian"].map(function(c){ return `<option value="${c}" ${m.category === c ? "selected" : ""}>${c}</option>`; }).join("")}
+            </select>
+          </div>
+          <div class="fld"><label for="ml">League / Tournament</label><input class="inp" id="ml" value="${esc(m.league)}"></div>
+        </div>
+        <div class="fld"><label for="mq">Question (Optional for Team A vs Team B)</label><input class="inp" id="mq" value="${esc(m.question || "")}"></div>
+        <div class="g2">
+          <div class="fld"><label for="ma">Team A / Option A</label><input class="inp" id="ma" value="${esc(m.team_a)}"></div>
+          <div class="fld"><label for="mb">Team B / Option B</label><input class="inp" id="mb" value="${esc(m.team_b)}"></div>
+          <div class="fld"><label for="oa">Odds Team A</label><input class="inp" id="oa" type="number" step="0.05" value="${m.odds_a || 1.85}"></div>
+          <div class="fld"><label for="ob">Odds Team B</label><input class="inp" id="ob" type="number" step="0.05" value="${m.odds_b || 2.10}"></div>
+          <div class="fld"><label for="ca">Crowd Pick % (Team A)</label><input class="inp" id="ca" type="number" value="${m.crowd_a || 50}"></div>
+          <div class="fld"><label for="api">CricAPI Match ID</label><input class="inp" id="api" value="${esc(m.cricket_match_id || "")}"></div>
+        </div>
+        <div class="err" id="er"></div>
+        <button class="btn p w" data-a="msave" data-v="${m.id || 'new'}">${isNew ? "Publish Fixture" : "Update Fixture"}</button>
+
+        ${!isNew && m.status !== "settled" ? `
+          <div class="card" style="margin-top:14px">
+            <h3>Declare Result & Settle Winnings</h3>
+            <div class="g2">
+              <button class="btn k" data-a="mset" data-v="${m.id}:A">${esc(m.team_a)} Won</button>
+              <button class="btn k" data-a="mset" data-v="${m.id}:B">${esc(m.team_b)} Won</button>
+            </div>
+            <button class="btn sm d w" style="margin-top:8px" data-a="mset" data-v="${m.id}:void">Void Match (Refund Bets)</button>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  if (d.t === "coupon") {
+    h = dhead("Create Coupon Code") + `
+      <div class="bd">
+        <div class="g2">
+          <div class="fld"><label for="cv">Discount Value</label><input class="inp" id="cv" placeholder="10% or ₹100"></div>
+          <div class="fld"><label for="cc">Category</label><input class="inp" id="cc" placeholder="Wallet / Perks"></div>
+        </div>
+        <div class="fld"><label for="ct">Title</label><input class="inp" id="ct" placeholder="e.g. Deposit Match Voucher"></div>
+        <div class="fld"><label for="cd">Code</label><input class="inp" id="cd" placeholder="CRIC2026"></div>
+        <div class="err" id="er"></div>
+        <button class="btn p w" data-a="csave">Save Coupon</button>
+      </div>
+    `;
+  }
+
+  if (d.t === "ticket") {
+    var t = S.tickets.find(function(x){ return x.id === d.id; });
+    if (!t) return "";
+
+    // Mark as read in DB if has unread
+    if (t.unread > 0 && db) {
+      db.from("ticket_messages").update({ is_read: true }).eq("ticket_id", t.id).eq("sender", "user").then(function(){});
+      t.unread = 0;
+    }
+
+    h = dhead(esc(t.subject), String(t.id).slice(0, 8) + " · " + esc(t.user)) + `
+      <div class="bd stack">
+        <div class="bt">
+          <div class="row">Status: ${sb(t.status)} | Priority: ${sb(t.prio)}</div>
+          <div class="row">
+            ${t.status === "closed" ? `<button class="btn sm k" data-a="treopen" data-v="${t.id}">Reopen</button>` : `<button class="btn sm d" data-a="tclose" data-v="${t.id}">Close Ticket</button>`}
+          </div>
+        </div>
+
+        ${t.rating ? `<div class="card" style="padding:10px 14px;background:var(--ams);color:var(--am)"><b>Customer Rating:</b> ${"★".repeat(t.rating)} (${t.rating}/5)</div>` : ""}
+        ${t.close_note ? `<div class="card" style="padding:10px 14px;background:var(--s2)"><b>Resolution Note:</b> ${esc(t.close_note)}</div>` : ""}
+
+        <div class="chat-container">
+          <div class="chat-msgs" id="chat-stream">
+            ${t.msgs.map(function(m){
+              return `<div class="msg ${m.f}">${esc(m.text)}<small>${m.f === 'admin' ? 'Support Agent' : esc(t.user)} · ${ago(m.ts)}</small></div>`;
+            }).join("")}
+          </div>
+          <div class="chat-box">
+            <select class="inp" id="tc" data-a="tcan">
+              <option value="">Insert Canned Response…</option>
+              <option>Hello! Thanks for reaching out. We are verifying this with our payments gateway.</option>
+              <option>This has been resolved on your account. Please log out and back in to see your updated balance.</option>
+              <option>Could you please provide your 12-digit UPI reference number (UTR) to locate the transaction?</option>
+            </select>
+            <textarea class="inp" id="tr" placeholder="Type response to user..."></textarea>
+            <div class="row">
+              <button class="btn p" data-a="treply" data-v="${t.id}"><i data-lucide="send"></i> Send Reply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `<div class="scrim" data-a="dx"></div><aside class="dr">${h}</aside>`;
+}
+
+function shell() {
+  var m = META[U.route] || META.dash;
+  var pw = pendW().length;
+  var ot = S.tickets.filter(function(t){ return t.unread > 0; }).length;
+  var cnt = { wallet: pw, tickets: ot };
+
+  return `
+    <div class="shell">
+      <aside class="nav ${U.nav ? 'open' : ''}">
+        <div class="brand">
+          <span class="mark"><i data-lucide="trophy"></i></span>
+          CricPulse <small>ADMIN</small>
+        </div>
+        ${NAV.map(function(g){
+          return `<div class="ng">${g[0]}</div>` + g[1].map(function(i){
+            return `<button class="nl ${U.route === i[0] ? 'on' : ''}" data-a="go" data-v="${i[0]}"><i data-lucide="${i[2]}"></i>${i[1]}${cnt[i[0]] ? `<span class="cnt">${cnt[i[0]]}</span>` : ''}</button>`;
+          }).join("");
+        }).join("")}
+        <div style="margin-top:auto;padding-top:14px">
+          <button class="nl" data-a="lock"><i data-lucide="log-out"></i> Lock Panel</button>
+        </div>
+      </aside>
+      ${U.nav ? '<div class="scrim" data-a="nav"></div>' : ''}
+      <div class="main">
+        <header class="top">
+          <button class="ib mob" data-a="nav" aria-label="Menu"><i data-lucide="menu"></i></button>
+          <div class="grow">
+            <h1>${m[0]}</h1>
+            <div class="sub">${m[1]}</div>
+          </div>
+          <button class="ib" data-a="eye" title="Toggle Private Balance Visibility"><i data-lucide="${U.eye ? 'eye' : 'eye-off'}"></i></button>
+          <button class="ib" data-a="theme" title="Toggle Theme"><i data-lucide="${document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon'}"></i></button>
+          <button class="ib" data-a="go" data-v="tickets" title="Tickets"><i data-lucide="bell"></i>${ot + pw ? `<span class="dot">${ot + pw}</span>` : ''}</button>
+          <span class="av">AD</span>
+        </header>
+        <main class="pg">${PAGES[U.route]()}</main>
+      </div>
+    </div>
+  `;
+}
+
+function authV() {
+  return `
+    <div class="login">
+      <div class="card">
+        <div class="brand" style="padding:0 0 16px;color:var(--ink)">
+          <span class="mark"><i data-lucide="shield-check"></i></span>
+          CricPulse <small>ADMIN</small>
+        </div>
+        <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
+        <p class="mut" style="margin:4px 0 16px">Enter your credentials to manage live markets and financials.</p>
+        <div class="fld">
+          <label for="pa">Master Passcode</label>
+          <input class="inp" id="pa" type="password" placeholder="Enter administrative passcode" autocomplete="current-password">
+        </div>
+        <div class="err" id="er"></div>
+        <button class="btn p w" data-a="login">Unlock Admin Control Room</button>
+      </div>
+    </div>
+  `;
+}
+
+var authed = sessionStorage.getItem("cpa_auth") === "1";
+
+function render() {
+  var y = window.scrollY;
+  $("app").innerHTML = authed ? shell() : authV();
+  $("dr").innerHTML = authed ? drawer() : "";
+  try { lucide.createIcons(); } catch(e){}
+  if (authed) window.scrollTo(0, y);
+}
+
+var applyTheme = function(){
+  document.documentElement.dataset.theme = localStorage.getItem("cpa_theme") || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+};
+
+var csv = function(name, rows){
+  var t = rows.map(function(r){ return r.map(function(c){ return '"' + String(c == null ? "" : c).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([t], {type: "text/csv"}));
+  a.download = name;
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
+  log("Exported CSV: " + name, "Reports");
+};
+
+document.addEventListener("click", async function(e){
+  var t = e.target.closest("[data-a]");
+  if (!t) return;
+  var a = t.dataset.a, v = t.dataset.v;
+  if (t.tagName === "SELECT" || t.tagName === "TEXTAREA" || (t.tagName === "INPUT" && t.type !== "checkbox")) return;
+
+  switch(a) {
+    case "login": {
+      var p = $("pa").value;
+      var hash = await hp(p);
+      if (hash !== MASTER_PASS_HASH && p !== "Vishal@123") {
+        $("er").textContent = "Incorrect admin passcode entered.";
+        return;
+      }
+      sessionStorage.setItem("cpa_auth", "1");
+      authed = true;
+      log("Administrator logged in", "Security");
       render();
+      loadAll();
+      initRealtime();
+      break;
+    }
+    case "lock":
+      sessionStorage.removeItem("cpa_auth");
+      authed = false;
+      U.nav = 0; U.dr = null;
+      render();
+      break;
+    case "nav":
+      U.nav = U.nav ? 0 : 1;
+      render();
+      break;
+    case "go":
+      U.route = v; U.nav = 0; U.q = ""; U.dr = null;
+      render();
+      window.scrollTo(0, 0);
+      break;
+    case "eye":
+      U.eye = !U.eye;
+      render();
+      break;
+    case "theme":
+      var cur = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("cpa_theme", cur);
+      applyTheme();
+      render();
+      break;
+    case "dx":
+      U.dr = null;
+      render();
+      break;
+    case "uf": U.uf = v; render(); break;
+    case "tf": U.tf = v; render(); break;
+    case "wf": U.wf = v; render(); break;
+    case "wt": U.wt = v; render(); break;
+    case "user": U.dr = { t: "user", id: v }; render(); break;
+    case "market": U.dr = { t: "market", id: v }; render(); break;
+    case "coupon": U.dr = { t: "coupon", id: v }; render(); break;
+    case "ticket":
+      U.dr = { t: "ticket", id: v };
+      render();
+      setTimeout(function(){ var cs = $("chat-stream"); if (cs) cs.scrollTop = cs.scrollHeight; }, 50);
+      break;
+
+    case "wok":
+    case "wno": {
+      var ok = a === "wok";
+      var newStatus = ok ? "approved" : "rejected";
+      var res = await db.from("withdrawal_requests").update({ status: newStatus }).eq("id", v);
+      if (res.error) { toast(res.error.message, "alert-circle"); return; }
+      if (!ok) {
+        var wItem = S.wds.find(function(x){ return x.id === v; });
+        if (wItem) {
+          await db.rpc("admin_adjust_balance", { p_user_id: wItem.user_id, p_delta: wItem.amount, p_reason: "Rejected payout refund" });
+        }
+      }
+      toast("Withdrawal " + newStatus);
+      log("Withdrawal " + v + " " + newStatus, "Wallet");
+      loadAll();
+      break;
+    }
+
+    case "uadj": {
+      var amt = Number($("ba").value), reason = $("br").value.trim();
+      if (!amt || !reason) { $("er").textContent = "Provide amount and reason."; return; }
+      var rpcRes = await db.rpc("admin_adjust_balance", { p_user_id: v, p_delta: amt, p_reason: reason });
+      if (rpcRes.error) { $("er").textContent = rpcRes.error.message; return; }
+      toast("Balance adjusted");
+      log("Adjusted balance for user " + v + " by " + amt, "Wallet");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "ublock": {
+      var usr = S.users.find(function(x){ return x.id === v; });
+      var nStatus = usr.status === "active" ? "blocked" : "active";
+      await db.from("users").update({ status: nStatus }).eq("id", v);
+      toast("User " + nStatus);
+      loadAll();
+      break;
+    }
+
+    case "ukyc": {
+      var usr2 = S.users.find(function(x){ return x.id === v; });
+      var nKyc = usr2.kyc !== "verified";
+      await db.from("users").update({ kyc_verified: nKyc }).eq("id", v);
+      toast("KYC " + (nKyc ? "verified" : "unverified"));
+      loadAll();
+      break;
+    }
+
+    case "msave": {
+      var isNewM = v === "new";
+      var mObj = {
+        category: $("mc").value,
+        league: $("ml").value,
+        question: $("mq").value.trim() || null,
+        team_a: $("ma").value,
+        team_b: $("mb").value,
+        odds_a: Number($("oa").value) || 1.85,
+        odds_b: Number($("ob").value) || 2.10,
+        crowd_a: Number($("ca").value) || 50,
+        cricket_match_id: $("api").value.trim() || null,
+        status: "open"
+      };
+      if (isNewM) {
+        await db.from("matches").insert(mObj);
+        toast("Match published!");
+      } else {
+        await db.from("matches").update(mObj).eq("id", v);
+        toast("Match updated!");
+      }
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "mset": {
+      var [mId, win] = v.split(":");
+      await db.from("matches").update({ status: "settled" }).eq("id", mId);
+      toast("Match settled (" + win + ")");
+      log("Settled match " + mId + " (" + win + " won)", "Markets");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "csave": {
+      var cObj = {
+        value: $("cv").value.trim(),
+        title: $("ct").value.trim(),
+        code: $("cd").value.trim().toUpperCase(),
+        category: $("cc").value.trim(),
+        is_claimed: false
+      };
+      await db.from("coupons").insert(cObj);
+      toast("Coupon added!");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "cdel": {
+      if (confirm("Delete this coupon?")) {
+        await db.from("coupons").delete().eq("id", v);
+        toast("Coupon removed");
+        loadAll();
+      }
+      break;
+    }
+
+    case "nsend": {
+      var title = $("nt").value.trim(), body = $("nd").value.trim(), aud = $("na").value;
+      if (!title || !body) { $("er").textContent = "Provide title and message."; return; }
+      var notifPayload = {
+        title: title,
+        body: body,
+        icon: "bell",
+        user_id: aud === "all" ? null : aud
+      };
+      await db.from("notifications").insert(notifPayload);
+      toast("Notification dispatched!");
+      loadAll();
+      break;
+    }
+
+    case "treply": {
+      var rep = $("tr").value.trim();
+      if (!rep) return;
+      var insRes = await db.from("ticket_messages").insert({
+        ticket_id: v,
+        sender: "admin",
+        message: rep,
+        is_read: false
+      });
+      if (insRes.error) { toast(insRes.error.message, "alert-circle"); return; }
+      await db.from("support_tickets").update({ status: "pending" }).eq("id", v);
+      $("tr").value = "";
+      toast("Reply sent");
+      loadAll();
+      break;
+    }
+
+    case "tclose": {
+      var note = prompt("Enter resolution close note for user (optional):");
+      await db.from("support_tickets").update({ status: "closed", close_note: note || "" }).eq("id", v);
+      toast("Ticket closed");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "treopen": {
+      await db.from("support_tickets").update({ status: "open" }).eq("id", v);
+      toast("Ticket reopened");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "save-cfg": {
+      S.cfg.maint = $("cfg-maint").checked ? 1 : 0;
+      S.cfg.regOpen = $("cfg-reg").checked ? 1 : 0;
+      S.cfg.banner = $("cfg-banner").value.trim();
+      toast("Settings updated");
+      log("Updated system platform configuration", "Settings");
+      break;
+    }
+
+    case "exp": {
+      if (v === "users") csv("users.csv", [["ID", "Name", "Email", "City", "Balance", "XP", "Status", "Joined"], ...S.users.map(function(u){ return [u.id, u.name, u.email, u.city, u.bal, u.xp, u.status, u.joined]; })]);
+      if (v === "txs") csv("transactions.csv", [["ID", "User ID", "Type", "Amount", "Description", "Created"], ...S.txs.map(function(t){ return [t.id, t.user_id, t.type, t.amount, t.description, t.created_at]; })]);
+      if (v === "tickets") csv("tickets.csv", [["ID", "User ID", "Subject", "Status", "Priority", "Rating", "Created"], ...S.tickets.map(function(t){ return [t.id, t.user_id, t.subject, t.status, t.prio, t.rating, t.created]; })]);
+      if (v === "matches") csv("matches.csv", [["ID", "Category", "League", "Team A", "Team B", "Status"], ...S.matches.map(function(m){ return [m.id, m.category, m.league, m.team_a, m.team_b, m.status]; })]);
+      break;
     }
   }
-}, 30000);
+});
 
-boot();
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if (t.id === "tpf") { U.tp = t.value; render(); }
+  if (t.id === "tc" && t.value) { $("tr").value = t.value; t.selectedIndex = 0; }
+});
+
+document.addEventListener("input", function(e){
+  if (e.target.id === "q") { U.q = e.target.value; render(); }
+});
+
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape" && U.dr) { U.dr = null; render(); }
+  if (e.key === "Enter" && e.target.id === "pa") {
+    var b = document.querySelector('[data-a="login"]');
+    if (b) b.click();
+  }
+});
+
+applyTheme();
+if (authed) {
+  loadAll();
+  initRealtime();
+} else {
+  render();
+}
 </script>
 </body>
 </html>
