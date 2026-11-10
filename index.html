@@ -235,7 +235,8 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<!-- Loader to prevent blank white screen on refresh -->
+<div id="app"><div style="display:flex;justify-content:center;align-items:center;height:100vh;color:var(--i2);font-weight:600;">Loading CricPulse...</div></div>
 <div id="sh"></div>
 <div class="tw" id="tw"></div>
 
@@ -422,7 +423,6 @@ function liveText(m) {
 }
 function liveBoard(m) {
     if (!m) return '';
-    // Safe fallback to prevent the white screen crash
     return `<div style="padding:12px;">
         <div style="font-weight:600;font-size:14px;margin-bottom:2px;">${esc(m.A[1])} vs ${esc(m.B[1])}</div>
         <div style="font-size:12px;color:var(--i3);">${esc(m.lg || 'Live Match')}</div>
@@ -477,9 +477,8 @@ function landing() {
 </div>
 <footer class="foot">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <!-- Removed Powered by SportScore -->
       <div><b>CricPulse</b><br>India's real money prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
-    <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button><button data-a="guest">Continue as guest</button></div>
+    <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button></div>
     <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
     <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
   </div>
@@ -498,7 +497,6 @@ function authV() {
   <button class="btn p w" data-a="subm" ${S.authBusy?"disabled":""}>${S.authBusy?"Please wait…":(up?"Create account":"Log in")}</button>
   <div class="divider">or</div>
   <button class="gbtn" data-a="gmail"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</button>
-  <button class="btn w" style="margin-top:8px" data-a="guest">Continue as guest</button>
   <p class="mut s11" style="text-align:center;margin-top:12px">By continuing, you agree to our Terms, Privacy and Refund policies. 18+ only.</p>
   </div></div>`;
 }
@@ -1298,7 +1296,8 @@ document.addEventListener("click", e => {
         preferred_app: selectedApp === 'upi' ? null : selectedApp, 
         success_url: currentUrl + '?status=success&order_id=' + orderId, failed_url: currentUrl + '?status=failed&order_id=' + orderId, timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
       }, {
-        onResponse: function(paymentUrl) { if (paymentUrl) window.open(paymentUrl, '_blank'); t.disabled = false; t.textContent = 'Continue to pay'; },
+        // THIS IS THE FIX: Changed from window.open to window.location.href
+        onResponse: function(paymentUrl) { if (paymentUrl) window.location.href = paymentUrl; t.disabled = false; t.textContent = 'Continue to pay'; },
         onError: function(err) { $("er").textContent = err || "Payment failed to initialize."; t.disabled = false; t.textContent = 'Continue to pay'; }
       });
       break;
@@ -1369,8 +1368,11 @@ async function fetchLiveScores() {
   if (!MK || MK.length === 0) return;
   try {
     const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score');
-    const data = await response.json();
-    if (!data || !data.matches) { toast("API Error: Could not load live data", "alert"); return; }
+    const text = await response.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { return; } // Silently fail if not JSON
+    
+    if (!data || !data.matches) return; // Silently fail
 
     for (const m of MK) {
       if (m.c !== 'cricket' && m.c !== 'football') continue; // Only fetch live score for sports
@@ -1390,7 +1392,7 @@ async function fetchLiveScores() {
         };
       }
     }
-  } catch (err) { console.error("Live score fetch failed", err); }
+  } catch (err) { console.warn("Live score fetch failed", err); }
   if (S.route === "match" || S.route === "home" || S.route === "markets") { render(); }
 }
 setInterval(fetchLiveScores, 15000);
@@ -1484,11 +1486,14 @@ function initRealtimeSync() {
 }
 
 window.addEventListener("load", async () => {
+  // 1. Immediate render to prevent white screen
+  render(); 
+
   try {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
-    // 1. Setup Auth Listener FIRST to catch initial session safely
+    // 2. Setup Auth Listener FIRST to catch initial session safely
     CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
@@ -1502,7 +1507,7 @@ window.addEventListener("load", async () => {
       }
     });
 
-    // 2. Load Matches Data
+    // 3. Load Matches Data
     try {
       const liveMatches = await CP_DB.getMatches();
       if (liveMatches && liveMatches.length > 0) {
@@ -1521,7 +1526,7 @@ window.addEventListener("load", async () => {
       MK = [...DEMO_MK];
     }
 
-    // 3. Safe Session Check (Ensures PC screen doesn't stay blank)
+    // 4. Safe Session Check (Ensures PC screen doesn't stay blank)
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     if (session) { 
       await applySession(session); 
@@ -1529,7 +1534,7 @@ window.addEventListener("load", async () => {
       render(); 
     }
     
-    // 4. Payment Return Handler
+    // 5. Payment Return Handler with Polling
     async function checkPaymentReturn() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -1539,9 +1544,20 @@ window.addEventListener("load", async () => {
         if (status === 'success' && S.user && S.user.id) {
           const { error } = await supabase.from('payment_requests').update({ status: 'approved' }).eq('txn_id', orderId).eq('user_id', S.user.id);
           if (!error) { 
-            toast('Payment successful. Wallet updated.', 'check'); 
-            const p = await CP_DB.getProfile(S.user.id); 
-            if (p && p.balance !== undefined) { S.bal = p.balance; save(); render(); } 
+            toast('Payment successful. Wallet will update shortly...', 'check'); 
+            
+            // Poll balance for 10 seconds in case webhook is slow
+            let attempts = 0;
+            const fetchBalance = setInterval(async () => {
+                const p = await CP_DB.getProfile(S.user.id); 
+                if (p && p.balance !== undefined && p.balance !== S.bal) {
+                    S.bal = p.balance; save(); render();
+                    clearInterval(fetchBalance);
+                }
+                attempts++;
+                if(attempts > 5) clearInterval(fetchBalance);
+            }, 2000);
+
           }
         } else if (status === 'failed' || status === 'timeout') { 
           toast('Payment ' + status + '. Try again.', 'x'); 
