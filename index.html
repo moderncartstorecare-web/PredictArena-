@@ -1533,6 +1533,20 @@ window.addEventListener("load", async () => {
     } else { 
       render(); 
     }
+
+    // 5. Listen for Immediate Maintenance Mode changes
+    if (window.CP_DB && CP_DB.ready) {
+      supabase.channel('global-settings')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings' }, (payload) => {
+          if (payload.new.key === 'maintenance') {
+            if (payload.new.value === true) {
+               document.body.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f6f7fb;color:#0f1729;text-align:center;padding:20px;font-family:Inter,sans-serif;"><div><h1 style="font-size:24px;margin-bottom:10px;">Under Maintenance</h1><p style="color:#7a8296;">CricPulse is getting an upgrade. We will be back shortly.</p></div></div>`;
+            } else {
+               location.reload(); // Reload to bring the app back if turned off
+            }
+          }
+        }).subscribe();
+    }
     
     // 5. Payment Return Handler with Polling
     async function checkPaymentReturn() {
