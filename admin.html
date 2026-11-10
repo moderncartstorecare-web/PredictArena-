@@ -73,14 +73,14 @@ var COLS={
 };
 var REFUND_ON_REJECT=false;
 
-// Pre-defined leagues for auto-suggest
 var LEAGUES = {
   cricket: ["Indian Premier League (IPL)", "T20 World Cup", "ODI Series", "Test Championship", "Big Bash League (BBL)", "The Hundred"],
   football: ["Premier League", "La Liga", "Champions League", "FIFA World Cup", "Serie A"],
   kabaddi: ["Pro Kabaddi League", "Kabaddi World Cup"],
   indian: ["Entertainment", "Economy", "Politics"],
   esports: ["BGMI Pro Series", "Valorant Champions", "CS:GO Major"]
-};var TICKET_STATUS_AFTER_REPLY="";
+};
+var TICKET_STATUS_AFTER_REPLY="";
 
 var db=null;
 try{
@@ -98,7 +98,16 @@ var D1=JSON.stringify(D0),S=JSON.parse(D1);
 try{var sv=localStorage.getItem("pxa1");if(sv){var o0=JSON.parse(sv);LOCAL_KEYS.forEach(function(k){if(o0[k]!==undefined)S[k]=o0[k]})}}catch(e){}
 
 var EYE=0,LOGIN=0,UQ="",WF="pending",TF="All",TKF="all",TKM=null,CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""},MOD=null,AD=0;
+
+// Restore Open Ticket on Refresh
+try {
+  var savedTkm = localStorage.getItem("admin_tkm");
+  if (savedTkm) { TKM = savedTkm; S.page = "sup"; }
+} catch(e) {}
+
 function save(){try{var o={};LOCAL_KEYS.forEach(function(k){o[k]=S[k]});localStorage.setItem("pxa1",JSON.stringify(o))}catch(e){}}
+function saveTkm(id){ TKM = id; try { if(id) localStorage.setItem("admin_tkm", id); else localStorage.removeItem("admin_tkm"); } catch(e){} }
+
 function $(i){return document.getElementById(i)}
 function ic(n){return '<i data-lucide="'+n+'"></i>'}
 function num(n){return n.toLocaleString("en-IN")}
@@ -152,13 +161,12 @@ function mapTk(r){
   var lastMsg = msgs[msgs.length - 1];
   var lastMsgDate = lastMsg ? new Date(lastMsg.created_at) : null;
   var lastMsgTimeFormatted = lastMsgDate ? lastMsgDate.toLocaleTimeString("en-IN", {hour: '2-digit', minute:'2-digit', hour12: true}) : '-';
-  var lastSender = lastMsg ? lastMsg.sender : '';
   var unread = msgs.filter(m => m.sender === 'user' && !m.is_read).length;
   
   return {
     id:String(r[c.id]), uid:String(r[c.user]==null?"":r[c.user]), nm:r.user_name||r.name||r.email||"",
     sub:r[c.subject]||"(no subject)", st:normTk(r[c.status]), pr:String(r[c.priority]||"normal").toLowerCase(), d:fd(r[c.created]),
-    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTimeFormatted: lastMsgTimeFormatted, lastMsgDate: lastMsgDate, lastSender: lastSender
+    msgs:null, rating:r.rating||0, close_note:r.close_note||'', unread: unread, lastMsgTimeFormatted: lastMsgTimeFormatted, lastMsgDate: lastMsgDate
   }
 }
 function rebuildTx(){S.tx=S.txl.concat(S.wd.filter(function(w){return w.st!=="rejected"}).map(function(w){return{uid:w.uid,ty:"Withdrawal",amt:"-"+w.amt,n:"Request "+w.id.slice(0,8),d:w.d}}))}
@@ -173,7 +181,7 @@ async function loadAll(){
       fetchT("wallet",null,500,0),
       fetchT("withdrawal_requests",COLS.wd.created,300),
       fetchT("notifications","created_at",100),
-      fetchT("support_tickets","created_at",300), // Changed order to match created_at
+      fetchT("support_tickets","created_at",300), 
       fetchT("matches","created_at",500),
       fetchT("predictions", "created_at", 500, 1)
     ]);
@@ -195,7 +203,6 @@ async function loadAll(){
       });
     }
     if(!r[4].error){
-        // Need to fetch ticket_messages separately because Supabase joins can be tricky if not specified as a relation
         const { data: ticketsData } = await db.from('support_tickets').select('*, ticket_messages(*)').order('created_at', {ascending: false});
         if(ticketsData) S.tickets = ticketsData.map(mapTk);
     }
@@ -233,11 +240,10 @@ async function doWallet(uid,a,cr,why){
 
 async function fetchMsgs(id){var mk=function(o){var x=db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);if(o)x=x.order(COLS.msg.created,{ascending:true});return x};var r=await mk(true);if(r.error)r=await mk(false);return r}
 function mapMsg(r){var c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created])}}
-function renderChat(){var t=TK(TKM),el=$("tkc");if(!t||!el)return;el.innerHTML=(t.msgs&&t.msgs.length)?t.msgs.map(function(m){return '<div class="ls"><div class="ico">'+ic(m.admin?"shield-check":"user")+'</div><div><b>'+esc(m.admin?"Support":tkUser(t))+'</b><small>'+esc(m.t)+'</small><div style="white-space:pre-wrap;margin-top:2px">'+esc(m.b)+'</div></div></div>'}).join(""):'<small>No messages yet.</small>';el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
 
 async function openTicket(id){
   var t=TK(id);if(!t)return;
-  TKM=id;
+  saveTkm(id);
   if(!db){toast("Supabase not configured","circle-alert");return}
   var r=await fetchMsgs(t.id);
   if(r.error){toast("Error loading messages","circle-alert");return}
@@ -290,7 +296,7 @@ window.closeTicket = async function(id) {
 window.reopenTicket = async function(id) {
     if(!confirm("Reopen this ticket?")) return;
     await db.from('support_tickets').update({status: 'open'}).eq('id', id);
-    toast('Ticket reopened'); TKM = null; render(); loadAll();
+    toast('Ticket reopened'); render(); loadAll();
 }
 
 function authRedirect(){return location.origin+location.pathname}
@@ -350,7 +356,7 @@ function wdV(){var l=S.wd.filter(function(w){return WF==="all"||w.st===WF});retu
 function supV() {
   if (TKM) {
     var t = TK(TKM);
-    if (!t) { TKM = null; return supV(); }
+    if (!t) { saveTkm(null); return supV(); }
     var u = U(t.uid);
     return `<div class="hd" style="flex-direction: column; align-items: flex-start; gap: 8px;">
         <button class="btn g s" data-a="closeticket" style="margin-bottom: 8px;">${ic("arrow-left")} Back to tickets</button>
@@ -425,7 +431,6 @@ function render(){
   
   modal('<div style="text-align:center;padding:20px"><small>Loading votes...</small></div>');
   
-  // Fetch predictions from DB
   var r = await db.from('predictions').select('*, users(full_name, email)').eq('match_id', id);
   var preds = r.data || [];
   
@@ -459,13 +464,12 @@ function render(){
   try{lucide.createIcons()}catch(e){}
 }
 
-// Global function to save the API ID
 window.saveApiId = async function(matchId) {
   var val = document.getElementById('edit-api-id').value.trim();
   var r = await db.from('matches').update({ cricket_match_id: val }).eq('id', matchId);
   if (r.error) { toast("Error saving ID: " + r.error.message, "circle-alert"); return; }
   toast("CricAPI ID updated!");
-  loadAll(); // Refresh matches list in background
+  loadAll();
 };
 function openMatchModal(match = null) {
   var isEdit = match !== null;
@@ -473,7 +477,6 @@ function openMatchModal(match = null) {
   var leagues = LEAGUES[cat] || [];
   var leagueOpts = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
   
-  // Format date for datetime-local input
   var dtVal = "";
   if (isEdit && match.closes_at) {
     var d = new Date(match.closes_at);
@@ -544,7 +547,7 @@ window.updateLeagues = function(cat) {
   document.getElementById('league-list').innerHTML = leagues.map(function(l){ return '<option value="'+l+'">'; }).join('');
 };
 function modal(h){var o=document.createElement("div");o.className="ov";o.innerHTML='<div class="md">'+h+'</div>';document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
-function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null;TKM=null}
+function closeM(){var o=document.querySelector(".ov");if(o)o.remove();MOD=null;}
 function fld(l,id,v,t){return '<label class="f">'+l+'<input class="in" id="'+id+'" type="'+(t||"text")+'" value="'+(v||"")+'" required></label>'}
 
 document.addEventListener("input",function(e){var t=e.target;if(t.id==="uq"){UQ=t.value;$("ut").innerHTML=usersTbl();try{lucide.createIcons()}catch(x){}}if(t.dataset.cp&&(t.dataset.cp==="t"||t.dataset.cp==="m"))CPS[t.dataset.cp]=t.value});
@@ -560,14 +563,13 @@ document.addEventListener("submit",function(e){
           const { error } = await db.from('support_tickets').update({ status: 'closed', close_note: note }).eq('id', ticketId);
           if (error) return toast(error.message, "circle-alert");
           
-          // Notify user
           const t = TK(ticketId);
           if (t) {
               await db.from('notifications').insert({
                   user_id: t.uid, title: 'Ticket Closed', body: 'Your support ticket has been closed. Please rate your experience.', icon: 'check-circle'
               });
           }
-          toast('Ticket closed'); closeM(); TKM = null; render(); loadAll();
+          toast('Ticket closed'); closeM(); render(); loadAll();
       })();
       return;
   }
@@ -584,7 +586,6 @@ document.addEventListener("submit",function(e){
   else if(id==="mf"){
     var dbId = $("mid_db").value;
     var timeVal = $("mtime").value; 
-    // Convert local datetime to ISO string for Supabase
     var closesAt = timeVal ? new Date(timeVal).toISOString() : new Date(Date.now() + 86400000).toISOString();
     
     var matchData = { 
@@ -597,13 +598,11 @@ document.addEventListener("submit",function(e){
     };
 
     if (dbId) {
-      // Update existing match
       db.from('matches').update(matchData).eq('id', dbId).then(function(res) {
         if (res.error) { toast("Error updating: " + res.error.message, "circle-alert"); return; }
         toast("Match updated successfully!"); closeM(); loadAll(); 
       });
     } else {
-      // Create new match
       db.from('matches').insert(matchData).then(function(res) {
         if (res.error) { toast("Error saving match: " + res.error.message, "circle-alert"); return; }
         toast("Match published to website!"); closeM(); loadAll(); 
@@ -646,7 +645,7 @@ var t=e.target.closest("[data-p],[data-a],[data-win],[data-cl],[data-reopen],[da
     db.from('matches').delete().eq('id', d.dm).then(function(r) {
       if (r.error) { toast("Error deleting: " + r.error.message, "circle-alert"); return; }
       toast("Match deleted successfully", "check");
-      loadAll(); // Refresh from database
+      loadAll();
     });
   }
 else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span>Email</span><span>'+esc(u.email)+'</span><span>City</span><span>'+esc(u.city)+'</span><span>Wallet</span><span>'+fm(u.wal)+'</span><span>Points</span><span>'+u.pts+'</span><span>Joined</span><span>'+esc(u.joined)+'</span><span>Status</span><span>'+u.st+'</span></div><h3 style="margin-top:16px">Recent transactions</h3>'+(S.tx.filter(function(x){return x.uid===u.id}).slice(0,4).map(function(x){return '<div class="ls"><div>'+x.ty+' · '+esc(x.amt)+'<small>'+esc(x.n)+' · '+esc(x.d)+'</small></div></div>'}).join("")||'<small>No transactions yet.</small>')+'<div class="ac" style="margin-top:14px"><button class="btn g" data-close>Close</button></div>');return}
@@ -656,9 +655,9 @@ else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span
   else if(d.wf)WF=d.wf;
   else if(d.kf)TKF=d.kf;
   else if(d.tk){openTicket(d.tk);return}
-  else if(d.a==="closeticket"){TKM=null;render();return}
+  else if(d.a==="closeticket"){saveTkm(null);render();return}
   else if(d.a==="notify-user"){
-      TKM=null; var u=U(d.v);
+      var u=U(d.v);
       modal(`<h3>Notify ${esc(u.name)}</h3><form id="modal-notif-form">
           <input type="hidden" id="mn-userid" value="${u.id}">
           <label class="f">Title<input class="in" id="mn-title" required></label>
@@ -668,7 +667,7 @@ else if(d.uv){var u=U(d.uv);modal('<h3>'+esc(u.name)+'</h3><div class="kv"><span
       return;
   }
   else if(d.a==="wallet-user"){
-      TKM=null; var u=U(d.v); MOD=u.id;
+      var u=U(d.v); MOD=u.id;
       modal('<h3>Adjust wallet · '+esc(u.name)+'</h3><small>Current balance '+fm(u.wal)+'</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>'+fld("Amount (₹)","wa","","number")+'</div>'+fld("Reason","wr")+'<div class="ac"><button type="button" class="btn g" data-close>Cancel</button><button class="btn" type="submit">Apply</button></div></form>');
       return;
   }
@@ -693,11 +692,12 @@ async function enter(session){
   S.adm = session.user.email;
   
   cleanUrl();
-  render(); // Render dashboard immediately so it doesn't loop
+  render(); 
   
   try {
     await loadAll(); 
     initAdminRealtime(); 
+    if(TKM) openTicket(TKM);
   } catch (e) {
     console.error("Dashboard load error:", e);
     toast("Loaded with some errors: " + e.message, "circle-alert");
@@ -742,7 +742,6 @@ function initAdminRealtime() {
       const newMsg = payload.new;
       if (S.page === 'sup') {
         if (TKM === newMsg.ticket_id) {
-          // Inside chat, refresh chat
           fetchMsgs(TKM).then(function(r) { 
             if(!r.error) { 
               TK(TKM).msgs = r.data.map(mapMsg); 
@@ -756,7 +755,6 @@ function initAdminRealtime() {
             } 
           });
         } else {
-          // Outside chat, update the list view for that specific ticket
           var t = S.tickets.find(x => x.id === newMsg.ticket_id);
           if (t) {
             t.lastMsgDate = new Date(newMsg.created_at);
