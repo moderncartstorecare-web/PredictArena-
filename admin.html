@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#1a5cff">
-<title>CricPulse Admin – Control Panel</title>
+<title>CricPulse Admin – Master Control</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -66,9 +66,6 @@ button.r:hover{background:var(--s2)}
 .hm{display:none}.mob{display:inline}
 .dot{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--no);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
 .empty{padding:26px;text-align:center;color:var(--i3)}
-.bars{display:flex;gap:8px;align-items:flex-end;height:140px;padding-top:8px}
-.bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;font-size:11px;color:var(--i3);min-width:0}
-.bars i{display:block;width:100%;background:var(--ac);border-radius:5px 5px 0 0;opacity:.88}.bars b{color:var(--ink);font-size:11px}
 .sw{position:relative;width:40px;height:22px;flex:none}.sw input{position:absolute;inset:0;opacity:0;margin:0;z-index:1;cursor:pointer}
 .sw i{position:absolute;inset:0;border-radius:11px;background:var(--ln2);transition:background .15s}
 .sw i:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
@@ -98,14 +95,16 @@ button.r:hover{background:var(--s2)}
 .msg small{display:block;font-size:10px;opacity:.75;margin-top:4px}
 .msg.user{background:var(--s2);color:var(--ink);border-bottom-left-radius:3px}
 .msg.admin{background:var(--ac);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
-.msg.note{background:var(--ams);color:var(--am);border:1px dashed var(--am);align-self:center;max-width:94%;font-size:12px}
 .chat-box{padding:10px;border-top:1px solid var(--ln);background:var(--sf);display:flex;flex-direction:column;gap:8px}
 .tw{position:fixed;left:0;right:0;bottom:18px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
 .ts{background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:9px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 10px 25px rgba(0,0,0,.25)}
 .login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--sb)}
 .login .card{width:100%;max-width:380px;padding:28px;background:var(--sf);border:1px solid var(--ln)}
 .two{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
-.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--no);display:inline-block;margin-right:6px}
+.sla-badge{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:11px;padding:2px 7px;border-radius:6px}
+.sla-urgent{background:var(--nos);color:var(--no);animation:pulse 1.5s infinite}
+.sla-wait{background:var(--ams);color:var(--am)}
+@keyframes pulse{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
 @media(max-width:900px){
   .shell{flex-direction:column}
   .nav{position:fixed;inset:0 auto 0 0;transform:translateX(-100%);transition:transform .2s;z-index:80;width:260px}
@@ -125,42 +124,25 @@ button.r:hover{background:var(--s2)}
 <div id="app"></div>
 <div id="dr"></div>
 <div class="tw" id="tw"></div>
-<input type="file" id="imp" accept="application/json" hidden>
 
 <script>
 var SUPABASE_URL = "https://hmiyhdekyqpzkxqiukvb.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
+var ADMIN_EMAILS = ["moderncartstore.care@gmail.com"];
 
-var MASTER_PASS_HASH = "8f1a17951a8f94ff8a3852084c8d5045db47ff57e4e11fa7a49dd29b4fa03290"; // SHA256 of "cp:Vishal@123"
+// Cryptographic hash of "cricpulse_salt_2026:Vishal@12012005"
+var SECURE_PASS_HASH = "8097b6a11e860fe3872f2d93e18a80352be7b41e3a479ff7d4dd065415bf3c6e";
 
 var db = null;
 try {
-  if (typeof supabase !== "undefined" && SUPABASE_URL.indexOf("YOUR-") < 0) {
-    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true }
-    });
+  if (typeof supabase !== "undefined") {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
   }
 } catch(e) { console.error("Supabase init failed", e); }
 
 var esc = function(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); };
 var $ = function(i){ return document.getElementById(i); };
 var inr = function(n){ return "₹" + Number(n || 0).toLocaleString("en-IN", {maximumFractionDigits: 0}); };
-var NOW = Date.now(), DAY = 864e5, HR = 36e5;
-var uid = function(){ return Math.random().toString(36).slice(2, 8); };
-var ago = function(t){
-  var s = (Date.now() - new Date(t).getTime()) / 1e3;
-  return s < 60 ? "just now" : s < 3600 ? Math.floor(s/60) + "m ago" : s < 86400 ? Math.floor(s/3600) + "h ago" : Math.floor(s/86400) + "d ago";
-};
-var dt = function(t){ return new Date(t).toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"}); };
-
-var bd = function(t, c){ return '<span class="badge ' + (c || "") + '">' + esc(t) + '</span>'; };
-var CS = {
-  active:"b-ok", suspended:"b-am", blocked:"b-no", banned:"b-no",
-  open:"b-ac", pending:"b-am", resolved:"b-ok", closed:"",
-  high:"b-no", medium:"b-am", low:"",
-  approved:"b-ok", rejected:"b-no", completed:"b-ok", verified:"b-ok", none:""
-};
-var sb = function(s){ return bd(s, CS[s] || ""); };
 
 var toast = function(m, icon) {
   var n = document.createElement("div");
@@ -172,14 +154,8 @@ var toast = function(m, icon) {
 };
 
 var hp = async function(s) {
-  try {
-    var b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("cp:" + s));
-    return [...new Uint8Array(b)].map(function(x){ return x.toString(16).padStart(2, "0"); }).join("");
-  } catch(e) {
-    var h = 5381;
-    for (var c of ("cp:" + s)) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0;
-    return "x" + h;
-  }
+  var b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("cricpulse_salt_2026:" + s));
+  return [...new Uint8Array(b)].map(function(x){ return x.toString(16).padStart(2, "0"); }).join("");
 };
 
 var S = {
@@ -190,14 +166,12 @@ var S = {
   tickets: [],
   coupons: [],
   notifs: [],
-  audit: [],
   cfg: {
-    maint: 0,
-    regOpen: 1,
-    manualWd: 1,
-    minDep: 50,
-    minWd: 100,
-    banner: "Welcome to CricPulse! Instant UPI payouts are operational."
+    maintenance_mode: false,
+    registrations_open: true,
+    min_deposit: 10,
+    min_withdrawal: 100,
+    banner_message: ""
   }
 };
 
@@ -211,12 +185,18 @@ var U = {
   tp: "all",
   wf: "pending",
   wt: "w",
-  xf: "all",
   eye: false
 };
 
-var ttl = function(m){ return m.question || (m.team_a + " vs " + m.team_b); };
-var pendW = function(){ return S.wds.filter(function(w){ return w.status === "pending"; }); };
+var authState = {
+  googleAuthed: false,
+  passAuthed: sessionStorage.getItem("cp_pass_auth") === "1",
+  email: ""
+};
+
+var bd = function(t, c){ return '<span class="badge ' + (c || "") + '">' + esc(t) + '</span>'; };
+var CS = { active:"b-ok", blocked:"b-no", open:"b-no", pending:"b-am", resolved:"b-ok", closed:"" };
+var sb = function(s){ return bd(s, CS[s] || ""); };
 var kpi = function(l, v, s, isMoney) {
   return '<div class="card kpi"><small>' + l + '</small><b class="' + (isMoney && !U.eye ? 'bl' : '') + '">' + v + '</b><span>' + (s || "&nbsp;") + '</span></div>';
 };
@@ -229,26 +209,28 @@ var row = function(cols, inner, attr) {
   return '<' + (attr ? "button" : "div") + ' class="r" style="--m:' + cols[0] + ';--c:' + cols[1] + '" ' + (attr || "") + '>' + inner + '</' + (attr ? "button" : "div") + '>';
 };
 
-var log = function(a, t) {
-  S.audit.unshift({ ts: Date.now(), a: a, t: t, by: "Admin" });
-  S.audit = S.audit.slice(0, 150);
-};
+function formatTimer(dateStr) {
+  if (!dateStr) return "00m 00s";
+  var diff = Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000));
+  var m = Math.floor(diff / 60);
+  var s = diff % 60;
+  return (m < 10 ? "0" + m : m) + "m " + (s < 10 ? "0" + s : s) + "s";
+}
 
 async function loadAll() {
   if (!db) return;
   try {
-    var [uRes, wRes, wdRes, mRes, pRes, tkRes, txRes, cpRes, nRes] = await Promise.all([
+    var [cfgRes, uRes, wdRes, mRes, tkRes, txRes, cpRes] = await Promise.all([
+      db.from("app_config").select("*").eq("id", "primary").single(),
       db.from("users").select("*, wallet(balance, points)").order("created_at", { ascending: false }),
-      db.from("wallet").select("*"),
       db.from("withdrawal_requests").select("*").order("created_at", { ascending: false }),
       db.from("matches").select("*").order("created_at", { ascending: false }),
-      db.from("predictions").select("*"),
       db.from("support_tickets").select("*, ticket_messages(*)").order("created_at", { ascending: false }),
       db.from("transactions").select("*").order("created_at", { ascending: false }).limit(200),
-      db.from("coupons").select("*").order("created_at", { ascending: false }),
-      db.from("notifications").select("*").order("created_at", { ascending: false }).limit(50)
+      db.from("coupons").select("*").order("created_at", { ascending: false })
     ]);
 
+    if (cfgRes.data) S.cfg = cfgRes.data;
     if (uRes.data) {
       S.users = uRes.data.map(function(u){
         var wal = Array.isArray(u.wallet) ? (u.wallet[0] || {}) : (u.wallet || {});
@@ -256,27 +238,14 @@ async function loadAll() {
           id: u.id,
           name: u.full_name || u.email.split("@")[0],
           email: u.email,
-          city: u.city || "Unknown",
+          city: u.city || "-",
           status: u.status || "active",
-          kyc: u.kyc_verified ? "verified" : "none",
           bal: Number(wal.balance != null ? wal.balance : (u.wallet_balance || 0)),
           xp: Number(wal.points || 0),
-          joined: u.created_at,
-          last: u.created_at,
-          picks: 0,
-          wins: 0
+          joined: u.created_at
         };
       });
     }
-
-    if (pRes.data) {
-      var userMap = {};
-      pRes.data.forEach(function(p){
-        userMap[p.user_id] = (userMap[p.user_id] || 0) + 1;
-      });
-      S.users.forEach(function(u){ u.picks = userMap[u.id] || 0; });
-    }
-
     if (wdRes.data) S.wds = wdRes.data;
     if (mRes.data) S.matches = mRes.data;
     if (tkRes.data) {
@@ -287,63 +256,55 @@ async function loadAll() {
         return {
           id: t.id,
           user_id: t.user_id,
-          subject: t.subject || "Support Request",
-          user: u ? u.name : "Member " + String(t.user_id).slice(0, 6),
-          email: u ? u.email : "user@cricpulse.in",
-          cat: "General",
-          prio: t.priority || "medium",
+          subject: t.subject || "Customer Inquiry",
+          user: u ? u.name : "Customer",
+          email: u ? u.email : "-",
+          prio: t.priority || "normal",
           status: t.status || "open",
           rating: t.rating || 0,
           close_note: t.close_note || "",
-          created: t.created_at,
-          updated: msgs.length ? msgs[msgs.length - 1].created_at : t.created_at,
+          last_user_reply_at: t.last_user_reply_at || (msgs.length ? msgs[msgs.length - 1].created_at : t.created_at),
           unread: unread,
           msgs: msgs.map(function(m){
             return {
               id: m.id,
-              f: (m.sender === "admin" || m.sender === "staff") ? "admin" : (m.sender === "note" ? "note" : "user"),
+              f: m.sender === "admin" ? "admin" : "user",
               text: m.message,
               ts: m.created_at
             };
           })
         };
       });
+      // Sort: Open tickets with highest wait times first
+      S.tickets.sort(function(a, b){
+        if (a.status === "open" && b.status !== "open") return -1;
+        if (a.status !== "open" && b.status === "open") return 1;
+        return new Date(a.last_user_reply_at) - new Date(b.last_user_reply_at);
+      });
     }
     if (txRes.data) S.txs = txRes.data;
     if (cpRes.data) S.coupons = cpRes.data;
-    if (nRes.data) {
-      S.notifs = nRes.data.map(function(n){
-        return {
-          id: n.id,
-          t: n.title,
-          d: n.body,
-          aud: n.user_id ? "Individual User" : "All Users",
-          n: n.user_id ? 1 : S.users.length,
-          ts: n.created_at
-        };
-      });
-    }
+
     render();
   } catch(e) {
     console.error("Data load failed", e);
-    toast("Database sync error", "alert-circle");
   }
 }
 
 function initRealtime() {
   if (!db) return;
-  db.channel("admin-realtime")
+  db.channel("admin-sync-hub")
     .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, function(){ loadAll(); })
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "ticket_messages" }, function(pl){
       var t = S.tickets.find(function(x){ return x.id === pl.new.ticket_id; });
       if (t) {
-        t.msgs.push({
-          id: pl.new.id,
-          f: pl.new.sender === "admin" ? "admin" : "user",
-          text: pl.new.message,
-          ts: pl.new.created_at
-        });
-        if (pl.new.sender === "user") t.unread++;
+        t.msgs.push({ id: pl.new.id, f: pl.new.sender === "admin" ? "admin" : "user", text: pl.new.message, ts: pl.new.created_at });
+        if (pl.new.sender === "user") {
+          t.unread++;
+          t.last_user_reply_at = pl.new.created_at;
+          t.status = "open";
+          toast("Customer sent a message!", "headset");
+        }
         render();
         var cs = $("chat-stream");
         if (cs) cs.scrollTop = cs.scrollHeight;
@@ -352,72 +313,207 @@ function initRealtime() {
       }
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "withdrawal_requests" }, function(){ loadAll(); })
-    .on("postgres_changes", { event: "*", schema: "public", table: "wallet" }, function(){ loadAll(); })
+    .on("postgres_changes", { event: "*", schema: "public", table: "app_config" }, function(pl){
+      if (pl.new) { S.cfg = pl.new; render(); }
+    })
     .subscribe();
 }
 
+// Continuous non-reloading timer
+setInterval(function(){
+  document.querySelectorAll("[data-live-timer]").forEach(function(el){
+    var dt = el.getAttribute("data-live-timer");
+    var st = el.getAttribute("data-status");
+    if (st === "open") {
+      el.textContent = formatTimer(dt) + " waiting";
+    }
+  });
+}, 1000);
+
 var NAV = [
-  ["Overview", [["dash", "Dashboard", "layout-dashboard"], ["reports", "Reports & CSV", "bar-chart-3"]]],
-  ["Operations", [["users", "User Profiles", "users"], ["markets", "Match Fixtures", "trophy"], ["wallet", "Payouts & Ledger", "wallet"], ["coupons", "Vouchers & Codes", "gift"]]],
-  ["Engagement", [["notify", "Push Broadcasts", "bell"], ["tickets", "Support Desk", "headset"]]],
-  ["System", [["settings", "Configuration", "sliders"], ["audit", "Audit Trail", "file-text"]]]
+  ["Overview", [["dash", "Dashboard", "layout-dashboard"]]],
+  ["Operations", [["users", "User Management", "users"], ["markets", "Match Fixtures", "trophy"], ["wallet", "Payouts & Ledger", "wallet"], ["coupons", "Vouchers & Codes", "gift"]]],
+  ["Engagement", [["tickets", "Live Support Desk", "headset"], ["notify", "Push Broadcasts", "bell"]]],
+  ["Website Control", [["controls", "Live Site Controls", "toggle-right"], ["risk", "Settlements & Risk", "shield-alert"]]]
 ];
 
 var META = {
-  dash: ["Dashboard", "Platform operations, real-time balances, and pending actions."],
-  reports: ["Reports & Data", "Export ledger CSV files and view distribution stats."],
-  users: ["User Management", "View balances, adjust credits, review KYC, and moderate."],
-  markets: ["Matches & Fixtures", "Create matches, sync CricAPI, close betting, and settle."],
-  wallet: ["Wallet & Withdrawals", "Approve or reject withdrawal requests and monitor flows."],
-  coupons: ["Vouchers & Rewards", "Manage promotional codes and track redemptions."],
-  notify: ["Notifications", "Send targeted or sitewide announcements directly."],
-  tickets: ["Support Chat Desk", "Live ticket chat, canned responses, ratings, and resolution."],
-  settings: ["Site Controls", "Configure platform operational flags and manage admin credentials."],
-  audit: ["Audit Records", "Chronological history of administrative actions."]
+  dash: ["Overview", "Live operations, financial liquidity, and pending tasks."],
+  users: ["User Management", "Monitor users, adjust balances, and block violators."],
+  markets: ["Match Fixtures", "Create matches, update odds, and declare winners."],
+  wallet: ["Wallet & Withdrawals", "Verify and process instant UPI payouts."],
+  coupons: ["Vouchers & Rewards", "Manage promotional codes for points."],
+  tickets: ["Live Support Desk", "Real-time queue auto-sorted by response timer."],
+  notify: ["Push Notifications", "Broadcast announcements directly to users."],
+  controls: ["Live Site Controls", "Toggle maintenance mode and sitewide banners."],
+  risk: ["Settlements & Risk", "Audit match exposure and handle voided markets."]
 };
 
 function dash() {
-  var pw = pendW(), ot = S.tickets.filter(function(t){ return t.status === "open" || t.status === "pending"; });
-  var totalDep = S.txs.filter(function(t){ return t.type === "deposit" || t.type === "credit"; }).reduce(function(a, t){ return a + Number(t.amount || 0); }, 0);
+  var pw = S.wds.filter(function(w){ return w.status === "pending"; });
+  var ot = S.tickets.filter(function(t){ return t.status === "open"; });
   var totalBal = S.users.reduce(function(a, u){ return a + u.bal; }, 0);
-  var kycPend = S.users.filter(function(u){ return u.kyc === "pending"; }).length;
 
   return `
     <div class="kpis">
-      ${kpi("Total Platform Users", S.users.length, "Registered members")}
-      ${kpi("System Balances Held", inr(totalBal), "User wallet pool", true)}
-      ${kpi("Pending Withdrawals", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
-      ${kpi("Open Inquiries", ot.length, S.tickets.filter(function(t){ return t.unread > 0; }).length + " unread responses")}
+      ${kpi("Platform Users", S.users.length, "Registered")}
+      ${kpi("User Balances (Held)", inr(totalBal), "Available liquidity", true)}
+      ${kpi("Pending Payouts", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
+      ${kpi("Action Required", ot.length, "Open customer tickets")}
     </div>
 
     <div class="two">
       <div class="card">
-        <div class="bt"><h3>Action Items</h3><span class="badge b-ac">Urgent</span></div>
-        <div class="ln"><span>Pending Payout Requests</span><div class="row">${bd(pw.length, pw.length ? "b-am" : "b-ok")}<button class="btn sm" data-a="go" data-v="wallet">Review</button></div></div>
-        <div class="ln"><span>Open Support Tickets</span><div class="row">${bd(ot.length, ot.length ? "b-no" : "b-ok")}<button class="btn sm" data-a="go" data-v="tickets">Respond</button></div></div>
-        <div class="ln"><span>Active Match Markets</span><div class="row">${bd(S.matches.filter(function(m){ return m.status !== "settled"; }).length, "b-ok")}<button class="btn sm" data-a="go" data-v="markets">Manage</button></div></div>
-        <div class="ln"><span>Maintenance Shield</span><div class="row">${S.cfg.maint ? bd("Enabled", "b-no") : bd("Disabled", "b-ok")}<button class="btn sm" data-a="go" data-v="settings">Toggle</button></div></div>
+        <h3>Live Website Control Status</h3>
+        <div class="ln">
+          <div><b>Maintenance Mode</b><div class="mut s12">Stops user access instantly</div></div>
+          <span class="badge ${S.cfg.maintenance_mode ? 'b-no' : 'b-ok'}">${S.cfg.maintenance_mode ? 'ACTIVE (SITE DOWN)' : 'LIVE & HEALTHY'}</span>
+        </div>
+        <div class="ln">
+          <div><b>Active Announcement Banner</b><div class="mut s12">${esc(S.cfg.banner_message || "No banner running")}</div></div>
+        </div>
+        <button class="btn p sm" data-a="go" data-v="controls" style="margin-top:10px">Open Site Controls</button>
       </div>
+
       <div class="card">
-        <h3>Recent Administrative Actions</h3>
-        ${S.audit.length ? S.audit.slice(0, 5).map(function(a){
-          return `<div class="ln"><div class="grow"><div class="b ell">${esc(a.a)}</div><div class="mut s12">${esc(a.t)} · ${esc(a.by)}</div></div><span class="mut s12">${ago(a.ts)}</span></div>`;
-        }).join("") : '<div class="empty">No recent action logs.</div>'}
+        <h3>Support Response Radar</h3>
+        ${ot.length ? ot.slice(0, 4).map(function(t){
+          return `
+            <div class="ln">
+              <div class="grow">
+                <b class="ell" style="display:block">${esc(t.subject)}</b>
+                <span class="mut s12">${esc(t.user)}</span>
+              </div>
+              <span class="sla-badge sla-urgent" data-live-timer="${t.last_user_reply_at}" data-status="open">${formatTimer(t.last_user_reply_at)}</span>
+              <button class="btn sm" data-a="ticket" data-v="${t.id}">Reply</button>
+            </div>
+          `;
+        }).join("") : '<div class="empty">All support queues are clear.</div>'}
       </div>
     </div>
   `;
 }
 
-function reports() {
+function tickets() {
+  var q = U.q.toLowerCase();
+  var L = S.tickets.filter(function(t){
+    return (U.tf === "all" || t.status === U.tf) && (t.subject + t.user + t.id).toLowerCase().includes(q);
+  });
+
+  return `
+    <div class="tool">
+      <div class="srch">
+        <i data-lucide="search"></i>
+        <input class="inp" id="q" placeholder="Search ticket or user..." value="${esc(U.q)}">
+      </div>
+    </div>
+    ${chips("tf", U.tf, [["open", "Needs Reply"], ["pending", "Waiting on Customer"], ["closed", "Closed"], ["all", "All Tickets"]])}
+    <div style="height:10px"></div>
+    <div class="list">
+      <div class="r rh" style="--c:2fr 1.2fr 110px 140px 100px 30px">
+        <span>Subject</span>
+        <span>Customer</span>
+        <span>Status</span>
+        <span>SLA Wait Timer</span>
+        <span>Rating</span>
+        <span></span>
+      </div>
+      ${L.length ? L.map(function(t){
+        return row(["1fr auto", "2fr 1.2fr 110px 140px 100px 30px"], `
+          <div class="grow">
+            <div class="b ell">${esc(t.subject)}</div>
+            <div class="mut s12 ell">${t.msgs.length} messages</div>
+          </div>
+          <span class="hm ell">${esc(t.user)}</span>
+          <span>${sb(t.status)}</span>
+          <span class="sla-badge ${t.status === 'open' ? 'sla-urgent' : 'sla-wait'}" data-live-timer="${t.last_user_reply_at}" data-status="${t.status}">
+            ${t.status === 'open' ? formatTimer(t.last_user_reply_at) + ' waiting' : 'Answered'}
+          </span>
+          <span class="hm">${t.rating ? "★".repeat(t.rating) : '<span class="mut">-</span>'}</span>
+          <span class="hm"><i data-lucide="chevron-right"></i></span>
+        `, `data-a="ticket" data-v="${t.id}"`);
+      }).join("") : '<div class="empty">No tickets match this filter.</div>'}
+    </div>
+  `;
+}
+
+function controls() {
+  return `
+    <div class="two">
+      <div class="card">
+        <h3>Master Platform Guard</h3>
+        <p class="mut s12" style="margin-bottom:14px">Instant changes apply live across all visitor browsers.</p>
+        <div class="ln">
+          <div>
+            <b>Instant Maintenance Mode</b>
+            <div class="mut s12">Takes the website down immediately for emergency fixes</div>
+          </div>
+          <label class="sw">
+            <input type="checkbox" id="maint-toggle" ${S.cfg.maintenance_mode ? 'checked' : ''}>
+            <i data-a="toggle-maint"></i>
+          </label>
+        </div>
+        <div class="ln">
+          <div>
+            <b>Registrations Open</b>
+            <div class="mut s12">Allow new visitor sign-ups</div>
+          </div>
+          <label class="sw">
+            <input type="checkbox" id="reg-toggle" ${S.cfg.registrations_open ? 'checked' : ''}>
+            <i data-a="toggle-reg"></i>
+          </label>
+        </div>
+        <div class="fld" style="margin-top:14px">
+          <label for="cfg-banner">Sitewide Alert Banner Text</label>
+          <input class="inp" id="cfg-banner" value="${esc(S.cfg.banner_message || '')}" placeholder="Leave empty to hide banner">
+        </div>
+        <button class="btn p" data-a="save-banner"><i data-lucide="save"></i> Publish Banner</button>
+      </div>
+
+      <div class="card">
+        <h3>Payment Limits</h3>
+        <div class="g2">
+          <div class="fld">
+            <label for="min-dep">Min Deposit (₹)</label>
+            <input class="inp" id="min-dep" type="number" value="${S.cfg.min_deposit}">
+          </div>
+          <div class="fld">
+            <label for="min-wd">Min Withdrawal (₹)</label>
+            <input class="inp" id="min-wd" type="number" value="${S.cfg.min_withdrawal}">
+          </div>
+        </div>
+        <button class="btn" data-a="save-limits">Update Limits</button>
+      </div>
+    </div>
+  `;
+}
+
+function risk() {
+  var activeM = S.matches.filter(function(m){ return m.status !== "settled"; });
   return `
     <div class="card">
-      <h3>Data Archival & Exports (Supabase Direct)</h3>
-      <p class="mut s12" style="margin-bottom:14px">Generate real-time CSV exports directly from your production database records.</p>
-      <div class="row" style="flex-wrap:wrap">
-        <button class="btn" data-a="exp" data-v="users"><i data-lucide="download"></i> Export Users (${S.users.length})</button>
-        <button class="btn" data-a="exp" data-v="txs"><i data-lucide="download"></i> Export Transactions (${S.txs.length})</button>
-        <button class="btn" data-a="exp" data-v="tickets"><i data-lucide="download"></i> Export Support Tickets (${S.tickets.length})</button>
-        <button class="btn" data-a="exp" data-v="matches"><i data-lucide="download"></i> Export Matches (${S.matches.length})</button>
+      <h3>Active Market Exposure</h3>
+      <p class="mut s12" style="margin-bottom:14px">Review unsettled fixtures and manage market integrity.</p>
+      <div class="list">
+        <div class="r rh" style="--c:2.5fr 1fr 1fr 140px">
+          <span>Fixture</span>
+          <span>Odds A / B</span>
+          <span>Crowd Split</span>
+          <span style="text-align:right">Action</span>
+        </div>
+        ${activeM.length ? activeM.map(function(m){
+          return row(["1fr auto", "2.5fr 1fr 1fr 140px"], `
+            <div class="grow">
+              <b>${esc(m.team_a)} vs ${esc(m.team_b)}</b>
+              <div class="mut s12">${esc(m.league)}</div>
+            </div>
+            <span>${m.odds_a}x / ${m.odds_b}x</span>
+            <span>${m.crowd_a}% on A</span>
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn sm d" data-a="void-match" data-v="${m.id}">Void & Refund</button>
+            </div>
+          `);
+        }).join("") : '<div class="empty">No active matches requiring risk review.</div>'}
       </div>
     </div>
   `;
@@ -425,178 +521,81 @@ function reports() {
 
 function users_() {
   var q = U.q.toLowerCase();
-  var L = S.users.filter(function(u){
-    return (U.uf === "all" || u.status === U.uf) && (u.name + u.email + u.id).toLowerCase().includes(q);
-  });
-
+  var L = S.users.filter(function(u){ return (U.uf === "all" || u.status === U.uf) && (u.name + u.email + u.id).toLowerCase().includes(q); });
   return `
     <div class="tool">
-      <div class="srch">
-        <i data-lucide="search"></i>
-        <input class="inp" id="q" placeholder="Search user name, email, or UUID..." value="${esc(U.q)}">
-      </div>
+      <div class="srch"><i data-lucide="search"></i><input class="inp" id="q" placeholder="Search user..." value="${esc(U.q)}"></div>
     </div>
     ${chips("uf", U.uf, [["all", "All Members"], ["active", "Active"], ["blocked", "Blocked"]])}
     <div style="height:10px"></div>
     <div class="list">
-      <div class="r rh" style="--c:2fr 1.2fr 90px 90px 80px 30px">
-        <span>User / Contact</span>
-        <span>City</span>
-        <span>Balance</span>
-        <span>XP</span>
-        <span>Status</span>
-        <span></span>
-      </div>
-      ${L.length ? L.map(function(u){
-        return row(["1fr auto", "2fr 1.2fr 90px 90px 80px 30px"], `
-          <div class="row" style="min-width:0">
-            <span class="av">${esc(u.name.charAt(0))}</span>
-            <div class="grow">
-              <div class="b ell">${esc(u.name)}</div>
-              <div class="mut s12 ell">${esc(u.email)}</div>
-            </div>
-          </div>
-          <span class="hm mut ell">${esc(u.city)}</span>
+      <div class="r rh" style="--c:2fr 1.2fr 100px 80px 30px"><span>User</span><span>City</span><span>Balance</span><span>Status</span><span></span></div>
+      ${L.map(function(u){
+        return row(["1fr auto", "2fr 1.2fr 100px 80px 30px"], `
+          <div class="row" style="min-width:0"><span class="av">${esc(u.name.charAt(0))}</span><div class="grow"><b>${esc(u.name)}</b><div class="mut s12">${esc(u.email)}</div></div></div>
+          <span class="hm mut">${esc(u.city)}</span>
           <span class="b ${!U.eye ? 'bl' : ''}">${inr(u.bal)}</span>
-          <span class="hm">${u.xp} pts</span>
           <span>${sb(u.status)}</span>
           <span class="hm"><i data-lucide="chevron-right"></i></span>
         `, `data-a="user" data-v="${u.id}"`);
-      }).join("") : '<div class="empty">No matching users found in database.</div>'}
+      }).join("")}
     </div>
   `;
 }
 
 function markets_() {
-  var q = U.q.toLowerCase();
-  var L = S.matches.filter(function(m){
-    return ttl(m).toLowerCase().includes(q) || (m.league || "").toLowerCase().includes(q);
-  });
-
   return `
     <div class="tool">
-      <div class="srch">
-        <i data-lucide="search"></i>
-        <input class="inp" id="q" placeholder="Search fixtures, leagues..." value="${esc(U.q)}">
-      </div>
       <button class="btn p" data-a="market" data-v="new"><i data-lucide="plus"></i> Create Match</button>
     </div>
     <div class="list">
-      <div class="r rh" style="--c:2.5fr 1.2fr 90px 90px 100px 30px">
-        <span>Match / Teams</span>
-        <span>League</span>
-        <span>Odds (A/B)</span>
-        <span>Crowd A</span>
-        <span>Status</span>
-        <span></span>
-      </div>
-      ${L.length ? L.map(function(m){
-        return row(["1fr auto", "2.5fr 1.2fr 90px 90px 100px 30px"], `
-          <div class="grow">
-            <div class="b ell">${esc(ttl(m))}</div>
-            <div class="mut s12 ell">${m.team_a} vs ${m.team_b}</div>
-          </div>
-          <span class="hm mut ell">${esc(m.league)}</span>
-          <span class="hm">${m.odds_a || 1.85} / ${m.odds_b || 2.10}</span>
-          <span class="hm">${m.crowd_a || 50}%</span>
+      <div class="r rh" style="--c:2.5fr 1.2fr 100px 90px 30px"><span>Match</span><span>League</span><span>Odds</span><span>Status</span><span></span></div>
+      ${S.matches.map(function(m){
+        return row(["1fr auto", "2.5fr 1.2fr 100px 90px 30px"], `
+          <div class="grow"><b>${esc(m.team_a)} vs ${esc(m.team_b)}</b><div class="mut s12">${esc(m.question || m.league)}</div></div>
+          <span class="hm mut">${esc(m.league)}</span>
+          <span class="hm">${m.odds_a} / ${m.odds_b}</span>
           <span>${sb(m.status || "open")}</span>
           <span class="hm"><i data-lucide="chevron-right"></i></span>
         `, `data-a="market" data-v="${m.id}"`);
-      }).join("") : '<div class="empty">No matches found.</div>'}
+      }).join("")}
     </div>
   `;
 }
 
 function wallet() {
   var L = S.wds.filter(function(w){ return U.wf === "all" || w.status === U.wf; });
-  var pw = pendW();
-
   return `
-    <div class="kpis">
-      ${kpi("Pending Review", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
-      ${kpi("Approved Total", S.wds.filter(function(w){ return w.status === "approved" || w.status === "completed"; }).length, "Disbursed")}
-      ${kpi("Rejected Total", S.wds.filter(function(w){ return w.status === "rejected"; }).length, "Returned to user")}
-    </div>
-    ${chips("wt", U.wt, [["w", "Withdrawal Requests"], ["x", "Transactions Ledger"]])}
+    <div class="kpis">${kpi("Pending Review", L.filter(function(w){ return w.status === "pending"; }).length, "Withdrawals")}</div>
+    ${chips("wf", U.wf, [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"], ["all", "All"]])}
     <div style="height:10px"></div>
-    ${U.wt === "w" ? `
-      ${chips("wf", U.wf, [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"], ["all", "All"]])}
-      <div style="height:10px"></div>
-      <div class="list">
-        <div class="r rh" style="--c:1.4fr 100px 1.2fr 90px 180px">
-          <span>User / ID</span>
-          <span>Amount</span>
-          <span>Payment Account</span>
-          <span>Status</span>
-          <span style="text-align:right">Action</span>
-        </div>
-        ${L.length ? L.map(function(w){
-          var u = S.users.find(function(x){ return x.id === w.user_id; });
-          var uName = u ? u.name : "User " + String(w.user_id).slice(0, 6);
-          return row(["1fr auto", "1.4fr 100px 1.2fr 90px 180px"], `
-            <div class="grow">
-              <div class="b ell">${esc(uName)}</div>
-              <div class="mut s12">${String(w.id).slice(0, 8)} · ${ago(w.created_at)}</div>
-            </div>
-            <b class="${!U.eye ? 'bl' : ''}">${inr(w.amount)}</b>
-            <span class="hm mut ell">${esc(w.account || w.method || "UPI")}</span>
-            <span class="hm">${sb(w.status)}</span>
-            <div class="row" style="justify-content:flex-end">
-              ${w.status === "pending" ? `
-                <button class="btn sm p" data-a="wok" data-v="${w.id}">Approve</button>
-                <button class="btn sm d" data-a="wno" data-v="${w.id}">Reject</button>
-              ` : `<span>${sb(w.status)}</span>`}
-            </div>
-          `);
-        }).join("") : '<div class="empty">No requests match this filter.</div>'}
-      </div>
-    ` : `
-      <div class="list">
-        <div class="r rh" style="--c:1.4fr 100px 110px 1.4fr">
-          <span>User / Ref</span>
-          <span>Type</span>
-          <span>Amount</span>
-          <span>Description</span>
-        </div>
-        ${S.txs.slice(0, 50).map(function(t){
-          var u = S.users.find(function(x){ return x.id === t.user_id; });
-          return row(["1fr auto", "1.4fr 100px 110px 1.4fr"], `
-            <div class="grow">
-              <div class="b ell">${esc(u ? u.name : String(t.user_id).slice(0, 6))}</div>
-              <div class="mut s12">${String(t.id).slice(0, 8)} · ${ago(t.created_at)}</div>
-            </div>
-            <span class="hm" style="text-transform:capitalize">${t.type}</span>
-            <b class="${t.type === 'withdraw' ? 'no' : 'ok'} ${!U.eye ? 'bl' : ''}">${t.type === 'withdraw' ? '-' : '+'}${inr(t.amount)}</b>
-            <span class="hm mut ell">${esc(t.description || "-")}</span>
-          `);
-        }).join("") || '<div class="empty">No transactions found.</div>'}
-      </div>
-    `}
+    <div class="list">
+      <div class="r rh" style="--c:1.4fr 100px 1.2fr 180px"><span>User</span><span>Amount</span><span>Destination</span><span style="text-align:right">Action</span></div>
+      ${L.map(function(w){
+        var u = S.users.find(function(x){ return x.id === w.user_id; });
+        return row(["1fr auto", "1.4fr 100px 1.2fr 180px"], `
+          <div class="grow"><b>${esc(u ? u.name : "Customer")}</b><div class="mut s12">${String(w.id).slice(0, 8)}</div></div>
+          <b class="${!U.eye ? 'bl' : ''}">${inr(w.amount)}</b>
+          <span class="hm mut">${esc(w.account || w.method || "UPI")}</span>
+          <div class="row" style="justify-content:flex-end">
+            ${w.status === "pending" ? `<button class="btn sm p" data-a="wok" data-v="${w.id}">Approve</button><button class="btn sm d" data-a="wno" data-v="${w.id}">Reject</button>` : `<span>${sb(w.status)}</span>`}
+          </div>
+        `);
+      }).join("")}
+    </div>
   `;
 }
 
 function coupons() {
   return `
-    <div class="tool">
-      <button class="btn p" data-a="coupon" data-v="new"><i data-lucide="plus"></i> Add Coupon</button>
-    </div>
+    <div class="tool"><button class="btn p" data-a="coupon" data-v="new"><i data-lucide="plus"></i> Add Coupon</button></div>
     <div class="list">
-      <div class="r rh" style="--c:90px 2fr 1.2fr 100px 80px">
-        <span>Discount</span>
-        <span>Title & Code</span>
-        <span>Category</span>
-        <span>Claimed</span>
-        <span></span>
-      </div>
+      <div class="r rh" style="--c:90px 2fr 1.2fr 80px"><span>Value</span><span>Code</span><span>Category</span><span></span></div>
       ${S.coupons.map(function(c){
-        return row(["auto 1fr", "90px 2fr 1.2fr 100px 80px"], `
+        return row(["auto 1fr", "90px 2fr 1.2fr 80px"], `
           <span class="badge b-am">${esc(c.value)}</span>
-          <div class="grow">
-            <div class="b ell">${esc(c.title)}</div>
-            <div class="mut s12 font-mono">${esc(c.code)}</div>
-          </div>
-          <span class="hm mut">${esc(c.category || "General")}</span>
-          <span class="hm">${c.is_claimed ? bd("Claimed", "b-am") : bd("Available", "b-ok")}</span>
+          <div class="grow"><b>${esc(c.code)}</b><div class="mut s12">${esc(c.title)}</div></div>
+          <span class="hm mut">${esc(c.category || "-")}</span>
           <button class="btn sm d" data-a="cdel" data-v="${c.id}"><i data-lucide="trash-2"></i></button>
         `);
       }).join("")}
@@ -606,302 +605,107 @@ function coupons() {
 
 function notify() {
   return `
-    <div class="two">
-      <div class="card">
-        <h3>Broadcast Push Announcement</h3>
-        <div class="fld">
-          <label for="nt">Notification Title</label>
-          <input class="inp" id="nt" maxlength="70" placeholder="e.g. Special odds for today's match!">
-        </div>
-        <div class="fld">
-          <label for="nd">Message Body</label>
-          <textarea class="inp" id="nd" maxlength="240" placeholder="Type notification content..."></textarea>
-        </div>
-        <div class="fld">
-          <label for="na">Target</label>
-          <select class="inp" id="na">
-            <option value="all">All registered users</option>
-            ${S.users.map(function(u){ return `<option value="${u.id}">${esc(u.name)} (${esc(u.email)})</option>`; }).join("")}
-          </select>
-        </div>
-        <div class="err" id="er"></div>
-        <button class="btn p" data-a="nsend"><i data-lucide="send"></i> Dispatch Notification</button>
-      </div>
-
-      <div class="card">
-        <h3>Broadcast History</h3>
-        ${S.notifs.length ? S.notifs.map(function(n){
-          return `<div class="ln"><div class="grow"><b class="ell" style="display:block">${esc(n.t)}</b><span class="mut s12 ell" style="display:block">${esc(n.d)}</span><span class="mut s11">${esc(n.aud)}</span></div><span class="mut s12">${ago(n.ts)}</span></div>`;
-        }).join("") : '<div class="empty">No notifications sent yet.</div>'}
-      </div>
-    </div>
-  `;
-}
-
-function tickets() {
-  var q = U.q.toLowerCase();
-  var L = S.tickets.filter(function(t){
-    return (U.tf === "all" || t.status === U.tf) && (U.tp === "all" || t.prio === U.tp) && (t.subject + t.user + t.id).toLowerCase().includes(q);
-  });
-
-  return `
-    <div class="tool">
-      <div class="srch">
-        <i data-lucide="search"></i>
-        <input class="inp" id="q" placeholder="Search ticket subject, user name, or ID..." value="${esc(U.q)}">
-      </div>
-      <select class="inp" style="width:auto" id="tpf" data-a="tpf">
-        <option value="all">All Priorities</option>
-        ${["high", "medium", "low"].map(function(p){ return `<option value="${p}" ${U.tp === p ? "selected" : ""}>${p.charAt(0).toUpperCase() + p.slice(1)} Priority</option>`; }).join("")}
-      </select>
-    </div>
-    ${chips("tf", U.tf, [["open", "Open"], ["pending", "Pending"], ["resolved", "Resolved"], ["closed", "Closed"], ["all", "All"]])}
-    <div style="height:10px"></div>
-    <div class="list">
-      <div class="r rh" style="--c:80px 2.2fr 1.2fr 90px 90px 90px 80px 30px">
-        <span>Ticket ID</span>
-        <span>Subject</span>
-        <span>Customer</span>
-        <span>Priority</span>
-        <span>Status</span>
-        <span>Rating</span>
-        <span>Updated</span>
-        <span></span>
-      </div>
-      ${L.length ? L.map(function(t){
-        return row(["1fr auto", "80px 2.2fr 1.2fr 90px 90px 90px 80px 30px"], `
-          <span class="hm mut">${String(t.id).slice(0, 8)}</span>
-          <div class="grow">
-            <div class="b ell">${t.unread ? '<span class="unread-dot"></span>' : ''}${esc(t.subject)}</div>
-            <div class="mut s12 ell">${esc(t.user)} · ${ago(t.updated)}</div>
-          </div>
-          <span class="hm ell">${esc(t.user)}</span>
-          <span class="hm">${sb(t.prio)}</span>
-          <span>${sb(t.status)}</span>
-          <span class="hm">${t.rating ? "★".repeat(t.rating) : '<span class="mut">None</span>'}</span>
-          <span class="hm mut s12">${ago(t.updated)}</span>
-          <span class="hm"><i data-lucide="chevron-right"></i></span>
-        `, `data-a="ticket" data-v="${t.id}"`);
-      }).join("") : '<div class="empty">No tickets match this view.</div>'}
-    </div>
-  `;
-}
-
-function settings() {
-  return `
-    <div class="two">
-      <div class="card">
-        <h3>Platform Configuration</h3>
-        <div class="ln"><div><b>Maintenance Mode</b><div class="mut s12">Temporarily close website markets for maintenance</div></div><label class="sw"><input type="checkbox" id="cfg-maint" ${S.cfg.maint ? "checked" : ""}><i data-a="sw-maint"></i></label></div>
-        <div class="ln"><div><b>User Registrations</b><div class="mut s12">Allow new users to sign up</div></div><label class="sw"><input type="checkbox" id="cfg-reg" ${S.cfg.regOpen ? "checked" : ""}><i data-a="sw-reg"></i></label></div>
-        <div class="fld" style="margin-top:14px"><label for="cfg-banner">Sitewide Announcement Banner</label><input class="inp" id="cfg-banner" value="${esc(S.cfg.banner)}"></div>
-        <button class="btn p" data-a="save-cfg"><i data-lucide="save"></i> Save System Config</button>
-      </div>
-
-      <div class="card">
-        <h3>Admin Access & Master Passcode</h3>
-        <p class="mut s12" style="margin-bottom:12px">Update your administrative master passcode.</p>
-        <div class="fld"><label for="p1">Current Passcode</label><input class="inp" id="p1" type="password" placeholder="Current passcode"></div>
-        <div class="fld"><label for="p2">New Passcode (Min 6 chars)</label><input class="inp" id="p2" type="password" placeholder="New passcode"></div>
-        <div class="err" id="er"></div>
-        <button class="btn" data-a="pw"><i data-lucide="key"></i> Update Passcode</button>
-      </div>
-    </div>
-  `;
-}
-
-function audit() {
-  return `
-    <div class="list">
-      <div class="r rh" style="--c:2.5fr 1.2fr 100px 140px">
-        <span>Action</span>
-        <span>Category</span>
-        <span>Author</span>
-        <span>Timestamp</span>
-      </div>
-      ${S.audit.length ? S.audit.map(function(a){
-        return row(["1fr auto", "2.5fr 1.2fr 100px 140px"], `
-          <div class="grow"><div class="b ell">${esc(a.a)}</div><div class="mut s12">${esc(a.t)}</div></div>
-          <span class="hm mut">${esc(a.t)}</span>
-          <span class="hm mut">${esc(a.by)}</span>
-          <span class="mut s12">${ago(a.ts)}</span>
-        `);
-      }).join("") : '<div class="empty">No actions logged yet.</div>'}
+    <div class="card">
+      <h3>Send Notification</h3>
+      <div class="fld"><label for="nt">Title</label><input class="inp" id="nt"></div>
+      <div class="fld"><label for="nd">Message</label><textarea class="inp" id="nd"></textarea></div>
+      <button class="btn p" data-a="nsend"><i data-lucide="send"></i> Dispatch Announcement</button>
     </div>
   `;
 }
 
 var PAGES = {
-  dash: dash, reports: reports, users: users_, markets: markets_, wallet: wallet, coupons: coupons, notify: notify, tickets: tickets, settings: settings, audit: audit
+  dash: dash, users: users_, markets: markets_, wallet: wallet, coupons: coupons,
+  tickets: tickets, notify: notify, controls: controls, risk: risk
 };
-
-function dhead(t, x) {
-  return `
-    <header>
-      <button class="ib" data-a="dx" aria-label="Close"><i data-lucide="x"></i></button>
-      <div class="grow"><b class="ell" style="display:block">${t}</b>${x ? `<span class="mut s12">${x}</span>` : ""}</div>
-    </header>
-  `;
-}
 
 function drawer() {
   var d = U.dr;
   if (!d) return "";
   var h = "";
 
-  if (d.t === "user") {
-    var u = S.users.find(function(x){ return x.id === d.id; });
-    if (!u) return "";
-    var tx = S.txs.filter(function(t){ return t.user_id === u.id; }).slice(0, 5);
-
-    h = dhead(esc(u.name), esc(u.email) + " · " + u.id) + `
-      <div class="bd stack">
-        <div class="row">${sb(u.status)}${bd("KYC: " + u.kyc, u.kyc === "verified" ? "b-ok" : "b-am")}</div>
-        <div class="g2">
-          <div class="card kpi"><small>Wallet Balance</small><b class="${!U.eye ? 'bl' : ''}">${inr(u.bal)}</b></div>
-          <div class="card kpi"><small>Reward XP</small><b>${u.xp} pts</b></div>
-          <div class="card kpi"><small>Predictions</small><b>${u.picks}</b></div>
-          <div class="card kpi"><small>City</small><b>${esc(u.city)}</b></div>
-        </div>
-
-        <div class="card">
-          <h3>Balance Adjustment</h3>
-          <div class="g2">
-            <div class="fld"><label for="ba">Delta Amount (+ or -)</label><input class="inp" id="ba" type="number" placeholder="e.g. 500 or -200"></div>
-            <div class="fld"><label for="br">Reason</label><input class="inp" id="br" placeholder="Manual bonus / correction"></div>
-          </div>
-          <div class="err" id="er"></div>
-          <button class="btn sm p" data-a="uadj" data-v="${u.id}">Apply Adjustment</button>
-        </div>
-
-        <div class="card">
-          <h3>User Moderation</h3>
-          <div class="row">
-            <button class="btn sm ${u.status === 'active' ? 'd' : 'k'}" data-a="ublock" data-v="${u.id}">${u.status === 'active' ? 'Block Account' : 'Unblock Account'}</button>
-            <button class="btn sm" data-a="ukyc" data-v="${u.id}">${u.kyc === 'verified' ? 'Revoke KYC' : 'Verify KYC'}</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Recent Transactions</h3>
-          ${tx.length ? tx.map(function(t){
-            return `<div class="ln"><div><div class="b" style="text-transform:capitalize">${t.type}</div><div class="mut s12">${ago(t.created_at)}</div></div><b class="${t.type === 'withdraw' ? 'no' : 'ok'} ${!U.eye ? 'bl' : ''}">${t.type === 'withdraw' ? '-' : '+'}${inr(t.amount)}</b></div>`;
-          }).join("") : '<div class="mut s12">No transactions recorded.</div>'}
-        </div>
-      </div>
-    `;
-  }
-
-  if (d.t === "market") {
-    var isNew = d.id === "new";
-    var m = isNew ? { id: "", category: "cricket", league: "", team_a: "", team_b: "", question: "", crowd_a: 50, odds_a: 1.85, odds_b: 2.10, status: "open", cricket_match_id: "" } : S.matches.find(function(x){ return x.id === d.id; });
-    if (!m) return "";
-
-    h = dhead(isNew ? "Create Fixture" : esc(ttl(m)), isNew ? "New Event" : "Status: " + m.status) + `
-      <div class="bd stack">
-        <div class="g2">
-          <div class="fld">
-            <label for="mc">Category</label>
-            <select class="inp" id="mc">
-              ${["cricket", "football", "kabaddi", "esports", "indian"].map(function(c){ return `<option value="${c}" ${m.category === c ? "selected" : ""}>${c}</option>`; }).join("")}
-            </select>
-          </div>
-          <div class="fld"><label for="ml">League / Tournament</label><input class="inp" id="ml" value="${esc(m.league)}"></div>
-        </div>
-        <div class="fld"><label for="mq">Question (Optional for Team A vs Team B)</label><input class="inp" id="mq" value="${esc(m.question || "")}"></div>
-        <div class="g2">
-          <div class="fld"><label for="ma">Team A / Option A</label><input class="inp" id="ma" value="${esc(m.team_a)}"></div>
-          <div class="fld"><label for="mb">Team B / Option B</label><input class="inp" id="mb" value="${esc(m.team_b)}"></div>
-          <div class="fld"><label for="oa">Odds Team A</label><input class="inp" id="oa" type="number" step="0.05" value="${m.odds_a || 1.85}"></div>
-          <div class="fld"><label for="ob">Odds Team B</label><input class="inp" id="ob" type="number" step="0.05" value="${m.odds_b || 2.10}"></div>
-          <div class="fld"><label for="ca">Crowd Pick % (Team A)</label><input class="inp" id="ca" type="number" value="${m.crowd_a || 50}"></div>
-          <div class="fld"><label for="api">CricAPI Match ID</label><input class="inp" id="api" value="${esc(m.cricket_match_id || "")}"></div>
-        </div>
-        <div class="err" id="er"></div>
-        <button class="btn p w" data-a="msave" data-v="${m.id || 'new'}">${isNew ? "Publish Fixture" : "Update Fixture"}</button>
-
-        ${!isNew && m.status !== "settled" ? `
-          <div class="card" style="margin-top:14px">
-            <h3>Declare Result & Settle Winnings</h3>
-            <div class="g2">
-              <button class="btn k" data-a="mset" data-v="${m.id}:A">${esc(m.team_a)} Won</button>
-              <button class="btn k" data-a="mset" data-v="${m.id}:B">${esc(m.team_b)} Won</button>
-            </div>
-            <button class="btn sm d w" style="margin-top:8px" data-a="mset" data-v="${m.id}:void">Void Match (Refund Bets)</button>
-          </div>
-        ` : ""}
-      </div>
-    `;
-  }
-
-  if (d.t === "coupon") {
-    h = dhead("Create Coupon Code") + `
-      <div class="bd">
-        <div class="g2">
-          <div class="fld"><label for="cv">Discount Value</label><input class="inp" id="cv" placeholder="10% or ₹100"></div>
-          <div class="fld"><label for="cc">Category</label><input class="inp" id="cc" placeholder="Wallet / Perks"></div>
-        </div>
-        <div class="fld"><label for="ct">Title</label><input class="inp" id="ct" placeholder="e.g. Deposit Match Voucher"></div>
-        <div class="fld"><label for="cd">Code</label><input class="inp" id="cd" placeholder="CRIC2026"></div>
-        <div class="err" id="er"></div>
-        <button class="btn p w" data-a="csave">Save Coupon</button>
-      </div>
-    `;
-  }
-
   if (d.t === "ticket") {
     var t = S.tickets.find(function(x){ return x.id === d.id; });
     if (!t) return "";
 
-    // Mark as read in DB if has unread
     if (t.unread > 0 && db) {
       db.from("ticket_messages").update({ is_read: true }).eq("ticket_id", t.id).eq("sender", "user").then(function(){});
       t.unread = 0;
     }
 
-    h = dhead(esc(t.subject), String(t.id).slice(0, 8) + " · " + esc(t.user)) + `
+    h = `
+      <header>
+        <button class="ib" data-a="dx"><i data-lucide="x"></i></button>
+        <div class="grow">
+          <b class="ell" style="display:block">${esc(t.subject)}</b>
+          <span class="mut s12">${esc(t.user)} (${esc(t.email)})</span>
+        </div>
+      </header>
       <div class="bd stack">
         <div class="bt">
-          <div class="row">Status: ${sb(t.status)} | Priority: ${sb(t.prio)}</div>
+          <div class="row">Status: ${sb(t.status)}</div>
           <div class="row">
             ${t.status === "closed" ? `<button class="btn sm k" data-a="treopen" data-v="${t.id}">Reopen</button>` : `<button class="btn sm d" data-a="tclose" data-v="${t.id}">Close Ticket</button>`}
           </div>
         </div>
-
-        ${t.rating ? `<div class="card" style="padding:10px 14px;background:var(--ams);color:var(--am)"><b>Customer Rating:</b> ${"★".repeat(t.rating)} (${t.rating}/5)</div>` : ""}
-        ${t.close_note ? `<div class="card" style="padding:10px 14px;background:var(--s2)"><b>Resolution Note:</b> ${esc(t.close_note)}</div>` : ""}
-
         <div class="chat-container">
           <div class="chat-msgs" id="chat-stream">
             ${t.msgs.map(function(m){
-              return `<div class="msg ${m.f}">${esc(m.text)}<small>${m.f === 'admin' ? 'Support Agent' : esc(t.user)} · ${ago(m.ts)}</small></div>`;
+              return `<div class="msg ${m.f}">${esc(m.text)}<small>${m.f === 'admin' ? 'Support Officer' : esc(t.user)}</small></div>`;
             }).join("")}
           </div>
           <div class="chat-box">
-            <select class="inp" id="tc" data-a="tcan">
-              <option value="">Insert Canned Response…</option>
-              <option>Hello! Thanks for reaching out. We are verifying this with our payments gateway.</option>
-              <option>This has been resolved on your account. Please log out and back in to see your updated balance.</option>
-              <option>Could you please provide your 12-digit UPI reference number (UTR) to locate the transaction?</option>
-            </select>
-            <textarea class="inp" id="tr" placeholder="Type response to user..."></textarea>
-            <div class="row">
-              <button class="btn p" data-a="treply" data-v="${t.id}"><i data-lucide="send"></i> Send Reply</button>
-            </div>
+            <textarea class="inp" id="tr" placeholder="Reply to customer..."></textarea>
+            <button class="btn p" data-a="treply" data-v="${t.id}"><i data-lucide="send"></i> Send Reply</button>
           </div>
         </div>
       </div>
     `;
+  } else if (d.t === "user") {
+    var u = S.users.find(function(x){ return x.id === d.id; });
+    if (!u) return "";
+    h = `
+      <header><button class="ib" data-a="dx"><i data-lucide="x"></i></button><div class="grow"><b>${esc(u.name)}</b></div></header>
+      <div class="bd stack">
+        <div class="card kpi"><small>Balance</small><b>${inr(u.bal)}</b></div>
+        <div class="fld"><label for="ba">Adjust Balance (Delta)</label><input class="inp" id="ba" type="number" placeholder="e.g. 500 or -200"></div>
+        <div class="fld"><label for="br">Reason</label><input class="inp" id="br"></div>
+        <button class="btn p w" data-a="uadj" data-v="${u.id}">Apply Adjustment</button>
+        <button class="btn ${u.status === 'active' ? 'd' : 'k'} w" style="margin-top:8px" data-a="ublock" data-v="${u.id}">${u.status === 'active' ? 'Block User' : 'Unblock User'}</button>
+      </div>
+    `;
+  } else if (d.t === "market") {
+    var isNew = d.id === "new";
+    var m = isNew ? { id: "", category: "cricket", league: "", team_a: "", team_b: "", odds_a: 1.85, odds_b: 2.10, crowd_a: 50 } : S.matches.find(function(x){ return x.id === d.id; });
+    h = `
+      <header><button class="ib" data-a="dx"><i data-lucide="x"></i></button><div class="grow"><b>${isNew ? "Create Fixture" : "Manage Match"}</b></div></header>
+      <div class="bd stack">
+        <div class="fld"><label for="ml">League</label><input class="inp" id="ml" value="${esc(m.league)}"></div>
+        <div class="g2">
+          <div class="fld"><label for="ma">Team A</label><input class="inp" id="ma" value="${esc(m.team_a)}"></div>
+          <div class="fld"><label for="mb">Team B</label><input class="inp" id="mb" value="${esc(m.team_b)}"></div>
+          <div class="fld"><label for="oa">Odds A</label><input class="inp" id="oa" type="number" step="0.05" value="${m.odds_a}"></div>
+          <div class="fld"><label for="ob">Odds B</label><input class="inp" id="ob" type="number" step="0.05" value="${m.odds_b}"></div>
+        </div>
+        <button class="btn p w" data-a="msave" data-v="${m.id || 'new'}">Publish Match</button>
+        ${!isNew && m.status !== "settled" ? `
+          <div class="card" style="margin-top:14px">
+            <h3>Declare Winner</h3>
+            <div class="g2">
+              <button class="btn k" data-a="mset" data-v="${m.id}:A">${esc(m.team_a)} Won</button>
+              <button class="btn k" data-a="mset" data-v="${m.id}:B">${esc(m.team_b)} Won</button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
   }
-
   return `<div class="scrim" data-a="dx"></div><aside class="dr">${h}</aside>`;
 }
 
 function shell() {
   var m = META[U.route] || META.dash;
-  var pw = pendW().length;
-  var ot = S.tickets.filter(function(t){ return t.unread > 0; }).length;
-  var cnt = { wallet: pw, tickets: ot };
+  var ot = S.tickets.filter(function(t){ return t.status === "open"; }).length;
 
   return `
     <div class="shell">
@@ -912,24 +716,20 @@ function shell() {
         </div>
         ${NAV.map(function(g){
           return `<div class="ng">${g[0]}</div>` + g[1].map(function(i){
-            return `<button class="nl ${U.route === i[0] ? 'on' : ''}" data-a="go" data-v="${i[0]}"><i data-lucide="${i[2]}"></i>${i[1]}${cnt[i[0]] ? `<span class="cnt">${cnt[i[0]]}</span>` : ''}</button>`;
+            return `<button class="nl ${U.route === i[0] ? 'on' : ''}" data-a="go" data-v="${i[0]}"><i data-lucide="${i[2]}"></i>${i[1]}${i[0] === 'tickets' && ot ? `<span class="cnt">${ot}</span>` : ''}</button>`;
           }).join("");
         }).join("")}
         <div style="margin-top:auto;padding-top:14px">
-          <button class="nl" data-a="lock"><i data-lucide="log-out"></i> Lock Panel</button>
+          <button class="nl" data-a="logout"><i data-lucide="log-out"></i> Log Out</button>
         </div>
       </aside>
       ${U.nav ? '<div class="scrim" data-a="nav"></div>' : ''}
       <div class="main">
         <header class="top">
-          <button class="ib mob" data-a="nav" aria-label="Menu"><i data-lucide="menu"></i></button>
-          <div class="grow">
-            <h1>${m[0]}</h1>
-            <div class="sub">${m[1]}</div>
-          </div>
-          <button class="ib" data-a="eye" title="Toggle Private Balance Visibility"><i data-lucide="${U.eye ? 'eye' : 'eye-off'}"></i></button>
-          <button class="ib" data-a="theme" title="Toggle Theme"><i data-lucide="${document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon'}"></i></button>
-          <button class="ib" data-a="go" data-v="tickets" title="Tickets"><i data-lucide="bell"></i>${ot + pw ? `<span class="dot">${ot + pw}</span>` : ''}</button>
+          <button class="ib mob" data-a="nav"><i data-lucide="menu"></i></button>
+          <div class="grow"><h1>${m[0]}</h1><div class="sub">${m[1]}</div></div>
+          <button class="ib" data-a="eye"><i data-lucide="${U.eye ? 'eye' : 'eye-off'}"></i></button>
+          <button class="ib" data-a="go" data-v="tickets"><i data-lucide="headset"></i>${ot ? `<span class="dot">${ot}</span>` : ''}</button>
           <span class="av">AD</span>
         </header>
         <main class="pg">${PAGES[U.route]()}</main>
@@ -938,234 +738,118 @@ function shell() {
   `;
 }
 
-function authV() {
+function loginV() {
+  if (!authState.googleAuthed) {
+    return `
+      <div class="login">
+        <div class="card">
+          <div class="brand" style="padding:0 0 16px;color:var(--ink)"><span class="mark"><i data-lucide="shield-check"></i></span>CricPulse <small>ADMIN</small></div>
+          <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
+          <p class="mut" style="margin:4px 0 16px">Authorized accounts only. Sign in with your registered Google ID.</p>
+          <button class="btn p w" data-a="google-login"><i data-lucide="log-in"></i> Sign In with Google</button>
+        </div>
+      </div>
+    `;
+  }
+
   return `
     <div class="login">
       <div class="card">
-        <div class="brand" style="padding:0 0 16px;color:var(--ink)">
-          <span class="mark"><i data-lucide="shield-check"></i></span>
-          CricPulse <small>ADMIN</small>
-        </div>
-        <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
-        <p class="mut" style="margin:4px 0 16px">Enter your credentials to manage live markets and financials.</p>
-        <div class="fld">
-          <label for="pa">Master Passcode</label>
-          <input class="inp" id="pa" type="password" placeholder="Enter administrative passcode" autocomplete="current-password">
-        </div>
+        <div class="brand" style="padding:0 0 16px;color:var(--ink)"><span class="mark"><i data-lucide="lock"></i></span>Security Gateway</div>
+        <h2 style="font-size:20px;font-weight:700">Master Passcode</h2>
+        <p class="mut" style="margin:4px 0 16px">Signed in as <b>${esc(authState.email)}</b>. Confirm master passcode to proceed.</p>
+        <div class="fld"><input class="inp" id="master-pass" type="password" placeholder="Enter master passcode" autocomplete="current-password"></div>
         <div class="err" id="er"></div>
-        <button class="btn p w" data-a="login">Unlock Admin Control Room</button>
+        <button class="btn p w" data-a="verify-pass">Unlock Control Panel</button>
       </div>
     </div>
   `;
 }
 
-var authed = sessionStorage.getItem("cpa_auth") === "1";
-
 function render() {
   var y = window.scrollY;
-  $("app").innerHTML = authed ? shell() : authV();
-  $("dr").innerHTML = authed ? drawer() : "";
+  $("app").innerHTML = (authState.googleAuthed && authState.passAuthed) ? shell() : loginV();
+  $("dr").innerHTML = (authState.googleAuthed && authState.passAuthed) ? drawer() : "";
   try { lucide.createIcons(); } catch(e){}
-  if (authed) window.scrollTo(0, y);
+  if (authState.googleAuthed && authState.passAuthed) window.scrollTo(0, y);
 }
-
-var applyTheme = function(){
-  document.documentElement.dataset.theme = localStorage.getItem("cpa_theme") || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
-};
-
-var csv = function(name, rows){
-  var t = rows.map(function(r){ return r.map(function(c){ return '"' + String(c == null ? "" : c).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([t], {type: "text/csv"}));
-  a.download = name;
-  a.click();
-  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 500);
-  log("Exported CSV: " + name, "Reports");
-};
 
 document.addEventListener("click", async function(e){
   var t = e.target.closest("[data-a]");
   if (!t) return;
   var a = t.dataset.a, v = t.dataset.v;
-  if (t.tagName === "SELECT" || t.tagName === "TEXTAREA" || (t.tagName === "INPUT" && t.type !== "checkbox")) return;
 
   switch(a) {
-    case "login": {
-      var p = $("pa").value;
-      var hash = await hp(p);
-      if (hash !== MASTER_PASS_HASH && p !== "Vishal@123") {
-        $("er").textContent = "Incorrect admin passcode entered.";
+    case "google-login":
+      if (!db) return toast("Supabase not connected", "alert-circle");
+      await db.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin + window.location.pathname }
+      });
+      break;
+
+    case "verify-pass": {
+      var pass = $("master-pass").value;
+      var hash = await hp(pass);
+      if (hash !== SECURE_PASS_HASH) {
+        $("er").textContent = "Passcode incorrect.";
         return;
       }
-      sessionStorage.setItem("cpa_auth", "1");
-      authed = true;
-      log("Administrator logged in", "Security");
+      sessionStorage.setItem("cp_pass_auth", "1");
+      authState.passAuthed = true;
       render();
       loadAll();
       initRealtime();
       break;
     }
-    case "lock":
-      sessionStorage.removeItem("cpa_auth");
-      authed = false;
-      U.nav = 0; U.dr = null;
-      render();
+
+    case "logout":
+      sessionStorage.removeItem("cp_pass_auth");
+      authState.passAuthed = false;
+      if (db) await db.auth.signOut();
+      window.location.reload();
       break;
-    case "nav":
-      U.nav = U.nav ? 0 : 1;
-      render();
-      break;
-    case "go":
-      U.route = v; U.nav = 0; U.q = ""; U.dr = null;
-      render();
-      window.scrollTo(0, 0);
-      break;
-    case "eye":
-      U.eye = !U.eye;
-      render();
-      break;
-    case "theme":
-      var cur = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      localStorage.setItem("cpa_theme", cur);
-      applyTheme();
-      render();
-      break;
-    case "dx":
-      U.dr = null;
-      render();
-      break;
+
+    case "nav": U.nav = U.nav ? 0 : 1; render(); break;
+    case "go": U.route = v; U.nav = 0; U.dr = null; render(); window.scrollTo(0, 0); break;
+    case "eye": U.eye = !U.eye; render(); break;
+    case "dx": U.dr = null; render(); break;
     case "uf": U.uf = v; render(); break;
     case "tf": U.tf = v; render(); break;
     case "wf": U.wf = v; render(); break;
-    case "wt": U.wt = v; render(); break;
+    case "ticket": U.dr = { t: "ticket", id: v }; render(); break;
     case "user": U.dr = { t: "user", id: v }; render(); break;
     case "market": U.dr = { t: "market", id: v }; render(); break;
-    case "coupon": U.dr = { t: "coupon", id: v }; render(); break;
-    case "ticket":
-      U.dr = { t: "ticket", id: v };
-      render();
-      setTimeout(function(){ var cs = $("chat-stream"); if (cs) cs.scrollTop = cs.scrollHeight; }, 50);
-      break;
 
-    case "wok":
-    case "wno": {
-      var ok = a === "wok";
-      var newStatus = ok ? "approved" : "rejected";
-      var res = await db.from("withdrawal_requests").update({ status: newStatus }).eq("id", v);
-      if (res.error) { toast(res.error.message, "alert-circle"); return; }
-      if (!ok) {
-        var wItem = S.wds.find(function(x){ return x.id === v; });
-        if (wItem) {
-          await db.rpc("admin_adjust_balance", { p_user_id: wItem.user_id, p_delta: wItem.amount, p_reason: "Rejected payout refund" });
-        }
-      }
-      toast("Withdrawal " + newStatus);
-      log("Withdrawal " + v + " " + newStatus, "Wallet");
+    case "toggle-maint": {
+      var val = !S.cfg.maintenance_mode;
+      await db.from("app_config").update({ maintenance_mode: val }).eq("id", "primary");
+      toast("Maintenance " + (val ? "ACTIVATED" : "DEACTIVATED"));
       loadAll();
       break;
     }
 
-    case "uadj": {
-      var amt = Number($("ba").value), reason = $("br").value.trim();
-      if (!amt || !reason) { $("er").textContent = "Provide amount and reason."; return; }
-      var rpcRes = await db.rpc("admin_adjust_balance", { p_user_id: v, p_delta: amt, p_reason: reason });
-      if (rpcRes.error) { $("er").textContent = rpcRes.error.message; return; }
-      toast("Balance adjusted");
-      log("Adjusted balance for user " + v + " by " + amt, "Wallet");
-      U.dr = null;
+    case "toggle-reg": {
+      var val2 = !S.cfg.registrations_open;
+      await db.from("app_config").update({ registrations_open: val2 }).eq("id", "primary");
+      toast("Registrations " + (val2 ? "Open" : "Closed"));
       loadAll();
       break;
     }
 
-    case "ublock": {
-      var usr = S.users.find(function(x){ return x.id === v; });
-      var nStatus = usr.status === "active" ? "blocked" : "active";
-      await db.from("users").update({ status: nStatus }).eq("id", v);
-      toast("User " + nStatus);
+    case "save-banner": {
+      var bTxt = $("cfg-banner").value.trim();
+      await db.from("app_config").update({ banner_message: bTxt }).eq("id", "primary");
+      toast("Banner published live!");
       loadAll();
       break;
     }
 
-    case "ukyc": {
-      var usr2 = S.users.find(function(x){ return x.id === v; });
-      var nKyc = usr2.kyc !== "verified";
-      await db.from("users").update({ kyc_verified: nKyc }).eq("id", v);
-      toast("KYC " + (nKyc ? "verified" : "unverified"));
-      loadAll();
-      break;
-    }
-
-    case "msave": {
-      var isNewM = v === "new";
-      var mObj = {
-        category: $("mc").value,
-        league: $("ml").value,
-        question: $("mq").value.trim() || null,
-        team_a: $("ma").value,
-        team_b: $("mb").value,
-        odds_a: Number($("oa").value) || 1.85,
-        odds_b: Number($("ob").value) || 2.10,
-        crowd_a: Number($("ca").value) || 50,
-        cricket_match_id: $("api").value.trim() || null,
-        status: "open"
-      };
-      if (isNewM) {
-        await db.from("matches").insert(mObj);
-        toast("Match published!");
-      } else {
-        await db.from("matches").update(mObj).eq("id", v);
-        toast("Match updated!");
-      }
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "mset": {
-      var [mId, win] = v.split(":");
-      await db.from("matches").update({ status: "settled" }).eq("id", mId);
-      toast("Match settled (" + win + ")");
-      log("Settled match " + mId + " (" + win + " won)", "Markets");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "csave": {
-      var cObj = {
-        value: $("cv").value.trim(),
-        title: $("ct").value.trim(),
-        code: $("cd").value.trim().toUpperCase(),
-        category: $("cc").value.trim(),
-        is_claimed: false
-      };
-      await db.from("coupons").insert(cObj);
-      toast("Coupon added!");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "cdel": {
-      if (confirm("Delete this coupon?")) {
-        await db.from("coupons").delete().eq("id", v);
-        toast("Coupon removed");
-        loadAll();
-      }
-      break;
-    }
-
-    case "nsend": {
-      var title = $("nt").value.trim(), body = $("nd").value.trim(), aud = $("na").value;
-      if (!title || !body) { $("er").textContent = "Provide title and message."; return; }
-      var notifPayload = {
-        title: title,
-        body: body,
-        icon: "bell",
-        user_id: aud === "all" ? null : aud
-      };
-      await db.from("notifications").insert(notifPayload);
-      toast("Notification dispatched!");
+    case "save-limits": {
+      var md = Number($("min-dep").value) || 10;
+      var mw = Number($("min-wd").value) || 100;
+      await db.from("app_config").update({ min_deposit: md, min_withdrawal: mw }).eq("id", "primary");
+      toast("Limits updated");
       loadAll();
       break;
     }
@@ -1173,13 +857,7 @@ document.addEventListener("click", async function(e){
     case "treply": {
       var rep = $("tr").value.trim();
       if (!rep) return;
-      var insRes = await db.from("ticket_messages").insert({
-        ticket_id: v,
-        sender: "admin",
-        message: rep,
-        is_read: false
-      });
-      if (insRes.error) { toast(insRes.error.message, "alert-circle"); return; }
+      await db.from("ticket_messages").insert({ ticket_id: v, sender: "admin", message: rep, is_read: false });
       await db.from("support_tickets").update({ status: "pending" }).eq("id", v);
       $("tr").value = "";
       toast("Reply sent");
@@ -1188,8 +866,7 @@ document.addEventListener("click", async function(e){
     }
 
     case "tclose": {
-      var note = prompt("Enter resolution close note for user (optional):");
-      await db.from("support_tickets").update({ status: "closed", close_note: note || "" }).eq("id", v);
+      await db.from("support_tickets").update({ status: "closed" }).eq("id", v);
       toast("Ticket closed");
       U.dr = null;
       loadAll();
@@ -1204,50 +881,84 @@ document.addEventListener("click", async function(e){
       break;
     }
 
-    case "save-cfg": {
-      S.cfg.maint = $("cfg-maint").checked ? 1 : 0;
-      S.cfg.regOpen = $("cfg-reg").checked ? 1 : 0;
-      S.cfg.banner = $("cfg-banner").value.trim();
-      toast("Settings updated");
-      log("Updated system platform configuration", "Settings");
+    case "wok":
+    case "wno": {
+      var ok = a === "wok";
+      await db.from("withdrawal_requests").update({ status: ok ? "approved" : "rejected" }).eq("id", v);
+      if (!ok) {
+        var w = S.wds.find(function(x){ return x.id === v; });
+        if (w) await db.rpc("admin_adjust_balance", { p_user_id: w.user_id, p_delta: w.amount, p_reason: "Payout refund" });
+      }
+      toast("Withdrawal " + (ok ? "approved" : "rejected"));
+      loadAll();
       break;
     }
 
-    case "exp": {
-      if (v === "users") csv("users.csv", [["ID", "Name", "Email", "City", "Balance", "XP", "Status", "Joined"], ...S.users.map(function(u){ return [u.id, u.name, u.email, u.city, u.bal, u.xp, u.status, u.joined]; })]);
-      if (v === "txs") csv("transactions.csv", [["ID", "User ID", "Type", "Amount", "Description", "Created"], ...S.txs.map(function(t){ return [t.id, t.user_id, t.type, t.amount, t.description, t.created_at]; })]);
-      if (v === "tickets") csv("tickets.csv", [["ID", "User ID", "Subject", "Status", "Priority", "Rating", "Created"], ...S.tickets.map(function(t){ return [t.id, t.user_id, t.subject, t.status, t.prio, t.rating, t.created]; })]);
-      if (v === "matches") csv("matches.csv", [["ID", "Category", "League", "Team A", "Team B", "Status"], ...S.matches.map(function(m){ return [m.id, m.category, m.league, m.team_a, m.team_b, m.status]; })]);
+    case "uadj": {
+      var amt = Number($("ba").value), rsn = $("br").value.trim();
+      if (!amt || !rsn) return;
+      await db.rpc("admin_adjust_balance", { p_user_id: v, p_delta: amt, p_reason: rsn });
+      toast("Balance updated");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "msave": {
+      var isNewM = v === "new";
+      var mObj = {
+        category: "cricket", league: $("ml").value, team_a: $("ma").value, team_b: $("mb").value,
+        odds_a: Number($("oa").value) || 1.85, odds_b: Number($("ob").value) || 2.10, status: "open"
+      };
+      if (isNewM) await db.from("matches").insert(mObj);
+      else await db.from("matches").update(mObj).eq("id", v);
+      toast("Match published");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "mset": {
+      var [mId, win] = v.split(":");
+      await db.from("matches").update({ status: "settled" }).eq("id", mId);
+      toast("Match settled (" + win + " won)");
+      U.dr = null;
+      loadAll();
+      break;
+    }
+
+    case "void-match": {
+      if (confirm("Void this match and refund all entries?")) {
+        await db.from("matches").update({ status: "void" }).eq("id", v);
+        toast("Match voided");
+        loadAll();
+      }
       break;
     }
   }
 });
 
-document.addEventListener("change", function(e){
-  var t = e.target;
-  if (t.id === "tpf") { U.tp = t.value; render(); }
-  if (t.id === "tc" && t.value) { $("tr").value = t.value; t.selectedIndex = 0; }
-});
-
-document.addEventListener("input", function(e){
-  if (e.target.id === "q") { U.q = e.target.value; render(); }
-});
-
-document.addEventListener("keydown", function(e){
-  if (e.key === "Escape" && U.dr) { U.dr = null; render(); }
-  if (e.key === "Enter" && e.target.id === "pa") {
-    var b = document.querySelector('[data-a="login"]');
-    if (b) b.click();
+async function checkAuth() {
+  if (!db) return render();
+  var { data: { session } } = await db.auth.getSession();
+  if (session && session.user) {
+    var em = String(session.user.email || "").toLowerCase();
+    if (ADMIN_EMAILS.indexOf(em) >= 0) {
+      authState.googleAuthed = true;
+      authState.email = em;
+    } else {
+      toast("Unauthorized account", "alert-circle");
+      await db.auth.signOut();
+    }
   }
-});
-
-applyTheme();
-if (authed) {
-  loadAll();
-  initRealtime();
-} else {
   render();
+  if (authState.googleAuthed && authState.passAuthed) {
+    loadAll();
+    initRealtime();
+  }
 }
+
+checkAuth();
 </script>
 </body>
 </html>
