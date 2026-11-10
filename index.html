@@ -1339,18 +1339,24 @@ document.addEventListener("change", e => {
     const f = e.target.files[0], t = S.tickets.find(x => x.id == S.ticketOpen);
     if (!f.type.startsWith("image/")) { toast("Please select an image.","x"); return; }
     if (f.size > 3*1024*1024) { toast("Image must be under 3 MB.","x"); return; }
+    
     const rd = new FileReader();
-    rd.onload = () => {
+    rd.onload = async () => {
       if (!t) return;
-      t.msgs.push({me:true, text:"", img:rd.result, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
+      const base64Data = rd.result;
+      
+      // 1. Update UI locally
+      t.msgs.push({me:true, text:"[Image]", img:base64Data, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
       t.updated = "Just now"; save(); render();
       setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+      
+      // 2. Save to database so admin can see it
+      await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: base64Data });
     };
     rd.readAsDataURL(f);
     e.target.value = "";
   }
 });
-
 /* timers */
 setInterval(() => {
   document.querySelectorAll("[data-cd]").forEach(n => {
