@@ -466,7 +466,7 @@ function landing() {
       <span class="tag">${ic("shield",12)} Real Predictions, Real Rewards</span>
       <h1>Call the match. <em>Win real money.</em></h1>
       <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
-      <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get started free</button><button class="btn grow" data-a="guest">Try as guest</button></div>
+      <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get Started Free</button><button class="btn grow" data-a="auth" data-v="in">Login</button></div>
       <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
     </div>
     <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
@@ -477,8 +477,8 @@ function landing() {
 </div>
 <footer class="foot">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <a href="https://sportscore.com/" target="_blank" rel="dofollow" style="color:var(--i3);font-size:0.65rem;">Powered by SportScore</a>
-    <div><b>CricPulse</b><br>India's real money prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
+      <!-- Removed Powered by SportScore -->
+      <div><b>CricPulse</b><br>India's real money prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
     <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button><button data-a="guest">Continue as guest</button></div>
     <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
     <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
@@ -1084,7 +1084,7 @@ const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
   <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
-  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount (Min ₹50)"></div>
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="1" placeholder="Enter amount (Min ₹1)"></div>
   
   <div class="fld">
     <label>Payment method</label>
@@ -1278,11 +1278,12 @@ document.addEventListener("click", e => {
       supabase.from('ticket_messages').insert({ ticket_id: t2.id, sender: 'user', message: txt }).then();
       break;
     }
+    case "closemore": closeSheet(); break;
     case "dep": depSheet(); break;
     case "damt": $("da").value = v; break;
     case "depok": {
       const x = Number($("da").value);
-      if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
+      if (!x || x < 1) { $("er").textContent = "Minimum deposit is ₹1."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       const selectedApp = $("dm").value; 
@@ -1440,8 +1441,30 @@ function initRealtimeSync() {
       }
     }).subscribe();
 
+  supabase.channel('cricpulse-ticket-status-' + S.user.id)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'support_tickets' }, (payload) => {
+        if (payload.new.status === 'closed' && S.route === 'ticket' && S.ticketOpen === payload.new.id) {
+            toast("Support has closed this ticket.", "check");
+            loadTickets().then(() => {
+                render();
+                // Optional: Trigger a popup for rating
+                const t = S.tickets.find(x => x.id === payload.new.id);
+                if(t && !t.rating) {
+                    sheet(`<div style="text-align:center; padding: 20px;">
+                        <h3>Ticket Closed</h3>
+                        <p class="mut s12" style="margin-bottom:15px;">Please rate your support experience.</p>
+                        <div class="stars" style="display:flex; justify-content:center; gap:8px;">
+                            ${[1,2,3,4,5].map(i => `<span onclick="rateTicket('${t.id}', ${i}); closeSheet();" style="font-size:32px; cursor:pointer; color:var(--ln2);">★</span>`).join('')}
+                        </div>
+                    </div>`);
+                }
+            });
+        }
+    }).subscribe();
+
   supabase.channel('cricpulse-tickets-' + S.user.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
+      
       const msg = payload.new;
       if (msg.sender === 'admin') {
         toast("Support is active: " + msg.message.substring(0, 30) + "...", "chat");
