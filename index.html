@@ -287,7 +287,7 @@ const P = {
   film:"M4 4h16v16H4zM9 4v16M15 4v16M4 9h5M4 15h5M15 9h5M15 15h5",
   pol:"M12 2l9 21H3zM12 10v4"
 };
-const ic = (n,s=18) => `<svg width="s"height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
+const ic = (n,s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
 const $ = i => document.getElementById(i);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const inr = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
@@ -436,11 +436,11 @@ const toast = (m,g="check") => {
   n.innerHTML = ic(g,14) + "<span>" + esc(m) + "</span>";
   $("tw").appendChild(n); setTimeout(() => n.remove(), 2800);
 };
-const sheet = h => { ("sh").innerHTML=`<divclass="ov"><divclass="shx">{h}</div></div>`; };
+const sheet = h => { $("sh").innerHTML = `<div class="ov"><div class="shx">${h}</div></div>`; };
 const closeSheet = () => { $("sh").innerHTML = ""; };
-const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class="chip${cur==k?" on":""}" data-a="a"data-v="{k}">${l}</button>`).join("")}</div>`;
+const chips = (a,cur,L) => `<div class="chips">${L.map(([k,l]) => `<button class="chip${cur==k?" on":""}" data-a="${a}" data-v="${k}">${l}</button>`).join("")}</div>`;
 const stp = p => p.res == "w" ? '<span class="pill ok">Won</span>' : p.res == "l" ? '<span class="pill no">Lost</span>' : '<span class="pill">Pending</span>';
-const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>x[1]</b><span>{x[2]}</span></div>`).join("")}</div>`;
+const kpi = L => `<div class="stats">${L.map(x => `<div><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("")}</div>`;
 const ntf = L => L.length ? L.map(n => {
   let timeStr = n.k || "";
   if (n.ts) {
@@ -450,9 +450,9 @@ const ntf = L => L.length ? L.map(n => {
     else if (diff < 86400) timeStr = Math.floor(diff / 3600) + "h ago";
     else timeStr = Math.floor(diff / 86400) + "d ago";
   }
-  return `<div class="ntn.r?"":"u""><i>{ic(n.i,15)}</i><div><b>esc(n.t)</b><small>{esc(n.d)}</small><small class="mut">${timeStr}</small></div></div>`;
+  return `<div class="nt${n.r?"":" u"}"><i>${ic(n.i,15)}</i><div><b>${esc(n.t)}</b><small>${esc(n.d)}</small><small class="mut">${timeStr}</small></div></div>`;
 }).join("") : '<div class="empty">Nothing here yet.</div>';
-const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>f[0]{ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
+const faqH = n => FAQ.slice(0,n||9).map(f => `<details class="card" style="margin-bottom:8px"><summary>${f[0]}${ic("chev",15)}</summary><div class="bd"><p>${f[1]}</p></div></details>`).join("");
 const wide = () => matchMedia("(min-width:900px)").matches;
 const brand = `<div class="brand"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" alt="CricPulse" style="width:32px; height:32px; object-fit:contain; border-radius:8px; margin-right:6px;">CricPulse</div>`;
 
@@ -467,12 +467,12 @@ function landing() {
       <h1>Call the match. <em>Win real money.</em></h1>
       <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
       <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get Started Free</button><button class="btn grow" data-a="auth" data-v="in">Login</button></div>
-      <div class="facts"><div><b>reg.toLocaleString("en-IN")</b>Playersjoined</div><div><b>{MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
+      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
     </div>
     <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
   </section>
-  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket, movies, and more with live updates."],["lock","Lock your pick","Enter your stake and lock in your prediction."],["wallet","Collect rewards","Correct picks instantly credit your wallet."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>s[1]</b><divclass="muts12">{s[2]}</div></div></div>`).join("")}</div></section>
-  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>c[1]</b><spanclass="muts12">{MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket, movies, and more with live updates."],["lock","Lock your pick","Enter your stake and lock in your prediction."],["wallet","Collect rewards","Correct picks instantly credit your wallet."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
   <section class="sec"><h2>Questions</h2>${faqH(5)}</section>
 </div>
 <footer class="foot">
@@ -489,12 +489,12 @@ function landing() {
 function authV() {
   const up = S.au == "up";
   return `<header class="pub">${brand}<button class="btn sm" data-a="home0">Back</button></header>
-  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">up?"Createyouraccount":"Welcomeback"</h2><pclass="mut"style="margin-top:2px">Freetojoin.Realmoneyrewards.</p><divclass="tabs"><buttonclass="{up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
+  <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. Real money rewards.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
   ${up ? '<div class="fld"><label for="an">Full name</label><input class="inp" id="an" autocomplete="name"></div>' : ""}
   <div class="fld"><label for="ae">Email</label><input class="inp" id="ae" type="email" autocomplete="email" inputmode="email"></div>
   <div class="fld"><label for="ap">Password</label><input class="inp" id="ap" type="password" autocomplete="${up?"new-password":"current-password"}"></div>
   <div class="err" id="er"></div>
-  <button class="btn p w" data-a="subm" S.authBusy?"disabled":"">{S.authBusy?"Please wait…":(up?"Create account":"Log in")}</button>
+  <button class="btn p w" data-a="subm" ${S.authBusy?"disabled":""}>${S.authBusy?"Please wait…":(up?"Create account":"Log in")}</button>
   <div class="divider">or</div>
   <button class="gbtn" data-a="gmail"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>Continue with Google</button>
   <p class="mut s11" style="text-align:center;margin-top:12px">By continuing, you agree to our Terms, Privacy and Refund policies. 18+ only.</p>
@@ -570,14 +570,14 @@ function legalPage(kind) {
     }
   };
   const p = PAGES[kind];
-  return `<header class="pub"><div class="row"><button class="ib" data-a="S.user?"nav":"home0""data-v="help"aria-label="Back">{ic("back",18)}</button>${brand}</div></header>
-  <div class="legal"><h1>p.title</h1>{p.body}<p class="mut s12" style="margin-top:20px">Last updated ${new Date().toLocaleDateString("en-IN",{year:"numeric",month:"long"})}</p></div>`;
+  return `<header class="pub"><div class="row"><button class="ib" data-a="${S.user?"nav":"home0"}" data-v="help" aria-label="Back">${ic("back",18)}</button>${brand}</div></header>
+  <div class="legal"><h1>${p.title}</h1>${p.body}<p class="mut s12" style="margin-top:20px">Last updated ${new Date().toLocaleDateString("en-IN",{year:"numeric",month:"long"})}</p></div>`;
 }
 
 /* ============== APP VIEWS ============== */
 const mrow = m => {
   const lk = S.preds.find(p => p.m == m.id), cls = !left(m) || m.isFinished, sel = S.slip[m.id];
-  return `<div class="mk" data-a="open" data-v="m.id"><divclass="bt"style="align-items:flex-start"><divclass="nm">{esc(ttl(m))}</div><span class="cd">ic("clock",12)<spandata-cd="{m.id}">cdt(m)</span></span></div><divclass="muts12">{cl(m.c)} · esc(m.lg)</div><divclass="lvt"style="color:var(--i3)"data-lt="{m.id}">liveText(m)</div><divclass="pks">{["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pkon?"on":"""data-a="pick"data-v="{m.id}:${k}" lk||cls?"disabled":""aria-label="{esc(full(m,k))}"><span>esc(lbl(m,k))</span><b>{lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
+  return `<div class="mk" data-a="open" data-v="${m.id}"><div class="bt" style="align-items:flex-start"><div class="nm">${esc(ttl(m))}</div><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
 };
 const mlist = () => {
   const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
@@ -595,8 +595,8 @@ const slipBody = () => {
     const potential = Math.round(stake * odds);
     totalPotential += potential;
     return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="id"value="{stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
-    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹potential</b><buttonclass="mut"data-a="rm"data-v="{id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
   html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
@@ -606,12 +606,12 @@ const slipBody = () => {
 };
 const marketsV = () => {
   const n = Object.keys(S.slip).length;
-  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">ic("search",16)<inputclass="inp"id="q"placeholder="Searchteams,eventsorquestions"value="{esc(S.q)}"></div><div class="lay2"><div id="ml">mlist()</div><divclass="cardslipd"id="sd"><h3>Yourslip</h3>{slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>npick{n>1?"s":""} selected</b><div class="s11" style="opacity:.7">Click to review and lock</div></div><button class="btn p sm" data-a="slipsheet">Review</button></div>` : "");
+  return chips("cat",S.cat,[["all","All"],...CATS.map(c => [c[0],c[1]])]) + `<div class="srch">${ic("search",16)}<input class="inp" id="q" placeholder="Search teams, events or questions" value="${esc(S.q)}"></div><div class="lay2"><div id="ml">${mlist()}</div><div class="card slipd" id="sd"><h3>Your slip</h3>${slipBody()}</div></div>` + (n ? `<div class="sbar"><div><b>${n} pick${n>1?"s":""} selected</b><div class="s11" style="opacity:.7">Click to review and lock</div></div><button class="btn p sm" data-a="slipsheet">Review</button></div>` : "");
 };
 function homeV() {
   const t = tally(), un = S.cps.filter(c => !c.cl).length, done = S.chk == new Date().toDateString();
   
-  const row = m => `<button class="ln" data-a="open" data-v="m.id"><divclass="grow"><divclass="nm">{esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="m.id">{liveText(m)}</div></div>${ic("chevR",16)}</button>`;
+  const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
 
   const activeMatches = MK.filter(m => !m.isFinished).slice(0, 3);
   const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
@@ -620,12 +620,12 @@ function homeV() {
 
 ${activeMatches.length ? `<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Markets</h3></div>${activeMatches.map(m => row(m)).join("")}</div>` : ''}
 
-${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="m.id"><divclass="grow"><divclass="nm">{esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in cdt(m)</div></div>{ic("chevR",16)}</button>`).join("")}</div>` : ''}
+${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>` : ''}
 
 <div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
   const m = mkt(p.m); 
   if (!m) return ''; 
-  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="m.id">{esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: inr(p.stake)</div></div>{stp(p)}</div>`; 
+  return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)}</div></div>${stp(p)}</div>`; 
 }).join("") : '<div class="empty" style="padding:14px 0">No picks yet. Open Markets to lock your first.</div>'}</div>
 </div>`;
 }
@@ -635,49 +635,49 @@ function picksV() {
   return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { 
     const m = mkt(p.m); 
     if (!m) return ''; 
-    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="m.id">{esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)} · Odds: p.oddsx</div></div><divclass="col"style="align-items:flex-end;gap:6px">{stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
+    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)} · Odds: ${p.odds}x</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
   }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
   const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
-  return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>inr2(S.bal)</h2><divclass="s12"style="opacity:.7">{pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">ic("down",14)Addfunds</button><buttonclass="btn"data-a="wd">{ic("up",14)} Withdraw</button></div></div>
-<div class="stats c3"><div><small>Deposits</small><b>inr(sumTx("deposit","completed"))</b></div><div><small>Winnings</small><bclass="ok">{inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
-<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]]){L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"BetStake"[t.type]||t.type</b><spanclass="muts12">{esc(t.n)} · esc(t.date)</span></div><divclass="col"style="align-items:flex-end;gap:4px"><bclass="{t.type=="withdraw"||t.type=="stake"?"no":"ok"}">t.type=="withdraw"||t.type=="stake"?"-":"+"{inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
+  return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
+<div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
+<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
 <details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
 }
 function rewardsV() {
   const un = S.cps.filter(c => !c.cl).length;
-  return `<div class="stack"><div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">esc(c.t)</b><spanclass="muts12">{esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
-<details class="card"><summary>Rewards you can winic("chev",15)</summary><divclass="bd">{RW.map(r => `<div class="ln"><div class="cv">r[0]</div><divclass="grow"><bclass="s12"style="display:block">{r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
+  return `<div class="stack"><div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
+<details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
 }
 function ranksV() {
   const W = [["Aarav Sharma",640,74],["Diya Menon",610,71],["Kabir Rao",540,68],["Meera Patel",470,65],["Rohan Thakur",390,61]];
   const A = [["Aarav Sharma",3420,72],["Diya Menon",3310,70],["Kabir Rao",3180,67],["Meera Patel",2990,66],["Rohan Thakur",2860,62]];
   const L = [...(S.rk=="w"?W:A),[S.user.n,Math.round(S.bal),tally().p,1]].sort((a,b) => b[1]-a[1]);
-  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">i+1</b><divclass="grow">{esc(r[0])}r[3]?"(you)":""</div><spanclass="muts12">{r[2]}%</span><b style="min-width:48px;text-align:right">${inr(r[1])}</b></div>`).join("")}</div>`;
+  return chips("rk",S.rk,[["w","This week"],["a","All time"]]) + `<div class="card" style="padding:0 14px">${L.map((r,i) => `<div class="ln" style="${r[3]?"background:var(--acs);margin:0 -14px;padding:10px 14px":""}"><b style="width:22px">${i+1}</b><div class="grow">${esc(r[0])}${r[3]?" (you)":""}</div><span class="mut s12">${r[2]}%</span><b style="min-width:48px;text-align:right">${inr(r[1])}</b></div>`).join("")}</div>`;
 }
-const alertsV = () => `<div class="bt" style="margin-bottom:8px">chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips"style="margin:0;padding:0"')<buttonclass="btnsm"data-a="readall">Markallread</button></div><divclass="card"style="padding:0;overflow:hidden">{ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
+const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
 function profileV() {
   const u = S.user, t = tally();
   const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
-  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">esc(u.n[0].toUpperCase())</span><divclass="grow"><b>{esc(u.n)}</b><div class="mut s12">${esc(u.e)}</div></div></div></div>
+  return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)}</div></div></div></div>
 <div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
-<div class="card" style="padding:12px 14px 2px"><h3>Preferences</h3>${tg.map(([k,l,d]) => `<div class="ln"><div><b class="s12" style="display:block">${l}</b><span class="mut s12">d</span></div><labelclass="sw"><inputtype="checkbox"data-a="pref"data-v="{k}" S.pf[k]?"checked":""aria-label="{l}"><i></i></label></div>`).join("")}<div class="ln"><b class="s12">Dark mode</b><label class="sw"><input type="checkbox" data-a="theme" ${isDark()?"checked":""} aria-label="Dark mode"><i></i></label></div></div>
-<div class="grid2"><button class="btn" data-a="support">ic("chat",15)Support</button><buttonclass="btn"data-a="logout">{ic("exit",15)} Log out</button></div></div>`;
+<div class="card" style="padding:12px 14px 2px"><h3>Preferences</h3>${tg.map(([k,l,d]) => `<div class="ln"><div><b class="s12" style="display:block">${l}</b><span class="mut s12">${d}</span></div><label class="sw"><input type="checkbox" data-a="pref" data-v="${k}" ${S.pf[k]?"checked":""} aria-label="${l}"><i></i></label></div>`).join("")}<div class="ln"><b class="s12">Dark mode</b><label class="sw"><input type="checkbox" data-a="theme" ${isDark()?"checked":""} aria-label="Dark mode"><i></i></label></div></div>
+<div class="grid2"><button class="btn" data-a="support">${ic("chat",15)} Support</button><button class="btn" data-a="logout">${ic("exit",15)} Log out</button></div></div>`;
 }
 const helpV = () => `<div class="stack">${faqH()}
 <details class="card"><summary>Terms &amp; Conditions${ic("chev",15)}</summary><div class="bd"><p>CricPulse is a skill-based prediction platform. By using this site you agree to play responsibly and follow local laws regarding online gaming.</p><p>Full policy available on the <button class="btn sm" data-a="page" data-v="terms">Terms page</button>.</p></div></details>
 <details class="card"><summary>Privacy Policy${ic("chev",15)}</summary><div class="bd"><p>We collect your email and display name to create your account. We do not sell your data. <button class="btn sm" data-a="page" data-v="privacy">Read full policy</button></p></div></details>
 <details class="card"><summary>Refund Policy${ic("chev",15)}</summary><div class="bd"><p>If a match is abandoned or tied, your entry fee is refunded to your wallet instantly. <button class="btn sm" data-a="page" data-v="refund">Read full policy</button></p></div></details>
-<div class="grid2"><button class="btn p" data-a="support">ic("chat",15)SupportCenter</button><buttonclass="btn"data-a="page"data-v="about">{ic("help",15)} About us</button></div></div>`;
+<div class="grid2"><button class="btn p" data-a="support">${ic("chat",15)} Support Center</button><button class="btn" data-a="page" data-v="about">${ic("help",15)} About us</button></div></div>`;
 
 /* support center */
 function supportV() {
   const open = S.tickets.filter(t => t.status != "closed").length;
   const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
   return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"60 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
-<div class="grid2"><button class="tile" data-a="newticket">ic("chat",18)<div><b>Createaticket</b><divclass="muts11">Chatwithourteam</div></div></button><buttonclass="tile"data-a="instagram">{ic("instagram",18)}<div><b>Instagram</b><div class="mut s11">@${esc(ig)}</div></div></button></div>
-<div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">esc(t.subject)</b><spanclass="muts12">{t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><div class="row" style="gap:6px"><span class="pill t.status=="closed"?"":"ok"">{t.status=="closed"?"Closed":"Open"}</span>${t.unread > 0 ? `<span class="dot" style="position:static;">${t.unread}</span>` : ''}</div></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
+<div class="grid2"><button class="tile" data-a="newticket">${ic("chat",18)}<div><b>Create a ticket</b><div class="mut s11">Chat with our team</div></div></button><button class="tile" data-a="instagram">${ic("instagram",18)}<div><b>Instagram</b><div class="mut s11">@${esc(ig)}</div></div></button></div>
+<div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">${esc(t.subject)}</b><span class="mut s12">${t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><div class="row" style="gap:6px"><span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span>${t.unread > 0 ? `<span class="dot" style="position:static;">${t.unread}</span>` : ''}</div></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
 <div class="card"><h3>Common questions</h3>${faqH(3)}</div></div>`;
 }
 function ticketV() {
@@ -700,7 +700,7 @@ function ticketV() {
 
   return `<div class="stack">
     <div class="card" style="padding:14px 16px; background:var(--s2); border-radius:12px;">
-      <div class="bt"><b>${esc(t.subject)}</b> <span class="pill t.status=="closed"?"":"ok"">{t.status=="closed"?"Closed":"Open"}</span></div>
+      <div class="bt"><b>${esc(t.subject)}</b> <span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span></div>
     </div>
     ${ratingHtml}
     <div class="chat">
@@ -709,7 +709,7 @@ function ticketV() {
           <div class="msg ${m.me?"me":"them"}">
             ${m.img ? `<img src="${esc(m.img)}" alt="attachment">` : ""}
             ${esc(m.text)}
-            <small>esc(m.at){m.me?"":" · Support"}</small>
+            <small>${esc(m.at)}${m.me?"":" · Support"}</small>
           </div>
         `).join("")}
         ${t.status=="closed"?'<div class="msg them">This ticket is closed. Create a new one for further help.</div>':""}
@@ -786,7 +786,7 @@ function matchV() {
             <span class="yc-live">LIVE</span>
             <span class="yc-timer">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              <span data-cd="m.id">{cdt(m)}</span>
+              <span data-cd="${m.id}">${cdt(m)}</span>
             </span>
           </div>
         </header>
@@ -796,7 +796,7 @@ function matchV() {
             <legend class="yc-label">Choose your team <small>Popularity</small></legend>
             <div class="yc-grid">
               <label class="yc-opt">
-                <input type="radio" name="yc-side" value="A" isTeamA?'checked':''onchange="selectSide('{m.id}', 'A')" ${cls ? 'disabled' : ''}>
+                <input type="radio" name="yc-side" value="A" ${isTeamA ? 'checked' : ''} onchange="selectSide('${m.id}', 'A')" ${cls ? 'disabled' : ''}>
                 <span class="yc-card" style="--c1:#1a5cff;--c2:#1348d6;--dot:var(--ac)">
                   <span class="yc-top">
                     <span class="yc-mono">${m.A[0].slice(0,2).toUpperCase()}</span>
@@ -808,7 +808,7 @@ function matchV() {
               </label>
 
               <label class="yc-opt">
-                <input type="radio" name="yc-side" value="B" isTeamB?'checked':''onchange="selectSide('{m.id}', 'B')" ${cls ? 'disabled' : ''}>
+                <input type="radio" name="yc-side" value="B" ${isTeamB ? 'checked' : ''} onchange="selectSide('${m.id}', 'B')" ${cls ? 'disabled' : ''}>
                 <span class="yc-card" style="--c1:#e0891a;--c2:#b86a0a;--dot:var(--am)">
                   <span class="yc-top">
                     <span class="yc-mono">${m.B[0].slice(0,2).toUpperCase()}</span>
@@ -819,14 +819,14 @@ function matchV() {
                 </span>
               </label>
             </div>
-            <div class="yc-split"><i style="width:m.w%"></i><istyle="width:{100-m.w}%"></i></div>
+            <div class="yc-split"><i style="width:${m.w}%"></i><i style="width:${100-m.w}%"></i></div>
           </fieldset>
 
           <div>
             <label class="yc-label" for="stake-input-${m.id}">Enter your stake <small>Min ₹10 · Max ₹10,000</small></label>
             <div class="yc-field">
               <span class="yc-cur" aria-hidden="true">₹</span>
-              <input class="yc-amt" id="stake-input-m.id"type="text"inputmode="numeric"pattern="[0-9]*"autocomplete="off"placeholder="0"value="{currentStake}" oninput="updateStake('${m.id}', this.value)" ${cls ? 'disabled' : ''}>
+              <input class="yc-amt" id="stake-input-${m.id}" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0" value="${currentStake}" oninput="updateStake('${m.id}', this.value)" ${cls ? 'disabled' : ''}>
             </div>
             <div class="yc-chips" role="group" aria-label="Quick add">
               <button type="button" class="yc-chip" onclick="incrementStake('${m.id}', 50)" ${cls ? 'disabled' : ''}>+₹50</button>
@@ -836,9 +836,9 @@ function matchV() {
           </div>
 
           <dl class="yc-sum" aria-live="polite">
-            <div><dt>Your Stake</dt><dd id="yc-stake-m.id">{inr(currentStake)}</dd></div>
-            <div class="yc-return"><dt>Total Return</dt><dd id="yc-return-m.id">{inr(potential)}</dd></div>
-            <div class="yc-profit"><dt>Potential Profit</dt><dd id="yc-profit-m.id">+{inr(profit)}</dd></div>
+            <div><dt>Your Stake</dt><dd id="yc-stake-${m.id}">${inr(currentStake)}</dd></div>
+            <div class="yc-return"><dt>Total Return</dt><dd id="yc-return-${m.id}">${inr(potential)}</dd></div>
+            <div class="yc-profit"><dt>Potential Profit</dt><dd id="yc-profit-${m.id}">+${inr(profit)}</dd></div>
           </dl>
 
           <button type="button" class="yc-cta" onclick="lockPicks(['${m.id}'])" ${cls || !sel ? 'disabled' : ''}>
@@ -856,7 +856,7 @@ function matchV() {
   // The Accordions below the widget
   const fa = form(m,0), fb = form(m,1), op = wide() ? " open" : "";
   const fs = a => `<div class="fm">${a.map(x => `<span class="${x}">${x}</span>`).join("")}</div>`;
-  const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id] || "Online / Official Source"],["Closes in",`<span data-cd="m.id">{cdt(m)}</span>`],["Entry fee","Free to browse"],["Payout","Odds based"]];
+  const det = [["Competition",m.lg],[m.q?"Resolution":"Venue",VEN[m.id] || "Online / Official Source"],["Closes in",`<span data-cd="${m.id}">${cdt(m)}</span>`],["Entry fee","Free to browse"],["Payout","Odds based"]];
 
   return `<div class="lay">
     <div class="c" style="margin-bottom: 12px; width: 100%;">
@@ -864,8 +864,8 @@ function matchV() {
     </div>
     
     <div class="d stack">
-      <details class="card"op><summary>Matchdetails{ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
-      ${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>m.question||"Resolvesbasedonofficialsource."</p></div></details>`:`<detailsclass="card"{op}><summary>Team comparisonic("chev",15)</summary><divclass="bd"><divclass="ln"><span>{esc(m.A[0])}</span>fs(fa)</div><divclass="ln"><span>{esc(m.B[0])}</span>${fs(fb)}</div></div></details>`}
+      <details class="card"${op}><summary>Match details${ic("chev",15)}</summary><div class="bd">${det.map(d => `<div class="ln"><span class="t2">${d[0]}</span><b style="text-align:right">${d[1]}</b></div>`).join("")}</div></details>
+      ${m.q ? `<details class="card"><summary>About this question${ic("chev",15)}</summary><div class="bd"><p>${m.question || "Resolves based on official source."}</p></div></details>` : `<details class="card"${op}><summary>Team comparison${ic("chev",15)}</summary><div class="bd"><div class="ln"><span>${esc(m.A[0])}</span>${fs(fa)}</div><div class="ln"><span>${esc(m.B[0])}</span>${fs(fb)}</div></div></details>`}
       <details class="card"><summary>Rules and settlement${ic("chev",15)}</summary><div class="bd"><p>One pick per market. Picks close when the countdown ends and cannot change after locking. Settled against the official result; voided if abandoned or tied. A correct pick adds your stake * odds to your wallet.</p></div></details>
     </div>
   </div>`;
@@ -887,11 +887,11 @@ function shell() {
   // Check for unread support messages
   const unreadSupport = S.tickets.some(t => t.unread > 0 && t.status !== 'closed');
 
-  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">brand</div>{RAIL.map(g => `<div class="rg">g[0]</div>`+g[1].map(i=>`<buttonclass="rl{R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="i[0]">{ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
-<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>esc(title)</h1><divclass="sub">{esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">ic(isDark()?"sun":"moon",16)</button><buttonclass="wc"data-a="nav"data-v="wallet">{ic("wallet",15)}inr(S.bal)</button><buttonclass="ib"data-a="pop"aria-label="Notifications">{ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
+  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
+<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
 <main class="pg">${VIEWS[R]()}</main></div></div>
-<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="i[0]=="more"?"more":"nav""data-v="{i[0]}">ic(i[2],20){i[1]}${i[0]=="more" && unreadSupport ? `<span class="dot" style="top:4px;right:calc(50% - 14px);"></span>` : ''}</button>`; }).join("")}</nav>`;
+<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}${i[0]=="more" && unreadSupport ? `<span class="dot" style="top:4px;right:calc(50% - 14px);"></span>` : ''}</button>`; }).join("")}</nav>`;
 }
 
 function render() {
@@ -1012,7 +1012,7 @@ function settle(id) {
     note("Bet Won", ttl(m)+". "+inr(p.pay)+" added.","award");
   } else { p.res = "l"; note("Bet Lost", ttl(m)+". You lost "+inr(p.stake)+".","x"); }
   save(); render();
-  sheet(`<h3 style="font-size:17px;margin-bottom:6px">win?"Correct!":"Incorrect"</h3><pclass="t2"style="margin-bottom:16px">{win?"You won "+inr(p.pay)+" and unlocked a coupon.":"You lost your stake of "+inr(p.stake)+". Try another market."}</p><button class="btn p w" data-a="sgo" data-v="win?"rewards":"markets"">{win?"Go to coupons":"Back to markets"}</button>`);
+  sheet(`<h3 style="font-size:17px;margin-bottom:6px">${win?"Correct!":"Incorrect"}</h3><p class="t2" style="margin-bottom:16px">${win?"You won "+inr(p.pay)+" and unlocked a coupon.":"You lost your stake of "+inr(p.stake)+". Try another market."}</p><button class="btn p w" data-a="sgo" data-v="${win?"rewards":"markets"}">${win?"Go to coupons":"Back to markets"}</button>`);
 }
 
 window.updateStake = function(id, val) {
@@ -1116,7 +1116,7 @@ function selectPaymentMethod(btn) {
   document.getElementById('dm').value = btn.dataset.method;
 }
 const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
-const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">ic(g,18){l}</button>`).join("")}<button class="tile" data-a="theme">ic(isDark()?"sun":"moon",18){isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
+const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">${ic(g,18)}${l}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
 function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
 
 async function loadTickets() {
@@ -1575,4 +1575,3 @@ window.addEventListener("load", async () => {
 </script>
 </body>
 </html>
-
