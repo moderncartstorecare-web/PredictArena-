@@ -1493,6 +1493,41 @@ window.addEventListener("load", async () => {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
+    // ==========================================
+    // CHECK MAINTENANCE MODE ON INITIAL LOAD
+    // ==========================================
+    try {
+      const { data } = await supabase.from('site_settings').select('*').in('key', ['maintenance', 'maint_msg']);
+      if (data && data.length > 0) {
+        const isMaint = data.find(x => x.key === 'maintenance');
+        const msgObj = data.find(x => x.key === 'maint_msg');
+        
+        if (isMaint && (isMaint.value === true || isMaint.value === 'true')) {
+          const text = msgObj ? msgObj.value : "CricPulse is getting an upgrade. We will be back shortly.";
+          document.getElementById('app').innerHTML = `
+            <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f6f7fb;color:#0f1729;text-align:center;padding:20px;font-family:Inter,sans-serif;">
+              <div>
+                <h1 style="font-size:28px;margin-bottom:12px;font-weight:700;">Under Maintenance</h1>
+                <p style="color:#7a8296;font-size:15px;">${text}</p>
+              </div>
+            </div>`;
+          
+          // Listen for changes so if admin turns it OFF, the page reloads automatically
+          supabase.channel('maintenance-live')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings' }, (payload) => {
+              if (payload.new.key === 'maintenance' && (payload.new.value === false || payload.new.value === 'false')) {
+                location.reload();
+              }
+            }).subscribe();
+            
+          return; // STOP loading the rest of the app
+        }
+      }
+    } catch (e) {
+      console.warn("Could not check maintenance mode (make sure site_settings table exists).", e);
+    }
+    // ==========================================
+
     // 2. Setup Auth Listener FIRST to catch initial session safely
     CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
