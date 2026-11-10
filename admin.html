@@ -3,926 +3,679 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#1a5cff">
-<title>CricPulse Admin – Master Control</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>CricPulse Admin – Control Panel</title>
+<link rel="icon" type="image/png" href="https://plain-apac-prod-public.komododecks.com/202610/29/6aKR6o1HOsaHTUWqryJe/image.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-:root{
-  --bg:#f4f6fa;--sf:#ffffff;--s2:#eef1f7;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;
-  --ln:#e3e7ee;--ln2:#d0d6e2;--ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
-  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
-  --sb:#090d16;--sb-tx:#9aa5be;
-}
-:root[data-theme="dark"]{
-  --bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;
-  --ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;
-  --ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211;
-  --sb:#06080d;--sb-tx:#8b95ad;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none;text-align:left}
-svg.lucide{width:16px;height:16px;stroke-width:2;flex:none}
-h1,h2,h3,p{margin:0}
-:focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:6px}
-.mut{color:var(--i3)}.t2{color:var(--i2)}.s12{font-size:12px}.s11{font-size:11px}.ok{color:var(--ok)}.no{color:var(--no)}.b{font-weight:600}.grow{flex:1;min-width:0}
-.row{display:flex;align-items:center;gap:10px}.bt{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.stack>*+*{margin-top:12px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 14px;border-radius:9px;font-weight:600;font-size:13px;border:1px solid var(--ln2);background:var(--sf);white-space:nowrap;text-align:center;transition:background .15s}
-.btn:hover{background:var(--s2)}.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.p:hover{background:var(--ac2)}
-.btn.d{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,var(--ln2))}.btn.d:hover{background:var(--nos)}
-.btn.k{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--ln2))}.btn.k:hover{background:var(--oks)}
-.btn.sm{height:30px;padding:0 10px;font-size:12px;border-radius:8px}.btn.w{width:100%}.btn:disabled{opacity:.45;cursor:not-allowed}
-.ib{width:36px;height:36px;border-radius:9px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);position:relative;flex:none}
-.ib:hover{background:var(--s2)}
-.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:16px;margin-bottom:14px}
-.card>h3,.card .bt>h3{font-size:14px;font-weight:600;margin-bottom:10px}
-.inp,select.inp,textarea.inp{width:100%;height:38px;padding:0 12px;background:var(--sf);border:1px solid var(--ln2);border-radius:9px;font-size:13.5px}
-textarea.inp{height:auto;padding:10px 12px;resize:vertical;min-height:70px}
-.inp:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
-.fld{margin-bottom:12px}.fld label{display:block;font-size:12px;font-weight:500;color:var(--i2);margin-bottom:4px}
-.err{min-height:18px;color:var(--no);font-size:12px;margin-bottom:6px}
-.badge{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--s2);color:var(--i2);white-space:nowrap;text-transform:capitalize}
-.b-ok{background:var(--oks);color:var(--ok)}.b-no{background:var(--nos);color:var(--no)}.b-am{background:var(--ams);color:var(--am)}.b-ac{background:var(--acs);color:var(--ac)}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--ln2);background:var(--sf);color:var(--i2);font-size:12px;font-weight:500;white-space:nowrap}
-.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.tool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
-.tool .srch{position:relative;flex:1;min-width:180px}.srch svg{position:absolute;left:11px;top:11px;color:var(--i3)}.srch .inp{padding-left:34px}
-.av{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:14px}
-.kpi{padding:14px}.kpi small{display:block;font-size:11px;font-weight:600;color:var(--i3);text-transform:uppercase;letter-spacing:.05em}
-.kpi b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:2px}.kpi span{font-size:12px;color:var(--i3)}
-.list{background:var(--sf);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
-.r{display:grid;grid-template-columns:var(--m);align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--ln);width:100%}.r:last-child{border:0}
-button.r:hover{background:var(--s2)}
-.rh{display:none;font-size:11px;font-weight:600;color:var(--i3);text-transform:uppercase;letter-spacing:.05em;background:var(--s2);cursor:default}
-.hm{display:none}.mob{display:inline}
-.dot{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--no);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
-.empty{padding:26px;text-align:center;color:var(--i3)}
-.sw{position:relative;width:40px;height:22px;flex:none}.sw input{position:absolute;inset:0;opacity:0;margin:0;z-index:1;cursor:pointer}
-.sw i{position:absolute;inset:0;border-radius:11px;background:var(--ln2);transition:background .15s}
-.sw i:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
-.sw input:checked+i{background:var(--ac)}.sw input:checked+i:after{transform:translateX(18px)}
-.ln{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--ln)}.ln:last-child{border:0}
-.bl{filter:blur(6px);user-select:none;transition:filter .2s}
-.shell{display:flex;min-height:100vh}
-.nav{width:240px;background:var(--sb);color:var(--sb-tx);display:flex;flex-direction:column;padding:16px 10px;position:sticky;top:0;height:100vh;flex:none;overflow-y:auto;z-index:40}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;padding:4px 8px 16px;letter-spacing:-.02em}
-.mark{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
-.brand small{font-size:10px;font-weight:700;color:var(--ac);background:var(--acs);padding:1px 6px;border-radius:4px;margin-left:auto}
-.ng{padding:12px 10px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#55617a}
-.nl{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border-radius:8px;font-size:13px;font-weight:500;color:var(--sb-tx);transition:background .15s,color .15s}
-.nl:hover{background:rgba(255,255,255,.05);color:#fff}.nl.on{background:var(--ac);color:#fff;font-weight:600}
-.nl .cnt{margin-left:auto;background:var(--no);color:#fff;border-radius:9px;font-size:10.5px;font-weight:700;min-width:18px;height:18px;display:grid;place-items:center;padding:0 5px}
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 24px;background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
-.top h1{font-size:18px;font-weight:700;letter-spacing:-.02em}.top .sub{display:none;color:var(--i3);font-size:13px}
-.pg{padding:20px 24px 60px;max-width:1200px;width:100%;margin:0 auto}
-.scrim{position:fixed;inset:0;z-index:70;background:rgba(9,12,18,.5);backdrop-filter:blur(2px)}
-.dr{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:540px;background:var(--sf);z-index:100;display:flex;flex-direction:column;border-left:1px solid var(--ln);box-shadow:-20px 0 50px rgba(0,0,0,.25)}
-.dr>header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--ln)}
-.dr .bd{padding:16px;overflow:auto;flex:1}
-.chat-container{display:flex;flex-direction:column;height:520px;border:1px solid var(--ln);border-radius:12px;background:var(--sf);overflow:hidden}
-.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:82%;padding:8px 12px;border-radius:12px;font-size:13px;word-break:break-word;position:relative}
-.msg small{display:block;font-size:10px;opacity:.75;margin-top:4px}
-.msg.user{background:var(--s2);color:var(--ink);border-bottom-left-radius:3px}
-.msg.admin{background:var(--ac);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
-.chat-box{padding:10px;border-top:1px solid var(--ln);background:var(--sf);display:flex;flex-direction:column;gap:8px}
-.tw{position:fixed;left:0;right:0;bottom:18px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
-.ts{background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:9px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 10px 25px rgba(0,0,0,.25)}
-.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--sb)}
-.login .card{width:100%;max-width:380px;padding:28px;background:var(--sf);border:1px solid var(--ln)}
-.two{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
-.sla-badge{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:11px;padding:2px 7px;border-radius:6px}
-.sla-urgent{background:var(--nos);color:var(--no);animation:pulse 1.5s infinite}
-.sla-wait{background:var(--ams);color:var(--am)}
-@keyframes pulse{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
-@media(max-width:900px){
-  .shell{flex-direction:column}
-  .nav{position:fixed;inset:0 auto 0 0;transform:translateX(-100%);transition:transform .2s;z-index:80;width:260px}
-  .nav.open{transform:none}
-  .top{padding:12px 16px}.pg{padding:14px}
-  .two{grid-template-columns:1fr}
-  .mob{display:inline}.hm{display:none}
-}
-@media(min-width:900px){
-  .r{grid-template-columns:var(--c)}
-  .rh{display:grid}.hm{display:block}.mob{display:none}
-  .top .sub{display:block}
+:root{--bg:#f3f5f9;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e4e8f0;--pr:#4338ca;--prs:#eef0ff;--ok:#0f8a5f;--oks:#e4f4ed;--bad:#d1384a;--bads:#fdecee;--wa:#a16207;--was:#fdf3dc;--sb:#0b1220;--sh:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.05);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0f1d;--card:#121a2d;--tx:#e8ecf6;--mu:#8b96b3;--bd:#222c47;--prs:#1d2350;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#070b16;--pr:#7c83ff;--sh:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{--bg:#0a0f1d;--card:#121a2d;--tx:#e8ecf6;--mu:#8b96b3;--bd:#222c47;--prs:#1d2350;--oks:#10302a;--bads:#3a1a20;--was:#3a2d10;--wa:#e0b04a;--sb:#070b16;--pr:#7c83ff;--sh:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:50}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;text-align:left}
+svg.lucide{width:16px;height:16px;stroke-width:1.9;flex:none}
+small{color:var(--mu);font-size:12px}h3{margin:0 0 12px;font-size:15px;font-weight:600}h1{margin:0;font-size:21px;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border-radius:9px;font-weight:600;font-size:13px;background:var(--pr);color:#fff;white-space:nowrap;text-align:center;transition:opacity .15s,transform .05s}
+.btn:hover{opacity:.9}.btn:active{transform:scale(.98)}.btn.g{background:var(--card);color:var(--tx);border:1px solid var(--bd)}.btn.s{padding:5px 10px;font-size:12px;border-radius:7px}.btn.r{background:var(--bads);color:var(--bad)}.btn.k{background:var(--oks);color:var(--ok)}.btn.w{width:100%}.btn[disabled]{opacity:.45;pointer-events:none}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+.in{width:100%;border:1px solid var(--bd);border-radius:9px;padding:9px 12px;background:var(--card);outline:0}.in:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--prs)}.in.sm{width:auto;padding:6px 10px;font-size:12px}
+label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bottom:12px}label.f .in{margin-top:4px;color:var(--tx)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.01em}.brand span{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#4338ca,#7c3aed);display:grid;place-items:center;color:#fff}
+#lg{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 20% 10%,#2a2f6b 0,transparent 45%),radial-gradient(circle at 85% 90%,#4c1d95 0,transparent 45%),var(--sb)}
+.lgc{background:var(--card);border-radius:18px;padding:32px;width:100%;max-width:400px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.pw{display:flex;gap:8px;margin-top:4px}.pw .in{margin:0!important}
+.den{color:var(--bad);font-size:13px;min-height:20px;margin-bottom:10px}
+#app{display:flex;min-height:100vh}
+.sb{width:240px;background:linear-gradient(180deg,#0b1220,#0f1830);color:#aab4cf;padding:20px 12px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:2px;overflow-y:auto;z-index:40}
+.sb .brand{color:#fff;padding:0 10px 16px}.sb h6{margin:16px 10px 6px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#6b7694;font-weight:600}
+.nv{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;font-weight:500;color:inherit;width:100%;position:relative}
+.nv:hover{background:rgba(255,255,255,.06);color:#fff}.nv.on{background:linear-gradient(90deg,rgba(124,131,255,.28),rgba(124,131,255,.08));color:#fff}
+.nv.on:before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:#8b92ff}
+.cn{margin-left:auto;background:#ef4444;color:#fff;border-radius:99px;font-size:11px;padding:1px 8px;font-weight:600;min-width:20px;text-align:center}
+.main{flex:1;min-width:0}
+.tp{display:flex;align-items:center;gap:12px;padding:11px 24px;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:30}
+.tp b{font-size:15px}.sp{flex:1}.tsr{max-width:300px;width:100%}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4338ca,#7c3aed);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+.ib{width:36px;height:36px;border-radius:9px;border:1px solid var(--bd);display:grid;place-items:center;position:relative;background:var(--card);flex:none}
+.ib .dt{position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;border-radius:99px;font-size:10px;min-width:17px;padding:0 4px;text-align:center;font-weight:700}
+.mb-only{display:none}
+.pg{padding:24px;max-width:1440px;margin:0 auto;animation:fi .2s}@keyframes fi{from{opacity:0}}
+.mbar{background:var(--was);color:var(--wa);border:1px solid var(--wa);border-radius:12px;padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;font-weight:500}
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;box-shadow:var(--sh)}
+.ki{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);flex:none}
+.kpi b{display:block;font-size:21px;font-weight:700;line-height:1.2}
+.cols{display:grid;grid-template-columns:3fr 2fr;gap:16px}@media(max-width:1000px){.cols{grid-template-columns:1fr}}
+.big{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.02em}.mk{transition:filter .2s}.bl{filter:blur(8px);user-select:none}
+.rev{background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--pr) 6%,var(--card)))}
+.erow{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between}
+.src{display:flex;gap:28px;flex-wrap:wrap}.src b{display:block;font-size:17px}
+.lgd{display:flex;gap:16px;font-size:12px;color:var(--mu);margin-top:6px}.lgd i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--prs);color:var(--pr);white-space:nowrap}.chip.ok{background:var(--oks);color:var(--ok)}.chip.no{background:var(--bads);color:var(--bad)}.chip.wa{background:var(--was);color:var(--wa)}.chip.mu{background:var(--bg);color:var(--mu)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}td{padding:11px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}tr:last-child td{border:0}tbody tr:hover td{background:color-mix(in srgb,var(--pr) 3%,transparent)}
+.ac{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.tb2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.tb2 .in{max-width:280px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tabs button{padding:7px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-weight:500}.tabs .on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.ls{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);align-items:center}.ls:last-child{border:0}.ls>div:nth-child(2){flex:1}.ls small{display:block}
+.row2{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--bd)}.row2:last-child{border:0}.row2>div:first-child{flex:1}.row2 small{display:block}
+.ico{width:34px;height:34px;border-radius:9px;background:var(--prs);color:var(--pr);display:grid;place-items:center;flex:none}
+.kv{display:grid;grid-template-columns:120px 1fr}.kv>*{padding:8px 0;border-bottom:1px solid var(--bd);word-break:break-word}.kv>:nth-child(odd){color:var(--mu)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.ov{position:fixed;inset:0;background:rgba(8,12,24,.6);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:60;padding:16px;animation:fi .15s;overflow-y:auto}.md{background:var(--card);border-radius:16px;padding:24px;max-width:500px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.4)}.md.wd{max-width:760px}.md h3{font-size:17px}
+.toast{position:fixed;right:20px;top:calc(18px + env(safe-area-inset-top,0px));background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:10px;font-weight:500;z-index:90;display:flex;gap:9px;align-items:center;animation:fi .2s;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw}
+.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--bd);border-radius:10px;padding:11px 12px;margin-bottom:8px;cursor:pointer}.opt:has(input:checked){border-color:var(--pr);background:var(--prs)}
+.sw{position:relative;width:44px;height:25px;flex:none;display:block}.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}.sw i{position:absolute;inset:0;border-radius:99px;background:var(--bd);transition:background .15s}.sw i:after{content:"";position:absolute;left:3px;top:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.sw input:checked+i{background:var(--pr)}.sw input:checked+i:after{transform:translateX(19px)}
+.avt{width:38px;height:38px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}.avt.lg{width:64px;height:64px;font-size:22px}
+.emp{padding:34px 16px;text-align:center;color:var(--mu)}
+.sqlb{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}
+/* chat support */
+.chat{display:grid;grid-template-columns:340px minmax(0,1fr) 310px;height:calc(100vh - 175px);min-height:560px;border:1px solid var(--bd);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:var(--sh)}
+.chat:not(.is-open){grid-template-columns:340px minmax(0,1fr)}
+.cl{border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0}
+.clh{padding:12px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:10px}
+.clh .tabs button{padding:5px 10px;font-size:12px}
+#tk-list{overflow-y:auto;flex:1}
+.ti{display:flex;gap:11px;width:100%;padding:12px;border-bottom:1px solid var(--bd);position:relative}.ti:hover{background:var(--bg)}.ti.on{background:var(--prs)}.ti.un{background:color-mix(in srgb,var(--pr) 7%,transparent)}
+.ti .tb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.tl{display:flex;justify-content:space-between;gap:8px}.tl b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tl em{font-style:normal;font-size:11px;color:var(--mu);flex:none}
+.ts2{font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm2{display:flex;gap:6px;align-items:center;margin-top:3px}
+.bd2{margin-left:auto;background:var(--pr);color:#fff;font-style:normal;font-size:11px;font-weight:700;border-radius:99px;min-width:19px;padding:0 6px;text-align:center}
+.cc{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
+.ch{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--bd)}.grow{flex:1;min-width:0}.grow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cm{flex:1;overflow-y:auto;padding:18px 18px 8px;display:flex;flex-direction:column;gap:6px}
+.ds{display:flex;justify-content:center;margin:10px 0}.ds span{font-size:11px;color:var(--mu);background:var(--card);border:1px solid var(--bd);border-radius:99px;padding:2px 12px}
+.mg{display:flex;flex-direction:column;max-width:72%}.mg.me{align-self:flex-end;align-items:flex-end}.mg.th{align-self:flex-start}
+.bb{padding:9px 13px;border-radius:14px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
+.me .bb{background:linear-gradient(135deg,#4338ca,#6d5ef5);color:#fff;border-bottom-right-radius:4px}.th .bb{background:var(--card);border:1px solid var(--bd);border-bottom-left-radius:4px}
+.mt{font-size:10.5px;color:var(--mu);margin-top:3px;display:flex;gap:4px;align-items:center}.mt svg{width:12px;height:12px}
+.cimg{max-width:240px;max-height:240px;border-radius:10px;display:block;cursor:zoom-in}
+.qr{display:flex;gap:6px;overflow-x:auto;padding:8px 16px 0;background:var(--card);border-top:1px solid var(--bd)}.qr button{flex:none;border:1px solid var(--bd);border-radius:99px;padding:4px 11px;font-size:12px;background:var(--bg);color:var(--mu)}.qr button:hover{color:var(--pr);border-color:var(--pr)}
+.cp{display:flex;gap:8px;padding:10px 16px 14px;background:var(--card);align-items:flex-end}.cp textarea{flex:1;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;resize:none;max-height:130px;min-height:42px;background:var(--bg);outline:0}.cp textarea:focus{border-color:var(--pr)}
+.cd{border-left:1px solid var(--bd);padding:18px;overflow-y:auto;background:var(--card)}
+.cdc{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:14px}
+.cd h4{margin:18px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+@media(max-width:1180px){.chat,.chat:not(.is-open){grid-template-columns:320px minmax(0,1fr)}.cd{display:none}}
+@media(max-width:860px){
+ .chat,.chat:not(.is-open){grid-template-columns:1fr;height:calc(100vh - 150px)}.chat.is-open .cl{display:none}.chat:not(.is-open) .cc{display:none}.mb-only{display:grid}.mg{max-width:86%}
+ .sb{position:fixed;left:-270px;top:0;bottom:0;width:250px;height:auto;transition:left .22s;padding-top:calc(20px + env(safe-area-inset-top))}
+ body.navopen .sb{left:0}.scrim{display:none}body.navopen .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35}
+ #app{flex-direction:column}.pg{padding:14px}.tp{padding:10px 14px}.fg{grid-template-columns:1fr}.tsr{display:none}.kv{grid-template-columns:100px 1fr}
 }
 </style>
 </head>
 <body>
-<div id="app"></div>
-<div id="dr"></div>
-<div class="tw" id="tw"></div>
-
+<div id="root"></div>
+<div class="scrim" data-act="menu"></div>
 <script>
-var SUPABASE_URL = "https://hmiyhdekyqpzkxqiukvb.supabase.co";
-var SUPABASE_ANON_KEY = "sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
-var ADMIN_EMAILS = ["moderncartstore.care@gmail.com"];
+/* =====================================================================
+   CONFIG
+   ===================================================================== */
+var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
+var ADMIN_EMAILS=["moderncartstore.care@gmail.com"];
+/* Admin password gate. Stored as a SHA-256 hash (not plain text). This is a convenience lock only:
+   the real protection is the Google admin check above plus your Supabase RLS policies. */
+var PASS_HASH="24246b86c42ba116e496847ec9878b4dacc443daf58057831cf1200fa089cd8b";
+var PASS_B64="VmlzaGFsQDEyMw=="; /* used only if the browser has no crypto.subtle (non-HTTPS) */
 
-var db = null;
-try {
-  if (typeof supabase !== "undefined") {
-    db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
-  }
-} catch(e) { console.error("Supabase init failed", e); }
-
-var esc = function(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); };
-var $ = function(i){ return document.getElementById(i); };
-var inr = function(n){ return "₹" + Number(n || 0).toLocaleString("en-IN", {maximumFractionDigits: 0}); };
-
-var toast = function(m, icon) {
-  var n = document.createElement("div");
-  n.className = "ts";
-  n.innerHTML = '<i data-lucide="' + (icon || "check-circle") + '" style="width:16px;height:16px"></i><span>' + esc(m) + '</span>';
-  $("tw").appendChild(n);
-  try { lucide.createIcons(); } catch(e){}
-  setTimeout(function(){ n.remove(); }, 2800);
+var COLS={
+  users:{id:"id",name:"full_name",email:"email",city:"city",wallet:"wallet_balance",points:"points",status:"status",kyc:"kyc_verified",created:"created_at"},
+  wd:{id:"id",user:"user_id",amount:"amount",method:"method",account:"account",status:"status",created:"created_at"},
+  tk:{id:"id",user:"user_id",subject:"subject",status:"status",priority:"priority",created:"created_at"},
+  msg:{id:"id",ticket:"ticket_id",sender:"sender",body:"message",created:"created_at"}
 };
+var LEAGUES={
+  cricket:["Indian Premier League (IPL)","T20 World Cup","ODI Series","Test Championship","Big Bash League (BBL)","The Hundred"],
+  football:["Premier League","La Liga","Champions League","FIFA World Cup","Serie A"],
+  kabaddi:["Pro Kabaddi League","Kabaddi World Cup"],
+  indian:["Entertainment","Economy","Politics"],
+  esports:["BGMI Pro Series","Valorant Champions","CS:GO Major"]
+};
+var QUICK=["Hello! Thanks for contacting CricPulse support. How can I help you?","Please share your registered email and the transaction ID.","Payment verification can take up to 24 hours. We are checking this for you.","We have escalated this to our team and will update you shortly.","Your issue has been resolved. Please let us know if you need anything else."];
 
-var S = {
-  users: [],
-  matches: [],
-  wds: [],
-  txs: [],
-  tickets: [],
-  coupons: [],
-  notifs: [],
-  cfg: {
-    maintenance_mode: false,
-    registrations_open: true,
-    min_deposit: 10,
-    min_withdrawal: 100,
-    banner_message: ""
-  }
-};
+var db=null;
+try{if(typeof supabase!=="undefined"){db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{detectSessionInUrl:true,persistSession:true}})}}catch(e){console.error("Supabase init failed",e);db=null}
 
-var U = {
-  route: "dash",
-  nav: 0,
-  dr: null,
-  q: "",
-  uf: "all",
-  tf: "open",
-  tp: "all",
-  wf: "pending",
-  wt: "w",
-  eye: false
-};
+/* =====================================================================
+   STATE + HELPERS
+   ===================================================================== */
+const MS=(()=>{const a=[],d=new Date();for(let i=0;i<6;i++){const m=new Date(d.getFullYear(),d.getMonth()-i,1);a.push({y:m.getFullYear(),m:m.getMonth(),l:m.toLocaleString("en-IN",{month:"long",year:"numeric"})})}return a})();
+const ST_DEF={maintenance:false,maint_msg:"CricPulse is getting an upgrade. We will be back shortly.",announce_on:false,announce_text:"",signups:true,predictions:true,min_deposit:50,min_withdraw:100,reply_window:"60 minutes",instagram:"cricpulse.official",refund_reject:false};
+let ST=Object.assign({},ST_DEF);
+try{ST=Object.assign(ST,JSON.parse(localStorage.getItem("cp_settings")||"{}"))}catch(e){}
+let S={mi:0,page:"dash",users:[],matches:[],wd:[],pay:[],tx:[],txReal:null,txl:[],tickets:[],preds:[],sent:[],cp:[],act:[],ucount:0,totalPreds:0,has:{},adm:""};
+try{const o=JSON.parse(localStorage.getItem("pxa3")||"{}");["mi","page","cp","act","txl"].forEach(k=>{if(o[k]!==undefined)S[k]=o[k]})}catch(e){}
+const save=()=>{try{const o={};["mi","page","cp","act","txl"].forEach(k=>o[k]=S[k]);localStorage.setItem("pxa3",JSON.stringify(o))}catch(e){}};
+let EYE=0,EYET=0,LOGIN=0,UQ="",UF="all",WF="pending",TF="All",TKF="open",TQ="",TKM=null,MOD=null,DENY="",SESS=null,BOOTED=0,LT=0;
+let CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""};
+let UNLOCK=false;try{UNLOCK=sessionStorage.getItem("cp_adm_ok")==="1"}catch(e){}
+try{TKM=localStorage.getItem("admin_tkm")||null;if(TKM)S.page="sup"}catch(e){}
+const saveTkm=id=>{TKM=id;try{id?localStorage.setItem("admin_tkm",id):localStorage.removeItem("admin_tkm")}catch(e){}};
 
-var authState = {
-  googleAuthed: false,
-  passAuthed: false,
-  email: ""
-};
+const $=i=>document.getElementById(i);
+const ic=n=>`<i data-lucide="${n}"></i>`;
+const num=n=>Number(n||0).toLocaleString("en-IN");
+const fm=n=>"₹"+num(n);
+const mk=n=>`<span class="mk${EYE?"":" bl"}">${EYE?fm(n):"₹ 00,00,000"}</span>`;
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ini=n=>String(n||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+const col=n=>{let h=0;String(n).split("").forEach(c=>h=(h*31+c.charCodeAt(0))%360);return `hsl(${h} 52% 44%)`};
+const fd=(v,y)=>{if(!v)return"";const d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})};
+const fdt=v=>{if(!v)return"";const d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"})};
+const ftm=v=>new Date(v).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true});
+const rel=ts=>{if(!ts)return"";const s=Math.floor((Date.now()-ts)/1000);if(s<45)return"now";if(s<3600)return Math.floor(s/60)+"m";if(s<86400)return Math.floor(s/3600)+"h";return Math.floor(s/86400)+"d"};
+const dayLabel=ts=>{const d=new Date(ts),t=new Date();if(d.toDateString()===t.toDateString())return"Today";const y=new Date(t.getTime()-864e5);if(d.toDateString()===y.toDateString())return"Yesterday";return d.toLocaleDateString("en-IN",{day:"2-digit",month:"long",year:"numeric"})};
+const U=i=>S.users.find(u=>u.id===String(i))||S.users.find(u=>u.email&&u.email===String(i))||{id:String(i),name:"Unknown user",email:"",city:"",wal:0,pts:0,st:"active",joined:"",kyc:0,ts:0,ghost:1};
+const userName=v=>U(v).name;
+const MM=i=>S.matches.find(m=>String(m.id)===String(i));
+const TK=i=>S.tickets.find(t=>t.id===String(i));
+const WDR=i=>S.wd.find(w=>w.id===i);
+const PAY=i=>S.pay.find(p=>p.id===i);
+const tkUser=t=>{const u=S.users.find(x=>x.id===t.uid);return u?u.name:(t.nm||("User "+String(t.uid).slice(0,6)))};
+const pendW=()=>S.wd.filter(w=>w.st==="pending");
+const pendP=()=>S.pay.filter(p=>p.st==="pending");
+const unreadT=()=>S.tickets.filter(t=>t.st!=="closed"&&t.unread>0);
+const openT=()=>S.tickets.filter(t=>t.st!=="closed");
+const TU=()=>S.ucount||S.users.length;
+const now=()=>new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"});
+const act=t=>{S.act.unshift([t,now(),Date.now()]);S.act=S.act.slice(0,20)};
+function toast(t,k){const e=document.createElement("div");e.className="toast";e.innerHTML=ic(k||"circle-check")+esc(t);document.body.appendChild(e);try{lucide.createIcons()}catch(x){}setTimeout(()=>e.remove(),3200)}
+function dl(name,rows){const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+const stars=r=>{if(!r)return'<span class="mut"><small>Not rated</small></span>';let s="";for(let i=1;i<=5;i++)s+=`<svg width="14" height="14" viewBox="0 0 24 24" fill="${i<=r?"#eab308":"none"}" stroke="${i<=r?"#eab308":"var(--bd)"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;margin-right:2px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;return `<span style="display:inline-flex;align-items:center">${s}</span>`};
+const renderBody=b=>(b&&String(b).startsWith("data:image"))?`<img class="cimg" src="${b}" alt="attachment">`:esc(b);
 
-var bd = function(t, c){ return '<span class="badge ' + (c || "") + '">' + esc(t) + '</span>'; };
-var CS = { active:"b-ok", blocked:"b-no", open:"b-no", pending:"b-am", resolved:"b-ok", closed:"" };
-var sb = function(s){ return bd(s, CS[s] || ""); };
-var kpi = function(l, v, s, isMoney) {
-  return '<div class="card kpi"><small>' + l + '</small><b class="' + (isMoney && !U.eye ? 'bl' : '') + '">' + v + '</b><span>' + (s || "&nbsp;") + '</span></div>';
-};
-var chips = function(a, cur, L) {
-  return '<div class="chips">' + L.map(function(item){
-    return '<button class="chip' + (cur === item[0] ? " on" : "") + '" data-a="' + a + '" data-v="' + item[0] + '">' + item[1] + '</button>';
-  }).join("") + '</div>';
-};
-var row = function(cols, inner, attr) {
-  return '<' + (attr ? "button" : "div") + ' class="r" style="--m:' + cols[0] + ';--c:' + cols[1] + '" ' + (attr || "") + '>' + inner + '</' + (attr ? "button" : "div") + '>';
-};
-
-function formatTimer(dateStr) {
-  if (!dateStr) return "00m 00s";
-  var diff = Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000));
-  var m = Math.floor(diff / 60);
-  var s = diff % 60;
-  return (m < 10 ? "0" + m : m) + "m " + (s < 10 ? "0" + s : s) + "s";
+/* ---------- mapping ---------- */
+const normSt=v=>{v=String(v==null?"active":v).toLowerCase();return(v==="blocked"||v==="banned"||v==="suspended")?"blocked":"active"};
+const normWd=v=>{v=String(v==null?"pending":v).toLowerCase();return(v==="approved"||v==="completed"||v==="paid"||v==="success")?"approved":(v==="rejected"||v==="declined"||v==="failed"||v==="cancelled")?"rejected":"pending"};
+const normTk=v=>{v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":(v==="pending"||v==="answered")?"pending":"open"};
+function mapUser(r,w){const c=COLS.users,wl=w?Number(w.balance||0):Number(r[c.wallet]||0);return{id:String(r[c.id]),name:r[c.name]||r.full_name||r[c.email]||"User",email:r[c.email]||"",city:r[c.city]||"",wal:wl,pts:Number(r[c.points]!=null?r[c.points]:(w&&w.points)||0),st:normSt(r[c.status]),joined:fd(r[c.created],1),ts:Date.parse(r[c.created])||0,kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0}}
+function mapWd(r){const c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),ts:Date.parse(r[c.created])||0,pts:Date.parse(r.processed_at)||0,st:normWd(r[c.status])}}
+function mapTk(r){const c=COLS.tk,ms=(r.ticket_messages||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)),last=ms[ms.length-1];return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),ts:Date.parse(r[c.created])||0,d:fd(r[c.created],1),msgs:null,rating:r.rating||0,close_note:r.close_note||"",unread:ms.filter(m=>m.sender==="user"&&!m.is_read).length,lastTs:last?Date.parse(last.created_at):(Date.parse(r[c.created])||0),lastSender:last?last.sender:"",count:ms.length}}
+function mapMsg(r){const c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{id:String(r[c.id]||""),admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created]),ts:Date.parse(r[c.created])||Date.now(),read:!!r.is_read}}
+const NEG=["withdraw","withdrawal","debit"];
+const TYL={deposit:"Deposit",credit:"Credit",debit:"Debit",win:"Reward",withdraw:"Withdrawal",withdrawal:"Withdrawal",refund:"Refund"};
+function rebuildTx(){
+  if(S.txReal)S.tx=S.txReal.slice();
+  else S.tx=S.txl.concat(S.wd.filter(w=>w.st!=="rejected").map(w=>({uid:w.uid,ty:"withdraw",amt:-w.amt,n:"Request "+w.id.slice(0,8),d:w.d,ts:w.ts})));
+  S.tx.sort((a,b)=>(b.ts||0)-(a.ts||0));
 }
 
-async function loadAll() {
-  if (!db) return;
-  try {
-    var [cfgRes, uRes, wdRes, mRes, tkRes, txRes, cpRes] = await Promise.all([
-      db.from("app_config").select("*").eq("id", "primary").single(),
-      db.from("users").select("*, wallet(balance, points)").order("created_at", { ascending: false }),
-      db.from("withdrawal_requests").select("*").order("created_at", { ascending: false }),
-      db.from("matches").select("*").order("created_at", { ascending: false }),
-      db.from("support_tickets").select("*, ticket_messages(*)").order("created_at", { ascending: false }),
-      db.from("transactions").select("*").order("created_at", { ascending: false }).limit(200),
-      db.from("coupons").select("*").order("created_at", { ascending: false })
+/* ---------- month data (real: approved deposits and paid withdrawals) ---------- */
+let MC={};
+const inM=(v,i)=>{if(!v)return false;const d=new Date(v),m=MS[i];return d.getFullYear()===m.y&&d.getMonth()===m.m};
+function MD(i){
+  if(MC[i])return MC[i];
+  const m=MS[i],days=i===0?new Date().getDate():new Date(m.y,m.m+1,0).getDate(),dep=Array(days).fill(0),pay=Array(days).fill(0),sum=a=>a.reduce((x,y)=>x+y,0);
+  S.pay.forEach(p=>{if(p.st==="approved"&&inM(p.ts,i)){const k=new Date(p.ts).getDate()-1;if(k<days)dep[k]+=p.amt}});
+  S.wd.forEach(w=>{const t=w.pts||w.ts;if(w.st==="approved"&&inM(t,i)){const k=new Date(t).getDate()-1;if(k<days)pay[k]+=w.amt}});
+  return MC[i]={dep,pay,d:sum(dep),w:sum(pay),net:sum(dep)-sum(pay),nu:S.users.filter(u=>inM(u.ts,i)).length,pr:S.preds.filter(p=>inM(p.ts,i)).length};
+}
+function chart(a,b){
+  const n=a.length,mx=Math.max(1,...a,...b),w=700/n;
+  let s='<svg viewBox="0 0 700 190" width="100%" role="img" aria-label="Daily deposits and payouts">';
+  for(let i=0;i<n;i++){const h1=a[i]/mx*148,h2=b[i]/mx*148;
+    s+=`<rect x="${i*w+w*.1}" y="${158-h1}" width="${w*.38}" height="${h1}" rx="2" style="fill:var(--pr)">${EYE?`<title>Day ${i+1}: deposits ${fm(a[i])}</title>`:""}</rect><rect x="${i*w+w*.52}" y="${158-h2}" width="${w*.38}" height="${h2}" rx="2" style="fill:var(--bad);opacity:.75">${EYE?`<title>Day ${i+1}: payouts ${fm(b[i])}</title>`:""}</rect>`;
+    if(i===0||(i+1)%5===0)s+=`<text x="${i*w+w/2}" y="178" font-size="10" text-anchor="middle" style="fill:var(--mu)">${i+1}</text>`}
+  return s+"</svg>";
+}
+
+/* =====================================================================
+   DATA LOADING
+   ===================================================================== */
+async function fetchT(t,oc,lim,cnt,sel){const q=o=>{let x=db.from(t).select(sel||"*",cnt?{count:"exact"}:{});if(o&&oc)x=x.order(oc,{ascending:false});return x.limit(lim)};let r=await q(true);if(r.error)r=await q(false);return r}
+async function loadTickets(){let r=await db.from("support_tickets").select("*, ticket_messages(id,sender,is_read,created_at)").order("created_at",{ascending:false}).limit(300);if(r.error)r=await db.from("support_tickets").select("*").limit(300);return r}
+const reload=()=>{clearTimeout(LT);LT=setTimeout(()=>loadAll(true),500)};
+async function loadAll(quiet){
+  if(!db)return;
+  try{
+    const r=await Promise.all([
+      fetchT("users","created_at",1000,1),fetchT("wallet",null,1000,0),fetchT("withdrawal_requests","created_at",500,0),
+      fetchT("notifications","created_at",300,0),loadTickets(),fetchT("matches","created_at",500,0),
+      fetchT("predictions","created_at",5000,1,"match_id,prediction_choice,user_id,created_at"),
+      fetchT("payment_requests","created_at",500,0),fetchT("transactions","created_at",500,0),fetchT("site_settings",null,100,0)
     ]);
-
-    if (cfgRes.data) S.cfg = cfgRes.data;
-    if (uRes.data) {
-      S.users = uRes.data.map(function(u){
-        var wal = Array.isArray(u.wallet) ? (u.wallet[0] || {}) : (u.wallet || {});
-        return {
-          id: u.id,
-          name: u.full_name || u.email.split("@")[0],
-          email: u.email,
-          city: u.city || "-",
-          status: u.status || "active",
-          bal: Number(wal.balance != null ? wal.balance : (u.wallet_balance || 0)),
-          xp: Number(wal.points || 0),
-          joined: u.created_at
-        };
-      });
-    }
-    if (wdRes.data) S.wds = wdRes.data;
-    if (mRes.data) S.matches = mRes.data;
-    if (tkRes.data) {
-      S.tickets = tkRes.data.map(function(t){
-        var msgs = (t.ticket_messages || []).sort(function(a, b){ return new Date(a.created_at) - new Date(b.created_at); });
-        var unread = msgs.filter(function(m){ return m.sender === "user" && !m.is_read; }).length;
-        var u = S.users.find(function(x){ return x.id === t.user_id; });
-        return {
-          id: t.id,
-          user_id: t.user_id,
-          subject: t.subject || "Customer Inquiry",
-          user: u ? u.name : "Customer",
-          email: u ? u.email : "-",
-          prio: t.priority || "normal",
-          status: t.status || "open",
-          rating: t.rating || 0,
-          close_note: t.close_note || "",
-          last_user_reply_at: t.last_user_reply_at || (msgs.length ? msgs[msgs.length - 1].created_at : t.created_at),
-          unread: unread,
-          msgs: msgs.map(function(m){
-            return {
-              id: m.id,
-              f: m.sender === "admin" ? "admin" : "user",
-              text: m.message,
-              ts: m.created_at
-            };
-          })
-        };
-      });
-      S.tickets.sort(function(a, b){
-        if (a.status === "open" && b.status !== "open") return -1;
-        if (a.status !== "open" && b.status === "open") return 1;
-        return new Date(a.last_user_reply_at) - new Date(b.last_user_reply_at);
-      });
-    }
-    if (txRes.data) S.txs = txRes.data;
-    if (cpRes.data) S.coupons = cpRes.data;
-
-    render();
-  } catch(e) {
-    console.error("Data load failed", e);
-  }
+    const names=["users","wallet","withdrawal_requests","notifications","support_tickets","matches"],er=[];
+    [0,2,3,4,5].forEach(i=>{if(r[i].error)er.push(names[i]+": "+r[i].error.message)});
+    if(er.length&&!quiet)toast("Could not load "+er[0],"circle-alert");
+    const D=i=>(r[i]&&!r[i].error&&r[i].data)||[];
+    S.has={pay:!r[7].error,tx:!r[8].error,set:!r[9].error};
+    const wmap={};D(1).forEach(w=>wmap[w.user_id]=w);
+    if(!r[0].error){S.users=D(0).map(u=>mapUser(u,wmap[u.id]));S.ucount=r[0].count||S.users.length}
+    if(!r[2].error)S.wd=D(2).map(mapWd);
+    S.preds=D(6).map(p=>({m:String(p.match_id),c:p.prediction_choice,uid:p.user_id,ts:Date.parse(p.created_at)||0}));
+    S.totalPreds=(r[6]&&r[6].count)||S.preds.length;
+    S.pay=D(7).map(p=>({id:String(p.id),uid:String(p.user_id==null?"":p.user_id),amt:Number(p.amount_inr||p.amount||0),txn:p.txn_id||"",st:normWd(p.status),ts:Date.parse(p.created_at)||0,d:fdt(p.created_at)}));
+    S.txReal=r[8].error?null:D(8).map(x=>{const ty=String(x.type||"").toLowerCase(),a=Number(x.amount||0);return{uid:String(x.user_id||""),ty,amt:NEG.includes(ty)?-Math.abs(a):Math.abs(a),n:x.description||x.note||"",d:fdt(x.created_at),ts:Date.parse(x.created_at)||0,st:x.status||""}});
+    if(!r[3].error){const g={};D(3).forEach(x=>{const k=(x.created_at||"")+"|"+x.title;(g[k]=g[k]||{t:x.title,m:x.body,ts:Date.parse(x.created_at),n:0,uid:x.user_id}).n++});S.sent=Object.values(g).sort((a,b)=>b.ts-a.ts).slice(0,40).map(x=>({t:x.t,m:x.m,time:fdt(x.ts),aud:x.uid?(x.n===1?userName(x.uid):x.n+" users"):"All users",r:x.uid?x.n:TU()}))}
+    if(!r[4].error){const old={};S.tickets.forEach(t=>old[t.id]=t);S.tickets=D(4).map(mapTk);S.tickets.forEach(t=>{if(old[t.id]&&old[t.id].msgs)t.msgs=old[t.id].msgs})}
+    if(!r[5].error)S.matches=D(5).map(x=>{const cl=x.closes_at?new Date(x.closes_at):null,settled=x.status==="settled"||!!x.winner,mp=S.preds.filter(p=>p.m===String(x.id)),A=mp.filter(p=>p.c==="A").length,B=mp.filter(p=>p.c==="B").length,tot=A+B;return{id:x.id,c:x.category,l:x.league,a:x.team_a,b:x.team_b,closes_at:x.closes_at,when:cl?fdt(x.closes_at):"",st:settled?"settled":(cl&&cl<new Date())?"closed":"upcoming",win:x.winner?String(x.winner).toLowerCase():null,pa:tot?Math.round(A/tot*100):(x.crowd_a||50),n:tot,api_id:x.cricket_match_id||"",oa:x.odds_a||1.85,ob:x.odds_b||2.1}});
+    if(!r[9].error){D(9).forEach(x=>{if(x.key in ST_DEF)ST[x.key]=x.value});try{localStorage.setItem("cp_settings",JSON.stringify(ST))}catch(e){}}
+  }catch(e){console.error(e);if(!quiet)toast("Network error while loading data","circle-alert")}
+  MC={};rebuildTx();render();
 }
 
-function initRealtime() {
-  if (!db) return;
-  db.channel("admin-sync-hub")
-    .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, function(){ loadAll(); })
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "ticket_messages" }, function(pl){
-      var t = S.tickets.find(function(x){ return x.id === pl.new.ticket_id; });
-      if (t) {
-        t.msgs.push({ id: pl.new.id, f: pl.new.sender === "admin" ? "admin" : "user", text: pl.new.message, ts: pl.new.created_at });
-        if (pl.new.sender === "user") {
-          t.unread++;
-          t.last_user_reply_at = pl.new.created_at;
-          t.status = "open";
-          toast("Customer sent a message!", "headset");
-        }
-        render();
-        var cs = $("chat-stream");
-        if (cs) cs.scrollTop = cs.scrollHeight;
-      } else {
-        loadAll();
-      }
-    })
-    .on("postgres_changes", { event: "*", schema: "public", table: "withdrawal_requests" }, function(){ loadAll(); })
-    .on("postgres_changes", { event: "*", schema: "public", table: "app_config" }, function(pl){
-      if (pl.new) { S.cfg = pl.new; render(); }
-    })
-    .subscribe();
+/* =====================================================================
+   DATABASE ACTIONS
+   ===================================================================== */
+async function upd(table,idcol,id,patch){if(!db){toast("Database not connected","circle-alert");return false}const r=await db.from(table).update(patch).eq(idcol,id).select();if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return false}if(!r.data||!r.data.length){toast("Nothing was updated. Check your RLS policies.","circle-alert");return false}return true}
+async function doBlock(id){const u=U(id);if(u.ghost){toast("User not found","circle-alert");return}const ns=u.st==="active"?"blocked":"active";if(!(await upd("users",COLS.users.id,u.id,{[COLS.users.status]:ns})))return;u.st=ns;act((ns==="blocked"?"Blocked ":"Unblocked ")+u.name);toast(u.name+" "+ns);save();render()}
+async function doKyc(id){const u=U(id);if(u.ghost)return;if(!(await upd("users",COLS.users.id,u.id,{[COLS.users.kyc]:!u.kyc})))return;u.kyc=u.kyc?0:1;act("KYC "+(u.kyc?"verified":"reset")+": "+u.name);toast("KYC updated");closeM();render()}
+async function credit(uid,delta,why){const r=await db.rpc("admin_adjust_balance",{p_user_id:uid,p_delta:delta,p_reason:why||"Admin update"});if(r.error){toast("Update failed: "+r.error.message,"circle-alert");return null}if(!r.data||r.data.ok===false){toast((r.data&&r.data.message)||"Update failed","circle-alert");return null}return r.data}
+async function doWallet(uid,a,cr,why){const u=U(uid);if(u.ghost){toast("User not found","circle-alert");return}if(!(a>0)){toast("Enter an amount above zero","circle-alert");return}if(!cr&&a>u.wal){toast("Amount exceeds wallet balance","circle-alert");return}const d=await credit(u.id,cr?a:-a,why);if(!d)return;u.wal=d.new_balance;S.txl.unshift({uid:u.id,ty:cr?"credit":"debit",amt:cr?a:-a,n:why||"Admin update",d:fdt(new Date()),ts:Date.now()});act((cr?"Credited ":"Debited ")+fm(a)+" "+(cr?"to ":"from ")+u.name);closeM();toast("Wallet updated");rebuildTx();save();render()}
+async function doWd(id,st){const w=WDR(id);if(!w)return;if(!(await upd("withdrawal_requests",COLS.wd.id,w.id,{[COLS.wd.status]:st})))return;w.st=st;const u=U(w.uid);if(st==="rejected"&&ST.refund_reject&&!u.ghost){const d=await credit(u.id,w.amt,"Refund: withdrawal "+w.id.slice(0,8)+" rejected");if(d)u.wal=d.new_balance}act("Withdrawal "+w.id.slice(0,8)+" "+st+" ("+u.name+")");toast("Withdrawal "+st);MC={};rebuildTx();save();render()}
+async function doDp(id,st){const p=PAY(id);if(!p)return;const u=U(p.uid);if(st==="approved"){if(u.ghost){toast("Cannot find the user for this deposit","circle-alert");return}const d=await credit(u.id,p.amt,"Deposit "+p.txn);if(!d)return;u.wal=d.new_balance}if(!(await upd("payment_requests","id",p.id,{status:st})))return;p.st=st;act("Deposit "+fm(p.amt)+" "+st+" ("+u.name+")");toast("Deposit "+st);MC={};save();render()}
+async function settleMatch(id,w){let r=await db.rpc("settle_match",{p_match:id,p_winner:w});if(!r.error)return{ok:true,wins:r.data};const u=await db.from("matches").update({status:"settled",winner:w}).eq("id",id).select();if(u.error)return{ok:false,msg:u.error.message};return{ok:true,fallback:true}}
+async function saveSetting(k,v){ST[k]=v;try{localStorage.setItem("cp_settings",JSON.stringify(ST))}catch(e){}if(db&&S.has.set!==false){const r=await db.from("site_settings").upsert({key:k,value:v,updated_at:new Date().toISOString()},{onConflict:"key"});if(r.error){S.has.set=false;toast("Saved on this device only. Run the setup SQL in Settings to sync it to your website.","circle-alert");return false}}return true}
+
+/* ---------- support ---------- */
+async function fetchMsgs(id){let x=await db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id).order(COLS.msg.created,{ascending:true});if(x.error)x=await db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);return x}
+async function loadMsgs(t){const r=await fetchMsgs(t.id);if(r.error){toast("Could not load messages","circle-alert");return}t.msgs=(r.data||[]).map(mapMsg);if(t.unread){t.unread=0;db.from("ticket_messages").update({is_read:true}).eq("ticket_id",t.id).eq("sender","user").then(()=>{})}if(S.page==="sup"){updateChat(true);updateList()}else render()}
+async function tkSend(text,img){const t=TK(TKM);if(!t||t.st==="closed")return;const body=img||text;if(!body)return;const r=await db.from("ticket_messages").insert({ticket_id:t.id,sender:"admin",message:body,is_read:false}).select();if(r.error){toast("Failed to send: "+r.error.message,"circle-alert");return}const m=mapMsg(r.data&&r.data[0]?r.data[0]:{message:body,sender:"admin",created_at:new Date().toISOString()});if(!t.msgs)t.msgs=[];if(!t.msgs.some(x=>x.id&&x.id===m.id))t.msgs.push(m);t.lastTs=Date.now();t.lastSender="admin";updateChat(true);updateList()}
+const tkNote=id=>{try{return localStorage.getItem("cp_note_"+id)||""}catch(e){return""}};
+
+/* =====================================================================
+   VIEWS
+   ===================================================================== */
+const kpi=(l,v,i,c,sub)=>`<div class="kpi"><div class="ki" style="--c:${c}">${ic(i)}</div><div><small>${l}</small><b>${v}</b>${sub?`<small>${sub}</small>`:""}</div></div>`;
+const chipM=s=>`<span class="chip ${{closed:"wa",settled:"ok",upcoming:""}[s]||""}">${s[0].toUpperCase()+s.slice(1)}</span>`;
+
+function feed(){const f=[];S.users.slice(0,40).forEach(u=>u.ts&&f.push({ts:u.ts,i:"user-plus",t:`${u.name} joined`}));S.wd.slice(0,40).forEach(w=>f.push({ts:w.ts,i:"landmark",t:`Withdrawal ${fm(w.amt)} ${w.st} · ${userName(w.uid)}`}));S.pay.slice(0,40).forEach(p=>f.push({ts:p.ts,i:"banknote",t:`Deposit ${fm(p.amt)} ${p.st} · ${userName(p.uid)}`}));S.tickets.slice(0,40).forEach(t=>f.push({ts:t.ts,i:"life-buoy",t:`Ticket "${t.sub}" · ${tkUser(t)}`}));S.act.forEach(a=>f.push({ts:a[2]||0,i:"activity",t:a[0]}));return f.filter(x=>x.ts).sort((a,b)=>b.ts-a.ts).slice(0,9)}
+
+function dashV(){
+  const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
+  const aw=S.matches.filter(m=>m.st!=="settled"&&m.st==="closed"),liab=S.users.reduce((a,u)=>a+u.wal,0),pamt=pw.reduce((a,w)=>a+w.amt,0);
+  const top=S.users.slice().sort((a,b)=>b.wal-a.wal).slice(0,5);
+  return `<div class="hd"><div><h1>Dashboard</h1><small>Live overview of your CricPulse platform</small></div><div class="sp"></div>
+    <select class="in sm" data-sel="month">${MS.map((m,i)=>`<option value="${i}"${i===S.mi?" selected":""}>${m.l}</option>`).join("")}</select></div>
+  <div class="card rev"><div class="erow"><div><small>Net revenue · ${MS[S.mi].l}</small>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><div class="big">${mk(d.net)}</div><button class="ib" data-act="eye" aria-label="Show or hide revenue">${ic(EYE?"eye":"eye-off")}</button></div>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${c===null?'<span class="chip mu">No earlier month to compare</span>':`<span class="chip ${c>=0?"ok":"no"}">${c>=0?"+":""}${c}% vs previous month</span>`}<small>${EYE?"Auto-hides in 60 seconds":"Hidden. Click the eye icon to reveal."}</small></div></div>
+    <div class="src"><div><small>Deposits received</small><b>${mk(d.d)}</b></div><div><small>Payouts completed</small><b>${mk(d.w)}</b></div><div><small>Pending payouts</small><b>${mk(pamt)}</b></div></div></div>
+    <div class="${EYE?"":"bl "}mk" style="margin-top:16px">${chart(d.dep,d.pay)}</div>
+    <div class="lgd"><span><i style="background:var(--pr)"></i>Deposits</span><span><i style="background:var(--bad);opacity:.75"></i>Payouts</span>${S.has.pay===false?"<span>Deposit data not available yet</span>":""}</div></div>
+  <div class="kg">
+    ${kpi("Total users",num(TU()),"users","#4338ca",num(d.nu)+" new this month")}
+    ${kpi("Predictions",num(S.totalPreds),"target","#0ea5e9",num(d.pr)+" this month")}
+    ${kpi("Wallet liability",fm(liab),"wallet","#0f8a5f","Across listed users")}
+    ${kpi("Pending withdrawals",pw.length,"landmark","#d97706",fm(pamt))}
+    ${kpi("Pending deposits",pp.length,"banknote","#7c3aed",fm(pp.reduce((a,p)=>a+p.amt,0)))}
+    ${kpi("Open tickets",openT().length,"life-buoy","#d1384a",unreadT().length+" unread")}
+  </div>
+  <div class="cols"><div>
+    <div class="card"><h3>Needs attention</h3>
+      ${aw.map(m=>`<div class="ls"><div class="ico">${ic("trophy")}</div><div><b>${esc(m.a)} vs ${esc(m.b)}</b><small>${esc(m.l)} · ${num(m.n)} predictions · awaiting result</small></div><button class="btn s" data-act="win" data-v="${m.id}">Set winner</button></div>`).join("")}
+      ${pw.slice(0,5).map(w=>`<div class="ls"><div class="ico">${ic("landmark")}</div><div><b>${fm(w.amt)} · ${esc(userName(w.uid))}</b><small>${esc(w.m)} · ${esc(w.ac)}</small></div><div class="ac"><button class="btn s k" data-act="wd" data-v="${esc(w.id)}|approved">Approve</button><button class="btn s r" data-act="wd" data-v="${esc(w.id)}|rejected">Reject</button></div></div>`).join("")}
+      ${pp.slice(0,5).map(p=>`<div class="ls"><div class="ico">${ic("banknote")}</div><div><b>Deposit ${fm(p.amt)} · ${esc(userName(p.uid))}</b><small>${esc(p.txn)} · ${esc(p.d)}</small></div><div class="ac"><button class="btn s k" data-act="dp" data-v="${esc(p.id)}|approved">Approve</button><button class="btn s r" data-act="dp" data-v="${esc(p.id)}|rejected">Reject</button></div></div>`).join("")}
+      ${unreadT().slice(0,4).map(t=>`<div class="ls"><div class="ico">${ic("life-buoy")}</div><div><b>${esc(tkUser(t))}</b><small>${esc(t.sub)} · ${t.unread} unread</small></div><button class="btn s" data-act="gotk" data-v="${esc(t.id)}">Reply</button></div>`).join("")}
+      ${(!aw.length&&!pw.length&&!pp.length&&!unreadT().length)?'<div class="emp">All caught up. Nothing needs your attention.</div>':""}
+    </div>
+    <div class="card tw"><h3>Top wallets</h3><table><tr><th>User</th><th>City</th><th>Balance</th><th>Points</th></tr>${top.map(u=>`<tr><td><b>${esc(u.name)}</b><br><small>${esc(u.email)}</small></td><td>${esc(u.city)}</td><td>${fm(u.wal)}</td><td>${u.pts}</td></tr>`).join("")||'<tr><td colspan="4"><small>No users yet.</small></td></tr>'}</table></div>
+  </div><div>
+    <div class="card"><h3>Quick actions</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn g" data-act="addm">${ic("plus")}Add match</button><button class="btn g" data-p="not">${ic("send")}Notify users</button>
+      <button class="btn g" data-p="sup">${ic("life-buoy")}Open inbox</button><button class="btn ${ST.maintenance?"r":"g"}" data-p="set">${ic("wrench")}${ST.maintenance?"Maintenance ON":"Maintenance"}</button></div></div>
+    <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}</div>
+  </div></div>`;
 }
 
-setInterval(function(){
-  document.querySelectorAll("[data-live-timer]").forEach(function(el){
-    var dt = el.getAttribute("data-live-timer");
-    var st = el.getAttribute("data-status");
-    if (st === "open") {
-      el.textContent = formatTimer(dt) + " waiting";
-    }
-  });
-}, 1000);
+function matchesV(){
+  return `<div class="hd"><div><h1>Matches</h1><small>Create markets, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-act="addm">${ic("plus")}Add match</button></div>
+  <div class="card tw"><table><tr><th>Match</th><th>Closes</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>${S.matches.map(m=>{
+    const st=m.st,btns=st==="settled"?"":(st==="upcoming"?`<button class="btn s g" data-act="closepicks" data-v="${m.id}">Close picks</button>`:`<button class="btn s k" data-act="reopen" data-v="${m.id}">Reopen</button>`)+`<button class="btn s" data-act="win" data-v="${m.id}">Set winner</button>`;
+    return `<tr><td><b>${esc(m.a)} vs ${esc(m.b)}</b><br><small>${esc(m.l)}</small></td><td>${esc(m.when)}</td><td>${num(m.n)}</td><td><small>${m.pa}% / ${100-m.pa}%</small></td><td>${chipM(st)}${m.win?`<br><small>Winner: ${m.win==="void"?"Void":esc(m.win==="a"?m.a:m.b)}</small>`:""}</td><td><div class="ac"><button class="btn s" data-act="manage" data-v="${m.id}">Manage</button><button class="btn s g" data-act="editm" data-v="${m.id}" aria-label="Edit">${ic("pencil")}</button>${btns}<button class="btn s g" data-act="delm" data-v="${m.id}" aria-label="Delete">${ic("trash-2")}</button></div></td></tr>`}).join("")||'<tr><td colspan="6"><div class="emp">No matches yet. Click Add match to publish one.</div></td></tr>'}</table></div>`;
+}
+function usersTbl(){
+  const q=UQ.toLowerCase(),l=S.users.filter(u=>(!q||(u.name+u.email+u.city).toLowerCase().includes(q))&&(UF==="all"||(UF==="blocked"&&u.st==="blocked")||(UF==="kyc"&&!u.kyc)||(UF==="rich"&&u.wal>=1000)));
+  return `<table><tr><th>User</th><th>City</th><th>Wallet</th><th>Points</th><th>KYC</th><th>Status</th><th></th></tr>${l.map(u=>`<tr><td><div style="display:flex;gap:10px;align-items:center"><span class="avt" style="background:${col(u.name)};width:34px;height:34px;font-size:12px">${ini(u.name)}</span><div><b>${esc(u.name)}</b><br><small>${esc(u.email)}</small></div></div></td><td>${esc(u.city)}</td><td>${fm(u.wal)}</td><td>${u.pts}</td><td><span class="chip ${u.kyc?"ok":"wa"}">${u.kyc?"Verified":"Pending"}</span></td><td><span class="chip ${u.st==="active"?"ok":"no"}">${u.st}</span></td><td><div class="ac"><button class="btn s g" data-act="uview" data-v="${esc(u.id)}">View</button><button class="btn s g" data-act="unotify" data-v="${esc(u.id)}" aria-label="Notify">${ic("bell")}</button><button class="btn s g" data-act="uwallet" data-v="${esc(u.id)}" aria-label="Wallet">${ic("wallet")}</button><button class="btn s ${u.st==="active"?"r":"k"}" data-act="ublock" data-v="${esc(u.id)}">${u.st==="active"?"Block":"Unblock"}</button></div></td></tr>`).join("")||'<tr><td colspan="7"><div class="emp">No users match.</div></td></tr>'}</table>`;
+}
+const usersV=()=>`<div class="hd"><div><h1>Users</h1><small>Showing ${S.users.length} of ${num(TU())} registered users</small></div><div class="sp"></div><button class="btn g" data-act="export" data-v="users">${ic("download")}Export CSV</button></div>
+  <div class="tb2"><input class="in" id="uq" placeholder="Search name, email or city" value="${esc(UQ)}"><select class="in sm" data-sel="uf">${[["all","All users"],["blocked","Blocked"],["kyc","KYC pending"],["rich","Wallet over ₹1,000"]].map(o=>`<option value="${o[0]}"${UF===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select></div><div class="card tw" id="ut">${usersTbl()}</div>`;
 
-var NAV = [
-  ["Overview", [["dash", "Dashboard", "layout-dashboard"]]],
-  ["Operations", [["users", "User Management", "users"], ["markets", "Match Fixtures", "trophy"], ["wallet", "Payouts & Ledger", "wallet"], ["coupons", "Vouchers & Codes", "gift"]]],
-  ["Engagement", [["tickets", "Live Support Desk", "headset"], ["notify", "Push Broadcasts", "bell"]]],
-  ["Website Control", [["controls", "Live Site Controls", "toggle-right"], ["risk", "Settlements & Risk", "shield-alert"]]]
-];
+function walletsV(){
+  const ty=["All","Deposit","Credit","Debit","Reward","Withdrawal","Refund"],l=S.tx.filter(t=>TF==="All"||TYL[t.ty]===TF);
+  const hi=Math.max(0,...S.users.map(u=>u.wal));
+  return `<div class="hd"><div><h1>Wallets</h1><small>Ledger of every wallet movement</small></div><div class="sp"></div><select class="in sm" data-sel="tf">${ty.map(t=>`<option${t===TF?" selected":""}>${t}</option>`).join("")}</select><button class="btn g" data-act="export" data-v="ledger">${ic("download")}Export CSV</button></div>
+  <div class="kg">${kpi("Wallet liability",fm(S.users.reduce((a,u)=>a+u.wal,0)),"wallet","#0f8a5f","Listed users")}${kpi("Highest balance",fm(hi),"trending-up","#4338ca","")}${kpi("Transactions",num(l.length),"activity","#0ea5e9",TF)}</div>
+  <div class="card tw"><table><tr><th>User</th><th>Type</th><th>Amount</th><th>Note</th><th>Date</th></tr>${l.map(t=>`<tr><td>${esc(userName(t.uid))}</td><td>${TYL[t.ty]||esc(t.ty)}</td><td style="color:var(--${t.amt>=0?"ok":"bad"});font-weight:600">${t.amt>=0?"+":"-"}₹${num(Math.abs(t.amt))}</td><td>${esc(t.n)}</td><td>${esc(t.d)}</td></tr>`).join("")||'<tr><td colspan="5"><div class="emp">No transactions.</div></td></tr>'}</table></div>`;
+}
+function depV(){
+  const l=S.pay;
+  return `<div class="hd"><div><h1>Deposits</h1><small>Verify ZapUPI payments, then approve to credit the wallet</small></div></div>
+  ${S.has.pay===false?'<div class="mbar">'+ic("circle-alert")+'The payment_requests table was not found, so deposits cannot be listed.</div>':""}
+  <div class="card tw"><table><tr><th>Order</th><th>User</th><th>Amount</th><th>Date</th><th>Status</th><th></th></tr>${l.map(p=>`<tr><td><b>${esc(p.txn||p.id.slice(0,8))}</b></td><td>${esc(userName(p.uid))}</td><td>${fm(p.amt)}</td><td>${esc(p.d)}</td><td><span class="chip ${{pending:"wa",approved:"ok",rejected:"no"}[p.st]}">${p.st}</span></td><td><div class="ac">${p.st==="pending"?`<button class="btn s k" data-act="dp" data-v="${esc(p.id)}|approved">Approve and credit</button><button class="btn s r" data-act="dp" data-v="${esc(p.id)}|rejected">Reject</button>`:""}</div></td></tr>`).join("")||'<tr><td colspan="6"><div class="emp">No deposit requests.</div></td></tr>'}</table></div>`;
+}
+function wdV(){
+  const l=S.wd.filter(w=>WF==="all"||w.st===WF);
+  return `<div class="hd"><div><h1>Withdrawals</h1><small>Review, approve or reject payout requests</small></div><div class="sp"></div><button class="btn g" data-act="export" data-v="wd">${ic("download")}Export CSV</button></div>
+  <div class="tabs" style="margin-bottom:12px">${["pending","approved","rejected","all"].map(f=>`<button class="${WF===f?"on":""}" data-act="wf" data-v="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join("")}</div>
+  <div class="card tw"><table><tr><th>Request</th><th>User</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th></th></tr>${l.map(w=>`<tr><td><b>${esc(w.id.slice(0,8))}</b></td><td>${esc(userName(w.uid))}</td><td>${fm(w.amt)}</td><td>${esc(w.m)}<br><small>${esc(w.ac)}</small></td><td>${esc(w.d)}</td><td><span class="chip ${{pending:"wa",approved:"ok",rejected:"no"}[w.st]}">${w.st}</span></td><td><div class="ac">${w.st==="pending"?`<button class="btn s k" data-act="wd" data-v="${esc(w.id)}|approved">Approve</button><button class="btn s r" data-act="wd" data-v="${esc(w.id)}|rejected">Reject</button>`:""}</div></td></tr>`).join("")||'<tr><td colspan="7"><div class="emp">No requests in this view.</div></td></tr>'}</table></div>`;
+}
 
-var META = {
-  dash: ["Overview", "Live operations, financial liquidity, and pending tasks."],
-  users: ["User Management", "Monitor users, adjust balances, and block violators."],
-  markets: ["Match Fixtures", "Create matches, update odds, and declare winners."],
-  wallet: ["Wallet & Withdrawals", "Verify and process instant UPI payouts."],
-  coupons: ["Vouchers & Rewards", "Manage promotional codes for points."],
-  tickets: ["Live Support Desk", "Real-time queue auto-sorted by response timer."],
-  notify: ["Push Notifications", "Broadcast announcements directly to users."],
-  controls: ["Live Site Controls", "Toggle maintenance mode and sitewide banners."],
-  risk: ["Settlements & Risk", "Audit match exposure and handle voided markets."]
+/* ---------- support inbox ---------- */
+const priChip=p=>`<span class="chip ${p==="urgent"||p==="high"?"no":p==="low"?"mu":""}">${esc(p)}</span>`;
+const stChip=s=>`<span class="chip ${{open:"wa",pending:"",closed:"ok"}[s]}">${s}</span>`;
+function tkTabs(){const c=f=>f==="all"?S.tickets.length:S.tickets.filter(t=>t.st===f).length;return `<div class="tabs">${["open","pending","closed","all"].map(f=>`<button class="${TKF===f?"on":""}" data-act="kf" data-v="${f}">${f[0].toUpperCase()+f.slice(1)} ${c(f)}</button>`).join("")}</div>`}
+function tkList(){
+  const q=TQ.toLowerCase(),l=S.tickets.filter(t=>(TKF==="all"||t.st===TKF)&&(!q||(tkUser(t)+t.sub+t.id).toLowerCase().includes(q))).sort((a,b)=>b.lastTs-a.lastTs);
+  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b><em>${rel(t.lastTs)}</em></span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc(t.sub)}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
+}
+function chatMsgs(t){
+  if(!t.msgs)return '<div class="emp">Loading conversation...</div>';
+  let last="",h=`<div class="ds"><span>Ticket opened ${esc(fd(t.ts,1))}</span></div>`;
+  t.msgs.forEach(m=>{const day=new Date(m.ts).toDateString();if(day!==last){last=day;h+=`<div class="ds"><span>${dayLabel(m.ts)}</span></div>`}h+=`<div class="mg ${m.admin?"me":"th"}"><div class="bb">${renderBody(m.b)}</div><div class="mt">${ftm(m.ts)}${m.admin?(m.read?" "+ic("check-check")+" Seen":" "+ic("check")+" Sent"):""}</div></div>`});
+  if(t.st==="closed")h+=`<div class="ds"><span>Ticket closed${t.close_note?": "+esc(t.close_note):""}</span></div>`;
+  return h;
+}
+function chatPane(t){
+  const n=tkUser(t),pris=["low","normal","high","urgent"];if(!pris.includes(t.pr))pris.push(t.pr);
+  return `<div class="ch"><button class="ib mb-only" data-act="tkback" aria-label="Back">${ic("arrow-left")}</button><span class="avt" style="background:${col(n)}">${ini(n)}</span><div class="grow"><b>${esc(n)}</b><small>${esc(t.sub)} · #${esc(t.id.slice(0,8))}</small></div>
+    <select class="in sm" data-pri="${esc(t.id)}" aria-label="Priority">${pris.map(p=>`<option${p===t.pr?" selected":""}>${p}</option>`).join("")}</select>
+    ${t.st==="closed"?`<button class="btn k s" data-act="tkreopen" data-v="${esc(t.id)}">Reopen</button>`:`<button class="btn r s" data-act="tkclose" data-v="${esc(t.id)}">Close ticket</button>`}</div>
+  <div class="cm" id="cr-msgs">${chatMsgs(t)}</div>
+  ${t.st==="closed"?`<div class="cp" style="justify-content:center;color:var(--mu)">This ticket is closed. Reopen it to reply.</div>`:`<div class="qr">${QUICK.map((q,i)=>`<button data-act="qr" data-v="${i}">${esc(q.length>34?q.slice(0,34)+"...":q)}</button>`).join("")}</div>
+  <div class="cp"><button class="ib" data-act="tkattach" aria-label="Attach image">${ic("paperclip")}</button><input type="file" id="cr-file" accept="image/*" hidden><textarea id="cr-in" rows="1" placeholder="Type a reply. Enter to send, Shift+Enter for a new line"></textarea><button class="btn" data-act="tksend">${ic("send")}Send</button></div>`}`;
+}
+function custPane(t){
+  const u=U(t.uid),n=tkUser(t),others=S.tickets.filter(x=>x.uid===t.uid).length;
+  return `<div class="cdc"><span class="avt lg" style="background:${col(n)}">${ini(n)}</span><b>${esc(n)}</b><small>${esc(u.email)}</small><span class="chip ${u.st==="active"?"ok":"no"}">${u.st}</span></div>
+  <div class="kv"><span>Wallet</span><span><b>${fm(u.wal)}</b></span><span>Points</span><span>${u.pts}</span><span>City</span><span>${esc(u.city)||"-"}</span><span>Joined</span><span>${esc(u.joined)||"-"}</span><span>KYC</span><span>${u.kyc?"Verified":"Pending"}</span><span>Tickets</span><span>${others}</span></div>
+  ${u.ghost?"":`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><button class="btn g s" data-act="unotify" data-v="${esc(u.id)}">${ic("bell")}Notify</button><button class="btn g s" data-act="uwallet" data-v="${esc(u.id)}">${ic("wallet")}Wallet</button></div>`}
+  <h4>Ticket</h4><div class="kv"><span>Status</span><span>${stChip(t.st)}</span><span>Priority</span><span>${priChip(t.pr)}</span><span>Messages</span><span>${t.msgs?t.msgs.length:t.count}</span><span>Rating</span><span>${stars(t.rating)}</span></div>
+  ${t.close_note?`<p style="background:var(--bads);color:var(--bad);border-radius:10px;padding:10px;font-size:13px"><b>Close note:</b> ${esc(t.close_note)}</p>`:""}
+  <h4>Private notes</h4><textarea class="in" id="cr-note" data-note="${esc(t.id)}" rows="4" placeholder="Only visible to you (saved in this browser)">${esc(tkNote(t.id))}</textarea>`;
+}
+function supV(){
+  let T=TKM?TK(TKM):null;if(TKM&&!T){saveTkm(null);T=null}
+  return `<div class="hd"><div><h1>Support inbox</h1><small>Customer chats, ratings and ticket history</small></div><div class="sp"></div><button class="btn g" data-act="refresh">${ic("refresh-cw")}Refresh</button></div>
+  <div class="chat${T?" is-open":""}"><aside class="cl"><div class="clh"><div class="tb2" style="margin:0"><input class="in" id="tks" placeholder="Search tickets" value="${esc(TQ)}"></div><div id="tk-tabs">${tkTabs()}</div></div><div id="tk-list">${tkList()}</div></aside>
+  <section class="cc">${T?chatPane(T):`<div class="emp" style="margin:auto">${ic("life-buoy")}<p>Select a ticket to start replying.</p></div>`}</section>${T?`<aside class="cd">${custPane(T)}</aside>`:""}</div>`;
+}
+function updateList(){const l=$("tk-list");if(l){l.innerHTML=tkList();$("tk-tabs").innerHTML=tkTabs();try{lucide.createIcons()}catch(e){}}}
+function updateChat(stick){const t=TK(TKM),el=$("cr-msgs");if(!t||!el)return;const atB=el.scrollHeight-el.scrollTop-el.clientHeight<90;el.innerHTML=chatMsgs(t);if(stick||atB)el.scrollTop=el.scrollHeight;try{lucide.createIcons()}catch(e){}}
+
+/* ---------- notifications / rewards / settings ---------- */
+const TPL=[["Maintenance notice","We will be performing maintenance tonight. Services may be briefly unavailable."],["New market live","A new market is open. Make your free prediction now."],["Payout update","Your withdrawal request is being processed. Thank you for your patience."]];
+function notV(){
+  const rc=CPS.aud==="all"?TU():CPS.aud==="act"?S.users.filter(u=>u.st==="active").length:1;
+  return `<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div>
+  <div class="cols"><form class="card" id="nf"><h3>Compose</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${TPL.map((t,i)=>`<button type="button" class="chip" data-act="tpl" data-v="${i}">${esc(t[0])}</button>`).join("")}</div>
+    <div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"${CPS.aud==="all"?" selected":""}>All users</option><option value="act"${CPS.aud==="act"?" selected":""}>Active users only</option><option value="one"${CPS.aud==="one"?" selected":""}>Particular user</option></select></label>
+    ${CPS.aud==="one"?`<label class="f">User<select class="in" data-cp="uid"><option value="">Select a user</option>${S.users.map(x=>`<option value="${esc(x.id)}"${x.id===CPS.uid?" selected":""}>${esc(x.name)}</option>`).join("")}</select></label>`:`<label class="f">Type<select class="in" data-cp="ty">${["Promo","Result","Alert","Info"].map(t=>`<option${t===CPS.ty?" selected":""}>${t}</option>`).join("")}</select></label>`}</div>
+    <label class="f">Title<input class="in" data-cp="t" value="${esc(CPS.t)}" maxlength="80" required></label>
+    <label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>${esc(CPS.m)}</textarea></label>
+    <div class="hd" style="margin:0"><small>Recipients: <b>${num(rc)}</b></small><div class="sp"></div><button class="btn" type="submit">${ic("send")}Send notification</button></div></form>
+  <div class="card"><h3>Sent history</h3>${S.sent.map(s=>`<div class="ls"><div class="ico">${ic("bell")}</div><div><b>${esc(s.t)}</b><small>${esc(s.m)}</small><small>${esc(s.aud)} · ${num(s.r)} recipients · ${esc(s.time)}</small></div></div>`).join("")||'<div class="emp">Nothing sent yet.</div>'}</div></div>`;
+}
+const rewV=()=>`<div class="hd"><div><h1>Rewards and coupons</h1><small>Coupons users can claim with points (stored in this browser)</small></div><div class="sp"></div><button class="btn" data-act="addc">${ic("plus")}Create coupon</button></div>
+  <div class="card tw"><table><tr><th>Reward</th><th>Code</th><th>Benefit</th><th>Claimed</th><th>Status</th><th></th></tr>${S.cp.map((c,i)=>`<tr><td><b>${esc(c.n)}</b></td><td><span class="chip">${esc(c.code)}</span></td><td>${esc(c.dc)}</td><td>${c.used} / ${c.tot}</td><td><span class="chip ${c.on?"ok":""}">${c.on?"Active":"Paused"}</span></td><td><div class="ac"><button class="btn s g" data-act="ctoggle" data-v="${i}">${c.on?"Pause":"Activate"}</button></div></td></tr>`).join("")||'<tr><td colspan="6"><div class="emp">No coupons yet.</div></td></tr>'}</table></div>`;
+const swRow=(k,l,d)=>`<div class="row2"><div><b>${l}</b><small>${d}</small></div><label class="sw"><input type="checkbox" data-set="${k}"${ST[k]?" checked":""}><i></i></label></div>`;
+const numRow=(k,l,d,pre)=>`<div class="row2"><div><b>${l}</b><small>${d}</small></div><input class="in sm" style="width:130px" data-setin="${k}" value="${esc(ST[k])}"${pre?' type="number" min="0"':""}></div>`;
+function sqlText(){const e=(ADMIN_EMAILS[0]||"you@example.com").replace(/'/g,"''");return `create table if not exists public.site_settings (
+  key text primary key, value jsonb not null, updated_at timestamptz default now());
+alter table public.site_settings enable row level security;
+drop policy if exists "settings read" on public.site_settings;
+create policy "settings read" on public.site_settings for select using (true);
+drop policy if exists "settings admin write" on public.site_settings;
+create policy "settings admin write" on public.site_settings for all to authenticated
+  using ((auth.jwt()->>'email') = '${e}') with check ((auth.jwt()->>'email') = '${e}');`}
+function setV(){
+  return `<div class="hd"><div><h1>Settings</h1><small>Control how your website behaves</small></div></div>
+  <div class="card" style="${ST.maintenance?"border-color:var(--wa)":""}"><div class="row2" style="border:0"><div><h3 style="margin:0">${ic("wrench")} Maintenance mode</h3><small>When ON, your website should show the maintenance message instead of the app.</small></div><label class="sw"><input type="checkbox" data-set="maintenance"${ST.maintenance?" checked":""}><i></i></label></div>
+    <label class="f" style="margin-top:8px">Maintenance message<textarea class="in" id="maint-msg" rows="2">${esc(ST.maint_msg)}</textarea></label><button class="btn s" data-act="savemaint">Save message</button></div>
+  <div class="cols"><div>
+    <div class="card"><h3>Website controls</h3>${swRow("signups","New sign-ups","Allow new users to register")}${swRow("predictions","Predictions open","Turn OFF to pause all new predictions")}${swRow("announce_on","Announcement banner","Show a banner at the top of the website")}
+      <label class="f" style="margin-top:10px">Banner text<input class="in" data-setin="announce_text" value="${esc(ST.announce_text)}" placeholder="e.g. IPL final tonight. Free entry on all markets."></label></div>
+    <div class="card"><h3>Payments and support</h3>${numRow("min_deposit","Minimum deposit","In rupees",1)}${numRow("min_withdraw","Minimum withdrawal","In rupees",1)}${swRow("refund_reject","Refund on rejected withdrawal","Credit the wallet back when you reject a request")}${numRow("reply_window","Support reply window","Shown to customers")}${numRow("instagram","Instagram handle","Without the @ sign")}</div>
+  </div><div>
+    <div class="card"><h3>Admin account</h3><div class="kv"><span>Email</span><span>${esc(S.adm||"-")}</span><span>Role</span><span>Super admin</span><span>Database</span><span>${db?'<span class="chip ok">Connected</span>':'<span class="chip no">Not connected</span>'}</span><span>Site settings</span><span>${S.has.set===false?'<span class="chip wa">This device only</span>':'<span class="chip ok">Synced</span>'}</span></div>
+      <div class="row2"><div><b>Appearance</b><small>Light or dark</small></div><button class="btn g s" data-act="theme">Toggle theme</button></div>
+      <div class="row2"><div><b>Lock panel</b><small>Ask for the password again</small></div><button class="btn g s" data-act="lock">${ic("lock")}Lock</button></div>
+      <div class="row2"><div><b>Clear local cache</b><small>Notes, coupons and activity in this browser</small></div><button class="btn r s" data-act="reset">Clear</button></div>
+      <button class="btn g w" style="margin-top:12px" data-act="logout">${ic("log-out")}Sign out</button></div>
+    <div class="card"><h3>Setup: sync settings to your website</h3><small>Run this once in Supabase SQL Editor so settings are shared with your website.</small><div class="sqlb" style="margin:10px 0">${esc(sqlText())}</div><button class="btn g s" data-act="copysql">${ic("copy")}Copy SQL</button></div>
+  </div></div>`;
+}
+
+const NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["deposits","banknote","Deposits"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
+const VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],deposits:["Deposits",depV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
+function badge(k){const n=k==="wd"?pendW().length:k==="deposits"?pendP().length:k==="sup"?unreadT().length:0;return n?`<span class="cn">${n}</span>`:""}
+const nav=()=>NV.map(n=>n[0]==="H"?`<h6>${n[1]}</h6>`:`<button class="nv${S.page===n[0]?" on":""}" data-p="${n[0]}">${ic(n[1])}${n[2]}${badge(n[0])}</button>`).join("")+`<button class="nv" data-act="logout">${ic("log-out")}Logout</button>`;
+
+/* ---------- login screens ---------- */
+const brandH=`<div class="brand" style="margin-bottom:20px"><span>${ic("shield-check")}</span>CricPulse Admin</div>`;
+const lockV=()=>`<div id="lg"><form id="pf" class="lgc">${brandH}<h1 style="margin-bottom:4px">Admin access</h1><small>Enter the admin password to continue.</small><div style="height:16px"></div>
+  <label class="f">Password<div class="pw"><input class="in" id="pw" type="password" autocomplete="current-password" required autofocus><button type="button" class="ib" data-act="showpw" aria-label="Show password">${ic("eye")}</button></div></label><div class="den" id="pe"></div><button class="btn w" type="submit">Unlock</button></form></div>`;
+const googleV=()=>`<div id="lg"><form id="lf" class="lgc">${brandH}<h1 style="margin-bottom:4px">Sign in</h1><small>Password accepted. Now sign in with your admin Google account.</small><div style="height:16px"></div>${DENY?`<div class="den">${esc(DENY)}</div>`:""}<button class="btn w" type="submit">Sign in with Google</button><button type="button" class="btn g w" style="margin-top:8px" data-act="lock">${ic("lock")}Lock again</button></form></div>`;
+
+/* ---------- render ---------- */
+function render(){
+  const r=$("root");
+  if(!LOGIN){r.innerHTML=UNLOCK?googleV():lockV();try{lucide.createIcons()}catch(e){}return}
+  const ci=$("cr-in"),cm=$("cr-msgs"),keep=ci?{v:ci.value,f:document.activeElement===ci}:null,sc=cm?{top:cm.scrollTop,bot:cm.scrollHeight-cm.scrollTop-cm.clientHeight<90}:null;
+  const v=VT[S.page]||VT.dash,al=pendW().length+pendP().length+unreadT().length;
+  r.innerHTML=`<div id="app"><aside class="sb"><div class="brand"><span>${ic("shield-check")}</span>CricPulse Admin</div>${nav()}<small style="margin-top:auto;padding:10px;color:#6b7694">CricPulse Admin v3</small></aside>
+  <div class="main"><div class="tp"><button class="ib mb-only" data-act="menu" aria-label="Menu">${ic("menu")}</button><b>${v[0]}</b><div class="sp"></div><input class="in tsr" id="gs" placeholder="Search users by name, email or city" aria-label="Search users"><small style="white-space:nowrap">${new Date().toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric"})}</small>
+    <button class="ib" data-act="alerts" aria-label="Alerts">${ic("bell")}${al?`<span class="dt">${al}</span>`:""}</button><button class="ib" data-act="eye" aria-label="Show or hide revenue">${ic(EYE?"eye":"eye-off")}</button><div class="av">${esc(ini(S.adm.split("@")[0]||"AD"))}</div></div>
+    <div class="pg">${ST.maintenance?`<div class="mbar">${ic("wrench")}Maintenance mode is ON. <button class="btn s g" data-p="set">Manage</button></div>`:""}${v[1]()}</div></div></div>`;
+  try{lucide.createIcons()}catch(e){}
+  if(keep){const n=$("cr-in");if(n){n.value=keep.v;if(keep.f)n.focus()}}
+  if(sc){const n=$("cr-msgs");if(n)n.scrollTop=sc.bot?n.scrollHeight:sc.top}else if($("cr-msgs"))$("cr-msgs").scrollTop=$("cr-msgs").scrollHeight;
+}
+function modal(h,wide){const o=document.createElement("div");o.className="ov";o.innerHTML=`<div class="md${wide?" wd":""}">${h}</div>`;document.body.appendChild(o);try{lucide.createIcons()}catch(e){}}
+function closeM(){document.querySelectorAll(".ov").forEach(o=>o.remove());MOD=null}
+const fld=(l,id,v,t,req)=>`<label class="f">${l}<input class="in" id="${id}" type="${t||"text"}" value="${esc(v||"")}"${req===false?"":" required"}></label>`;
+
+/* ---------- modals ---------- */
+function matchModal(m){
+  const e=!!m,cat=e?m.c:"cricket";let dt="";
+  if(e&&m.closes_at){const d=new Date(m.closes_at);dt=new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,16)}
+  modal(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;border-bottom:1px solid var(--bd);padding-bottom:14px"><div class="ico" style="width:42px;height:42px">${ic(e?"pencil":"plus")}</div><div><h3 style="margin:0">${e?"Edit match":"Create new match"}</h3><small>Fill in the details to publish</small></div></div>
+  <form id="mf"><div class="fg"><label class="f">Category<select class="in" id="mc" data-leagues>${[["cricket","Cricket"],["football","Football"],["kabaddi","Kabaddi"],["esports","Esports"],["indian","Indian events"]].map(o=>`<option value="${o[0]}"${cat===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select></label>
+    <label class="f">League / event<input class="in" id="ml" list="lgl" value="${e?esc(m.l):""}" placeholder="e.g. IPL 2026" required><datalist id="lgl">${(LEAGUES[cat]||[]).map(l=>`<option value="${l}">`).join("")}</datalist></label></div>
+  <div class="fg">${fld("Team A / option A","ma",e?m.a:"")}${fld("Team B / option B","mb",e?m.b:"")}</div>
+  <div class="fg">${fld("Odds A","moa",e?m.oa:1.85,"number")}${fld("Odds B","mob",e?m.ob:2.1,"number")}</div>
+  <label class="f">Predictions close at<input class="in" type="datetime-local" id="mtime" value="${dt}" required></label>
+  <div class="ac" style="margin-top:6px"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn" type="submit">${e?"Save changes":"Publish match"}</button></div><input type="hidden" id="mid_db" value="${e?m.id:""}"></form>`);
+}
+async function manageMatch(id){
+  const m=MM(id);if(!m)return;
+  modal('<div class="emp">Loading votes...</div>',true);
+  const r=await db.from("predictions").select("*, users(full_name, email)").eq("match_id",id);closeM();
+  const p=r.data||[],A=p.filter(x=>x.prediction_choice==="A").length,B=p.filter(x=>x.prediction_choice==="B").length,t=A+B||1,pa=Math.round(A/t*100);
+  modal(`<h3>Manage match</h3><div class="kv" style="margin-bottom:14px"><span>Match</span><span><b>${esc(m.a)} vs ${esc(m.b)}</b></span><span>League</span><span>${esc(m.l)}</span><span>Status</span><span>${chipM(m.st)}</span>
+    <span>CricAPI ID</span><span style="display:flex;gap:8px"><input class="in sm" id="edit-api-id" value="${esc(m.api_id)}" style="width:200px"><button class="btn s" data-act="saveapi" data-v="${m.id}">Save</button></span></div>
+  <div class="kg" style="grid-template-columns:1fr 1fr"><div class="kpi"><div><small>${esc(m.a)}</small><b>${A} votes (${pa}%)</b></div></div><div class="kpi"><div><small>${esc(m.b)}</small><b>${B} votes (${100-pa}%)</b></div></div></div>
+  <h3>User votes (${p.length})</h3><div style="max-height:300px;overflow-y:auto">${p.map(x=>`<div class="ls"><div class="ico">${ic("user")}</div><div><b>${esc(x.users?(x.users.full_name||x.users.email):"Unknown")}</b><small>Voted for ${esc(x.prediction_choice==="A"?m.a:m.b)} · ${esc(fdt(x.created_at))}</small></div><span class="chip ok">${esc(x.prediction_choice)}</span></div>`).join("")||'<div class="emp">No votes yet.</div>'}</div>
+  <div class="ac" style="margin-top:14px"><button class="btn g" data-act="close">Close</button></div>`,true);
+}
+function userModal(id){
+  const u=U(id),tx=S.tx.filter(x=>x.uid===u.id).slice(0,5);
+  modal(`<div class="cdc" style="margin-bottom:10px"><span class="avt lg" style="background:${col(u.name)}">${ini(u.name)}</span><h3 style="margin:0">${esc(u.name)}</h3><small>${esc(u.email)}</small></div>
+  <div class="kv"><span>City</span><span>${esc(u.city)||"-"}</span><span>Wallet</span><span><b>${fm(u.wal)}</b></span><span>Points</span><span>${u.pts}</span><span>Joined</span><span>${esc(u.joined)}</span><span>Status</span><span>${u.st}</span><span>KYC</span><span>${u.kyc?"Verified":"Pending"}</span></div>
+  <h3 style="margin-top:16px">Recent transactions</h3>${tx.map(x=>`<div class="ls"><div><b>${TYL[x.ty]||esc(x.ty)} · ${x.amt>=0?"+":"-"}₹${num(Math.abs(x.amt))}</b><small>${esc(x.n)} · ${esc(x.d)}</small></div></div>`).join("")||"<small>No transactions yet.</small>"}
+  <div class="ac" style="margin-top:14px"><button class="btn g s" data-act="ukyc" data-v="${esc(u.id)}">${u.kyc?"Reset KYC":"Mark KYC verified"}</button><button class="btn g" data-act="close">Close</button></div>`);
+}
+const walletModal=id=>{const u=U(id);MOD=u.id;modal(`<h3>Adjust wallet · ${esc(u.name)}</h3><small>Current balance ${fm(u.wal)}</small><form id="wf" style="margin-top:14px"><div class="fg"><label class="f">Action<select class="in" id="wt"><option value="c">Credit</option><option value="d">Debit</option></select></label>${fld("Amount (₹)","wa","","number")}</div>${fld("Reason","wr")}<div class="ac"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn" type="submit">Apply</button></div></form>`)};
+const notifyModal=id=>{const u=U(id);modal(`<h3>Notify ${esc(u.name)}</h3><form id="mnf"><input type="hidden" id="mn-uid" value="${esc(u.id)}">${fld("Title","mn-t","")}<label class="f">Message<textarea class="in" id="mn-m" rows="3" required></textarea></label><div class="ac"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn" type="submit">Send</button></div></form>`)};
+function alertsModal(){
+  const pw=pendW(),pp=pendP(),ut=unreadT();
+  modal(`<h3>Alerts</h3>${[[`Pending withdrawals`,pw.length,"wd","landmark"],[`Pending deposits`,pp.length,"deposits","banknote"],[`Unread support chats`,ut.length,"sup","life-buoy"]].map(a=>`<div class="ls"><div class="ico">${ic(a[3])}</div><div><b>${a[0]}</b><small>${a[1]?a[1]+" waiting":"Nothing waiting"}</small></div><button class="btn s g" data-p="${a[2]}" data-act="close">Open</button></div>`).join("")}<div class="ac" style="margin-top:14px"><button class="btn g" data-act="close">Close</button></div>`);
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+const ACT={
+  menu(){document.body.classList.toggle("navopen")},
+  eye(){EYE=!EYE;clearTimeout(EYET);if(EYE)EYET=setTimeout(()=>{EYE=0;render()},60000);render()},
+  theme(){const h=document.documentElement,cur=h.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");h.setAttribute("data-theme",cur==="dark"?"light":"dark")},
+  close(){closeM()},
+  refresh(){toast("Refreshing...","refresh-cw");loadAll()},
+  logout(){doLogout()},
+  lock(){try{sessionStorage.removeItem("cp_adm_ok")}catch(e){}UNLOCK=false;LOGIN=0;DENY="";render()},
+  showpw(v,el){const p=$("pw");if(!p)return;p.type=p.type==="password"?"text":"password"},
+  reset(){if(!confirm("Clear notes, coupons and activity saved in this browser?"))return;localStorage.removeItem("pxa3");S.cp=[];S.act=[];S.txl=[];Object.keys(localStorage).filter(k=>k.startsWith("cp_note_")).forEach(k=>localStorage.removeItem(k));toast("Local cache cleared");rebuildTx();render()},
+  copysql(){try{navigator.clipboard.writeText(sqlText())}catch(e){}toast("SQL copied","copy")},
+  alerts(){alertsModal()},
+  goset(){S.page="set";render()},
+  export(v){
+    if(v==="users")dl("users.csv",[["Name","Email","City","Wallet","Points","KYC","Status","Joined"]].concat(S.users.map(u=>[u.name,u.email,u.city,u.wal,u.pts,u.kyc?"Verified":"Pending",u.st,u.joined])));
+    if(v==="wd")dl("withdrawals.csv",[["ID","User","Amount","Method","Account","Date","Status"]].concat(S.wd.map(w=>[w.id,userName(w.uid),w.amt,w.m,w.ac,w.d,w.st])));
+    if(v==="ledger")dl("ledger.csv",[["User","Type","Amount","Note","Date"]].concat(S.tx.map(t=>[userName(t.uid),TYL[t.ty]||t.ty,t.amt,t.n,t.d])));
+    toast("Export started","download")},
+  /* matches */
+  addm(){matchModal()},editm(v){matchModal(MM(v))},manage(v){manageMatch(v)},
+  async closepicks(v){if(!(await upd("matches","id",v,{closes_at:new Date().toISOString()})))return;const m=MM(v);act("Predictions closed: "+m.a+" vs "+m.b);toast("Predictions closed");loadAll()},
+  async reopen(v){if(!(await upd("matches","id",v,{closes_at:new Date(Date.now()+864e5).toISOString()})))return;toast("Match reopened for 24 hours");loadAll()},
+  async delm(v){if(!confirm("Delete this match permanently?"))return;const r=await db.from("matches").delete().eq("id",v);if(r.error)return toast("Error deleting: "+r.error.message,"circle-alert");toast("Match deleted","trash-2");loadAll()},
+  async saveapi(v){const x=$("edit-api-id").value.trim(),r=await db.from("matches").update({cricket_match_id:x}).eq("id",v);if(r.error)return toast("Error saving ID: "+r.error.message,"circle-alert");toast("CricAPI ID updated");loadAll()},
+  win(v){const m=MM(v);if(!m)return;MOD=m.id;modal(`<h3>Declare winner</h3><small>${esc(m.l)}. This settles ${num(m.n)} predictions.</small><form id="sw" style="margin-top:14px"><label class="opt"><input type="radio" name="w" value="a"> ${esc(m.a)}</label><label class="opt"><input type="radio" name="w" value="b"> ${esc(m.b)}</label><label class="opt"><input type="radio" name="w" value="void"> Void match (no payouts)</label><div class="ac"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn" type="submit">Confirm winner</button></div></form>`)},
+  /* users */
+  uview(v){userModal(v)},unotify(v){notifyModal(v)},uwallet(v){walletModal(v)},ublock(v){doBlock(v)},ukyc(v){doKyc(v)},
+  /* money */
+  wf(v){WF=v;render()},wd(v){const p=v.split("|");doWd(p[0],p[1])},dp(v){const p=v.split("|");doDp(p[0],p[1])},
+  /* notifications + rewards */
+  tpl(v){CPS.t=TPL[v][0];CPS.m=TPL[v][1];render()},
+  addc(){modal(`<h3>Create coupon</h3><form id="cf">${fld("Reward name","cn")}<div class="fg">${fld("Code","cc")}${fld("Benefit","cd")}</div>${fld("Total available","ct","100","number")}<div class="ac"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn" type="submit">Create</button></div></form>`)},
+  ctoggle(v){S.cp[v].on=S.cp[v].on?0:1;save();render()},
+  async savemaint(){if(await saveSetting("maint_msg",$("maint-msg").value.trim()))toast("Maintenance message saved")},
+  /* support */
+  kf(v){TKF=v;render()},
+  async tk(v){saveTkm(v);const t=TK(v);render();if(t)await loadMsgs(t);setTimeout(()=>{const i=$("cr-in");if(i)i.focus()},60)},
+  gotk(v){S.page="sup";ACT.tk(v)},
+  tkback(){saveTkm(null);render()},
+  async tksend(){const ta=$("cr-in");if(!ta)return;const v=ta.value.trim();if(!v)return;ta.value="";ta.style.height="";await tkSend(v);ta.focus()},
+  qr(v){const ta=$("cr-in");if(ta){ta.value=QUICK[v];ta.focus()}},
+  tkattach(){const f=$("cr-file");if(f)f.click()},
+  tkclose(v){modal(`<h3>Close ticket</h3><p><small>Add an optional note for the customer.</small></p><form id="ctf"><input type="hidden" id="ct-id" value="${esc(v)}"><label class="f">Closing note<textarea class="in" id="ct-note" rows="3" placeholder="e.g. Issue resolved. Let us know if you need anything else."></textarea></label><div class="ac"><button type="button" class="btn g" data-act="close">Cancel</button><button class="btn r" type="submit">Close ticket</button></div></form>`)},
+  async tkreopen(v){if(!(await upd("support_tickets","id",v,{status:"open"})))return;const t=TK(v);if(t)t.st="open";toast("Ticket reopened");render()}
 };
-
-function dash() {
-  var pw = S.wds.filter(function(w){ return w.status === "pending"; });
-  var ot = S.tickets.filter(function(t){ return t.status === "open"; });
-  var totalBal = S.users.reduce(function(a, u){ return a + u.bal; }, 0);
-
-  return `
-    <div class="kpis">
-      ${kpi("Platform Users", S.users.length, "Registered")}
-      ${kpi("User Balances (Held)", inr(totalBal), "Available liquidity", true)}
-      ${kpi("Pending Payouts", pw.length, inr(pw.reduce(function(a, w){ return a + Number(w.amount || 0); }, 0)), true)}
-      ${kpi("Action Required", ot.length, "Open customer tickets")}
-    </div>
-
-    <div class="two">
-      <div class="card">
-        <h3>Live Website Control Status</h3>
-        <div class="ln">
-          <div><b>Maintenance Mode</b><div class="mut s12">Stops user access instantly</div></div>
-          <span class="badge ${S.cfg.maintenance_mode ? 'b-no' : 'b-ok'}">${S.cfg.maintenance_mode ? 'ACTIVE (SITE DOWN)' : 'LIVE & HEALTHY'}</span>
-        </div>
-        <div class="ln">
-          <div><b>Active Announcement Banner</b><div class="mut s12">${esc(S.cfg.banner_message || "No banner running")}</div></div>
-        </div>
-        <button class="btn p sm" data-a="go" data-v="controls" style="margin-top:10px">Open Site Controls</button>
-      </div>
-
-      <div class="card">
-        <h3>Support Response Radar</h3>
-        ${ot.length ? ot.slice(0, 4).map(function(t){
-          return `
-            <div class="ln">
-              <div class="grow">
-                <b class="ell" style="display:block">${esc(t.subject)}</b>
-                <span class="mut s12">${esc(t.user)}</span>
-              </div>
-              <span class="sla-badge sla-urgent" data-live-timer="${t.last_user_reply_at}" data-status="open">${formatTimer(t.last_user_reply_at)}</span>
-              <button class="btn sm" data-a="ticket" data-v="${t.id}">Reply</button>
-            </div>
-          `;
-        }).join("") : '<div class="empty">All support queues are clear.</div>'}
-      </div>
-    </div>
-  `;
-}
-
-function tickets() {
-  var q = U.q.toLowerCase();
-  var L = S.tickets.filter(function(t){
-    return (U.tf === "all" || t.status === U.tf) && (t.subject + t.user + t.id).toLowerCase().includes(q);
-  });
-
-  return `
-    <div class="tool">
-      <div class="srch">
-        <i data-lucide="search"></i>
-        <input class="inp" id="q" placeholder="Search ticket or user..." value="${esc(U.q)}">
-      </div>
-    </div>
-    ${chips("tf", U.tf, [["open", "Needs Reply"], ["pending", "Waiting on Customer"], ["closed", "Closed"], ["all", "All Tickets"]])}
-    <div style="height:10px"></div>
-    <div class="list">
-      <div class="r rh" style="--c:2fr 1.2fr 110px 140px 100px 30px">
-        <span>Subject</span>
-        <span>Customer</span>
-        <span>Status</span>
-        <span>SLA Wait Timer</span>
-        <span>Rating</span>
-        <span></span>
-      </div>
-      ${L.length ? L.map(function(t){
-        return row(["1fr auto", "2fr 1.2fr 110px 140px 100px 30px"], `
-          <div class="grow">
-            <div class="b ell">${esc(t.subject)}</div>
-            <div class="mut s12 ell">${t.msgs.length} messages</div>
-          </div>
-          <span class="hm ell">${esc(t.user)}</span>
-          <span>${sb(t.status)}</span>
-          <span class="sla-badge ${t.status === 'open' ? 'sla-urgent' : 'sla-wait'}" data-live-timer="${t.last_user_reply_at}" data-status="${t.status}">
-            ${t.status === 'open' ? formatTimer(t.last_user_reply_at) + ' waiting' : 'Answered'}
-          </span>
-          <span class="hm">${t.rating ? "★".repeat(t.rating) : '<span class="mut">-</span>'}</span>
-          <span class="hm"><i data-lucide="chevron-right"></i></span>
-        `, `data-a="ticket" data-v="${t.id}"`);
-      }).join("") : '<div class="empty">No tickets match this filter.</div>'}
-    </div>
-  `;
-}
-
-function controls() {
-  return `
-    <div class="two">
-      <div class="card">
-        <h3>Master Platform Guard</h3>
-        <p class="mut s12" style="margin-bottom:14px">Instant changes apply live across all visitor browsers.</p>
-        <div class="ln">
-          <div>
-            <b>Instant Maintenance Mode</b>
-            <div class="mut s12">Takes the website down immediately for emergency fixes</div>
-          </div>
-          <label class="sw">
-            <input type="checkbox" id="maint-toggle" ${S.cfg.maintenance_mode ? 'checked' : ''}>
-            <i data-a="toggle-maint"></i>
-          </label>
-        </div>
-        <div class="ln">
-          <div>
-            <b>Registrations Open</b>
-            <div class="mut s12">Allow new visitor sign-ups</div>
-          </div>
-          <label class="sw">
-            <input type="checkbox" id="reg-toggle" ${S.cfg.registrations_open ? 'checked' : ''}>
-            <i data-a="toggle-reg"></i>
-          </label>
-        </div>
-        <div class="fld" style="margin-top:14px">
-          <label for="cfg-banner">Sitewide Alert Banner Text</label>
-          <input class="inp" id="cfg-banner" value="${esc(S.cfg.banner_message || '')}" placeholder="Leave empty to hide banner">
-        </div>
-        <button class="btn p" data-a="save-banner"><i data-lucide="save"></i> Publish Banner</button>
-      </div>
-
-      <div class="card">
-        <h3>Payment Limits</h3>
-        <div class="g2">
-          <div class="fld">
-            <label for="min-dep">Min Deposit (₹)</label>
-            <input class="inp" id="min-dep" type="number" value="${S.cfg.min_deposit}">
-          </div>
-          <div class="fld">
-            <label for="min-wd">Min Withdrawal (₹)</label>
-            <input class="inp" id="min-wd" type="number" value="${S.cfg.min_withdrawal}">
-          </div>
-        </div>
-        <button class="btn" data-a="save-limits">Update Limits</button>
-      </div>
-    </div>
-  `;
-}
-
-function risk() {
-  var activeM = S.matches.filter(function(m){ return m.status !== "settled"; });
-  return `
-    <div class="card">
-      <h3>Active Market Exposure</h3>
-      <p class="mut s12" style="margin-bottom:14px">Review unsettled fixtures and manage market integrity.</p>
-      <div class="list">
-        <div class="r rh" style="--c:2.5fr 1fr 1fr 140px">
-          <span>Fixture</span>
-          <span>Odds A / B</span>
-          <span>Crowd Split</span>
-          <span style="text-align:right">Action</span>
-        </div>
-        ${activeM.length ? activeM.map(function(m){
-          return row(["1fr auto", "2.5fr 1fr 1fr 140px"], `
-            <div class="grow">
-              <b>${esc(m.team_a)} vs ${esc(m.team_b)}</b>
-              <div class="mut s12">${esc(m.league)}</div>
-            </div>
-            <span>${m.odds_a}x / ${m.odds_b}x</span>
-            <span>${m.crowd_a}% on A</span>
-            <div class="row" style="justify-content:flex-end">
-              <button class="btn sm d" data-a="void-match" data-v="${m.id}">Void & Refund</button>
-            </div>
-          `);
-        }).join("") : '<div class="empty">No active matches requiring risk review.</div>'}
-      </div>
-    </div>
-  `;
-}
-
-function users_() {
-  var q = U.q.toLowerCase();
-  var L = S.users.filter(function(u){ return (U.uf === "all" || u.status === U.uf) && (u.name + u.email + u.id).toLowerCase().includes(q); });
-  return `
-    <div class="tool">
-      <div class="srch"><i data-lucide="search"></i><input class="inp" id="q" placeholder="Search user..." value="${esc(U.q)}"></div>
-    </div>
-    ${chips("uf", U.uf, [["all", "All Members"], ["active", "Active"], ["blocked", "Blocked"]])}
-    <div style="height:10px"></div>
-    <div class="list">
-      <div class="r rh" style="--c:2fr 1.2fr 100px 80px 30px"><span>User</span><span>City</span><span>Balance</span><span>Status</span><span></span></div>
-      ${L.map(function(u){
-        return row(["1fr auto", "2fr 1.2fr 100px 80px 30px"], `
-          <div class="row" style="min-width:0"><span class="av">${esc(u.name.charAt(0))}</span><div class="grow"><b>${esc(u.name)}</b><div class="mut s12">${esc(u.email)}</div></div></div>
-          <span class="hm mut">${esc(u.city)}</span>
-          <span class="b ${!U.eye ? 'bl' : ''}">${inr(u.bal)}</span>
-          <span>${sb(u.status)}</span>
-          <span class="hm"><i data-lucide="chevron-right"></i></span>
-        `, `data-a="user" data-v="${u.id}"`);
-      }).join("")}
-    </div>
-  `;
-}
-
-function markets_() {
-  return `
-    <div class="tool">
-      <button class="btn p" data-a="market" data-v="new"><i data-lucide="plus"></i> Create Match</button>
-    </div>
-    <div class="list">
-      <div class="r rh" style="--c:2.5fr 1.2fr 100px 90px 30px"><span>Match</span><span>League</span><span>Odds</span><span>Status</span><span></span></div>
-      ${S.matches.map(function(m){
-        return row(["1fr auto", "2.5fr 1.2fr 100px 90px 30px"], `
-          <div class="grow"><b>${esc(m.team_a)} vs ${esc(m.team_b)}</b><div class="mut s12">${esc(m.question || m.league)}</div></div>
-          <span class="hm mut">${esc(m.league)}</span>
-          <span class="hm">${m.odds_a} / ${m.odds_b}</span>
-          <span>${sb(m.status || "open")}</span>
-          <span class="hm"><i data-lucide="chevron-right"></i></span>
-        `, `data-a="market" data-v="${m.id}"`);
-      }).join("")}
-    </div>
-  `;
-}
-
-function wallet() {
-  var L = S.wds.filter(function(w){ return U.wf === "all" || w.status === U.wf; });
-  return `
-    <div class="kpis">${kpi("Pending Review", L.filter(function(w){ return w.status === "pending"; }).length, "Withdrawals")}</div>
-    ${chips("wf", U.wf, [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"], ["all", "All"]])}
-    <div style="height:10px"></div>
-    <div class="list">
-      <div class="r rh" style="--c:1.4fr 100px 1.2fr 180px"><span>User</span><span>Amount</span><span>Destination</span><span style="text-align:right">Action</span></div>
-      ${L.map(function(w){
-        var u = S.users.find(function(x){ return x.id === w.user_id; });
-        return row(["1fr auto", "1.4fr 100px 1.2fr 180px"], `
-          <div class="grow"><b>${esc(u ? u.name : "Customer")}</b><div class="mut s12">${String(w.id).slice(0, 8)}</div></div>
-          <b class="${!U.eye ? 'bl' : ''}">${inr(w.amount)}</b>
-          <span class="hm mut">${esc(w.account || w.method || "UPI")}</span>
-          <div class="row" style="justify-content:flex-end">
-            ${w.status === "pending" ? `<button class="btn sm p" data-a="wok" data-v="${w.id}">Approve</button><button class="btn sm d" data-a="wno" data-v="${w.id}">Reject</button>` : `<span>${sb(w.status)}</span>`}
-          </div>
-        `);
-      }).join("")}
-    </div>
-  `;
-}
-
-function coupons() {
-  return `
-    <div class="tool"><button class="btn p" data-a="coupon" data-v="new"><i data-lucide="plus"></i> Add Coupon</button></div>
-    <div class="list">
-      <div class="r rh" style="--c:90px 2fr 1.2fr 80px"><span>Value</span><span>Code</span><span>Category</span><span></span></div>
-      ${S.coupons.map(function(c){
-        return row(["auto 1fr", "90px 2fr 1.2fr 80px"], `
-          <span class="badge b-am">${esc(c.value)}</span>
-          <div class="grow"><b>${esc(c.code)}</b><div class="mut s12">${esc(c.title)}</div></div>
-          <span class="hm mut">${esc(c.category || "-")}</span>
-          <button class="btn sm d" data-a="cdel" data-v="${c.id}"><i data-lucide="trash-2"></i></button>
-        `);
-      }).join("")}
-    </div>
-  `;
-}
-
-function notify() {
-  return `
-    <div class="card">
-      <h3>Send Notification</h3>
-      <div class="fld"><label for="nt">Title</label><input class="inp" id="nt"></div>
-      <div class="fld"><label for="nd">Message</label><textarea class="inp" id="nd"></textarea></div>
-      <button class="btn p" data-a="nsend"><i data-lucide="send"></i> Dispatch Announcement</button>
-    </div>
-  `;
-}
-
-var PAGES = {
-  dash: dash, users: users_, markets: markets_, wallet: wallet, coupons: coupons,
-  tickets: tickets, notify: notify, controls: controls, risk: risk
-};
-
-function drawer() {
-  var d = U.dr;
-  if (!d) return "";
-  var h = "";
-
-  if (d.t === "ticket") {
-    var t = S.tickets.find(function(x){ return x.id === d.id; });
-    if (!t) return "";
-
-    if (t.unread > 0 && db) {
-      db.from("ticket_messages").update({ is_read: true }).eq("ticket_id", t.id).eq("sender", "user").then(function(){});
-      t.unread = 0;
-    }
-
-    h = `
-      <header>
-        <button class="ib" data-a="dx"><i data-lucide="x"></i></button>
-        <div class="grow">
-          <b class="ell" style="display:block">${esc(t.subject)}</b>
-          <span class="mut s12">${esc(t.user)} (${esc(t.email)})</span>
-        </div>
-      </header>
-      <div class="bd stack">
-        <div class="bt">
-          <div class="row">Status: ${sb(t.status)}</div>
-          <div class="row">
-            ${t.status === "closed" ? `<button class="btn sm k" data-a="treopen" data-v="${t.id}">Reopen</button>` : `<button class="btn sm d" data-a="tclose" data-v="${t.id}">Close Ticket</button>`}
-          </div>
-        </div>
-        <div class="chat-container">
-          <div class="chat-msgs" id="chat-stream">
-            ${t.msgs.map(function(m){
-              return `<div class="msg ${m.f}">${esc(m.text)}<small>${m.f === 'admin' ? 'Support Officer' : esc(t.user)}</small></div>`;
-            }).join("")}
-          </div>
-          <div class="chat-box">
-            <textarea class="inp" id="tr" placeholder="Reply to customer..."></textarea>
-            <button class="btn p" data-a="treply" data-v="${t.id}"><i data-lucide="send"></i> Send Reply</button>
-          </div>
-        </div>
-      </div>
-    `;
-  } else if (d.t === "user") {
-    var u = S.users.find(function(x){ return x.id === d.id; });
-    if (!u) return "";
-    h = `
-      <header><button class="ib" data-a="dx"><i data-lucide="x"></i></button><div class="grow"><b>${esc(u.name)}</b></div></header>
-      <div class="bd stack">
-        <div class="card kpi"><small>Balance</small><b>${inr(u.bal)}</b></div>
-        <div class="fld"><label for="ba">Adjust Balance (Delta)</label><input class="inp" id="ba" type="number" placeholder="e.g. 500 or -200"></div>
-        <div class="fld"><label for="br">Reason</label><input class="inp" id="br"></div>
-        <button class="btn p w" data-a="uadj" data-v="${u.id}">Apply Adjustment</button>
-        <button class="btn ${u.status === 'active' ? 'd' : 'k'} w" style="margin-top:8px" data-a="ublock" data-v="${u.id}">${u.status === 'active' ? 'Block User' : 'Unblock User'}</button>
-      </div>
-    `;
-  } else if (d.t === "market") {
-    var isNew = d.id === "new";
-    var m = isNew ? { id: "", category: "cricket", league: "", team_a: "", team_b: "", odds_a: 1.85, odds_b: 2.10, crowd_a: 50 } : S.matches.find(function(x){ return x.id === d.id; });
-    h = `
-      <header><button class="ib" data-a="dx"><i data-lucide="x"></i></button><div class="grow"><b>${isNew ? "Create Fixture" : "Manage Match"}</b></div></header>
-      <div class="bd stack">
-        <div class="fld"><label for="ml">League</label><input class="inp" id="ml" value="${esc(m.league)}"></div>
-        <div class="g2">
-          <div class="fld"><label for="ma">Team A</label><input class="inp" id="ma" value="${esc(m.team_a)}"></div>
-          <div class="fld"><label for="mb">Team B</label><input class="inp" id="mb" value="${esc(m.team_b)}"></div>
-          <div class="fld"><label for="oa">Odds A</label><input class="inp" id="oa" type="number" step="0.05" value="${m.odds_a}"></div>
-          <div class="fld"><label for="ob">Odds B</label><input class="inp" id="ob" type="number" step="0.05" value="${m.odds_b}"></div>
-        </div>
-        <button class="btn p w" data-a="msave" data-v="${m.id || 'new'}">Publish Match</button>
-        ${!isNew && m.status !== "settled" ? `
-          <div class="card" style="margin-top:14px">
-            <h3>Declare Winner</h3>
-            <div class="g2">
-              <button class="btn k" data-a="mset" data-v="${m.id}:A">${esc(m.team_a)} Won</button>
-              <button class="btn k" data-a="mset" data-v="${m.id}:B">${esc(m.team_b)} Won</button>
-            </div>
-          </div>
-        ` : ""}
-      </div>
-    `;
-  }
-  return `<div class="scrim" data-a="dx"></div><aside class="dr">${h}</aside>`;
-}
-
-function shell() {
-  var m = META[U.route] || META.dash;
-  var ot = S.tickets.filter(function(t){ return t.status === "open"; }).length;
-
-  return `
-    <div class="shell">
-      <aside class="nav ${U.nav ? 'open' : ''}">
-        <div class="brand">
-          <span class="mark"><i data-lucide="trophy"></i></span>
-          CricPulse <small>ADMIN</small>
-        </div>
-        ${NAV.map(function(g){
-          return `<div class="ng">${g[0]}</div>` + g[1].map(function(i){
-            return `<button class="nl ${U.route === i[0] ? 'on' : ''}" data-a="go" data-v="${i[0]}"><i data-lucide="${i[2]}"></i>${i[1]}${i[0] === 'tickets' && ot ? `<span class="cnt">${ot}</span>` : ''}</button>`;
-          }).join("");
-        }).join("")}
-        <div style="margin-top:auto;padding-top:14px">
-          <button class="nl" data-a="logout"><i data-lucide="log-out"></i> Log Out</button>
-        </div>
-      </aside>
-      ${U.nav ? '<div class="scrim" data-a="nav"></div>' : ''}
-      <div class="main">
-        <header class="top">
-          <button class="ib mob" data-a="nav"><i data-lucide="menu"></i></button>
-          <div class="grow"><h1>${m[0]}</h1><div class="sub">${m[1]}</div></div>
-          <button class="ib" data-a="eye"><i data-lucide="${U.eye ? 'eye' : 'eye-off'}"></i></button>
-          <button class="ib" data-a="go" data-v="tickets"><i data-lucide="headset"></i>${ot ? `<span class="dot">${ot}</span>` : ''}</button>
-          <span class="av">AD</span>
-        </header>
-        <main class="pg">${PAGES[U.route]()}</main>
-      </div>
-    </div>
-  `;
-}
-
-function loginV() {
-  return `
-    <div class="login">
-      <div class="card">
-        <div class="brand" style="padding:0 0 16px;color:var(--ink)">
-          <span class="mark"><i data-lucide="shield-check"></i></span>CricPulse <small>ADMIN</small>
-        </div>
-        <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
-        <p class="mut" style="margin:4px 0 16px">Authorized account access only. Sign in with your registered Google account.</p>
-        <button class="btn p w" data-a="google-login"><i data-lucide="log-in"></i> Sign In with Google</button>
-      </div>
-    </div>
-  `;
-}
-
-function render() {
-  var y = window.scrollY;
-  $("app").innerHTML = (authState.googleAuthed && authState.passAuthed) ? shell() : loginV();
-  $("dr").innerHTML = (authState.googleAuthed && authState.passAuthed) ? drawer() : "";
-  try { lucide.createIcons(); } catch(e){}
-  if (authState.googleAuthed && authState.passAuthed) window.scrollTo(0, y);
-}
-
-document.addEventListener("click", async function(e){
-  var t = e.target.closest("[data-a]");
-  if (!t) return;
-  var a = t.dataset.a, v = t.dataset.v;
-
-  switch(a) {
-    case "google-login":
-      if (!db) return toast("Supabase not connected", "alert-circle");
-      await db.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin + window.location.pathname }
-      });
-      break;
-
-    case "logout":
-      sessionStorage.removeItem("cp_pass_auth");
-      authState.passAuthed = false;
-      authState.googleAuthed = false;
-      if (db) await db.auth.signOut();
-      window.location.reload();
-      break;
-
-    case "nav": U.nav = U.nav ? 0 : 1; render(); break;
-    case "go": U.route = v; U.nav = 0; U.dr = null; render(); window.scrollTo(0, 0); break;
-    case "eye": U.eye = !U.eye; render(); break;
-    case "dx": U.dr = null; render(); break;
-    case "uf": U.uf = v; render(); break;
-    case "tf": U.tf = v; render(); break;
-    case "wf": U.wf = v; render(); break;
-    case "ticket": U.dr = { t: "ticket", id: v }; render(); break;
-    case "user": U.dr = { t: "user", id: v }; render(); break;
-    case "market": U.dr = { t: "market", id: v }; render(); break;
-
-    case "toggle-maint": {
-      var val = !S.cfg.maintenance_mode;
-      await db.from("app_config").update({ maintenance_mode: val }).eq("id", "primary");
-      toast("Maintenance " + (val ? "ACTIVATED" : "DEACTIVATED"));
-      loadAll();
-      break;
-    }
-
-    case "toggle-reg": {
-      var val2 = !S.cfg.registrations_open;
-      await db.from("app_config").update({ registrations_open: val2 }).eq("id", "primary");
-      toast("Registrations " + (val2 ? "Open" : "Closed"));
-      loadAll();
-      break;
-    }
-
-    case "save-banner": {
-      var bTxt = $("cfg-banner").value.trim();
-      await db.from("app_config").update({ banner_message: bTxt }).eq("id", "primary");
-      toast("Banner published live!");
-      loadAll();
-      break;
-    }
-
-    case "save-limits": {
-      var md = Number($("min-dep").value) || 10;
-      var mw = Number($("min-wd").value) || 100;
-      await db.from("app_config").update({ min_deposit: md, min_withdrawal: mw }).eq("id", "primary");
-      toast("Limits updated");
-      loadAll();
-      break;
-    }
-
-    case "treply": {
-      var rep = $("tr").value.trim();
-      if (!rep) return;
-      await db.from("ticket_messages").insert({ ticket_id: v, sender: "admin", message: rep, is_read: false });
-      await db.from("support_tickets").update({ status: "pending" }).eq("id", v);
-      $("tr").value = "";
-      toast("Reply sent");
-      loadAll();
-      break;
-    }
-
-    case "tclose": {
-      await db.from("support_tickets").update({ status: "closed" }).eq("id", v);
-      toast("Ticket closed");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "treopen": {
-      await db.from("support_tickets").update({ status: "open" }).eq("id", v);
-      toast("Ticket reopened");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "wok":
-    case "wno": {
-      var ok = a === "wok";
-      await db.from("withdrawal_requests").update({ status: ok ? "approved" : "rejected" }).eq("id", v);
-      if (!ok) {
-        var w = S.wds.find(function(x){ return x.id === v; });
-        if (w) await db.rpc("admin_adjust_balance", { p_user_id: w.user_id, p_delta: w.amount, p_reason: "Payout refund" });
-      }
-      toast("Withdrawal " + (ok ? "approved" : "rejected"));
-      loadAll();
-      break;
-    }
-
-    case "uadj": {
-      var amt = Number($("ba").value), rsn = $("br").value.trim();
-      if (!amt || !rsn) return;
-      await db.rpc("admin_adjust_balance", { p_user_id: v, p_delta: amt, p_reason: rsn });
-      toast("Balance updated");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "msave": {
-      var isNewM = v === "new";
-      var mObj = {
-        category: "cricket", league: $("ml").value, team_a: $("ma").value, team_b: $("mb").value,
-        odds_a: Number($("oa").value) || 1.85, odds_b: Number($("ob").value) || 2.10, status: "open"
-      };
-      if (isNewM) await db.from("matches").insert(mObj);
-      else await db.from("matches").update(mObj).eq("id", v);
-      toast("Match published");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "mset": {
-      var [mId, win] = v.split(":");
-      await db.from("matches").update({ status: "settled" }).eq("id", mId);
-      toast("Match settled (" + win + " won)");
-      U.dr = null;
-      loadAll();
-      break;
-    }
-
-    case "void-match": {
-      if (confirm("Void this match and refund all entries?")) {
-        await db.from("matches").update({ status: "void" }).eq("id", v);
-        toast("Match voided");
-        loadAll();
-      }
-      break;
-    }
-  }
+document.addEventListener("click",e=>{
+  const im=e.target.closest(".cimg");if(im){modal(`<img src="${im.src}" alt="attachment" style="max-width:100%;border-radius:10px"><div class="ac" style="margin-top:12px"><button class="btn g" data-act="close">Close</button></div>`,true);return}
+  const t=e.target.closest("[data-act],[data-p]");if(!t)return;
+  if(t.dataset.p){S.page=t.dataset.p;document.body.classList.remove("navopen");if(S.page!=="sup"&&t.dataset.p!=="sup"){}closeM();save();render();scrollTo(0,0);return}
+  const f=ACT[t.dataset.act];if(f)f(t.dataset.v,t,e);
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.id==="uq"){UQ=t.value;$("ut").innerHTML=usersTbl();try{lucide.createIcons()}catch(x){}}
+  if(t.id==="tks"){TQ=t.value;updateList()}
+  if(t.id==="cr-in"){t.style.height="auto";t.style.height=Math.min(t.scrollHeight,130)+"px"}
+  if(t.dataset.note)try{localStorage.setItem("cp_note_"+t.dataset.note,t.value)}catch(x){}
+  if(t.dataset.cp&&(t.dataset.cp==="t"||t.dataset.cp==="m"))CPS[t.dataset.cp]=t.value;
+});
+document.addEventListener("change",async e=>{
+  const t=e.target;
+  if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}
+  else if(t.dataset.sel==="tf"){TF=t.value;render()}
+  else if(t.dataset.sel==="uf"){UF=t.value;render()}
+  else if(t.dataset.leagues!==undefined){const l=$("lgl");if(l)l.innerHTML=(LEAGUES[t.value]||[]).map(x=>`<option value="${x}">`).join("")}
+  else if(t.dataset.cp){CPS[t.dataset.cp]=t.value;if(t.dataset.cp==="aud"||t.dataset.cp==="uid")render()}
+  else if(t.dataset.pri){if(await upd("support_tickets","id",t.dataset.pri,{priority:t.value})){const k=TK(t.dataset.pri);if(k)k.pr=t.value;updateList();toast("Priority set to "+t.value)}}
+  else if(t.dataset.set){const k=t.dataset.set;if(k==="maintenance"&&t.checked&&!confirm("Turn ON maintenance mode? Visitors will see the maintenance message.")){t.checked=false;return}if(await saveSetting(k,t.checked)){act((t.checked?"Enabled ":"Disabled ")+k.replace("_"," "));toast(k.replace("_"," ")+" "+(t.checked?"ON":"OFF"))}render()}
+  else if(t.dataset.setin){const k=t.dataset.setin,v=t.type==="number"?Math.max(0,Number(t.value)||0):t.value.trim();if(await saveSetting(k,v))toast("Saved")}
+  else if(t.id==="cr-file"&&t.files&&t.files[0]){const f=t.files[0];if(!f.type.startsWith("image/")){toast("Please choose an image","circle-alert");return}if(f.size>1.5*1024*1024){toast("Image must be under 1.5 MB","circle-alert");return}const rd=new FileReader();rd.onload=()=>tkSend("",rd.result);rd.readAsDataURL(f);t.value=""}
+});
+document.addEventListener("keydown",e=>{
+  if(e.target.id==="cr-in"&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();ACT.tksend()}
+  if(e.target.id==="gs"&&e.key==="Enter"){UQ=e.target.value;S.page="users";save();render()}
+  if(e.key==="Escape")closeM();
+});
+document.addEventListener("submit",async e=>{
+  e.preventDefault();const id=e.target.id;
+  if(id==="pf"){
+    const el=$("pe"),fails=+(sessionStorage.getItem("cp_fail")||0),until=+(sessionStorage.getItem("cp_until")||0);
+    if(Date.now()<until){el.textContent="Too many attempts. Try again in "+Math.ceil((until-Date.now())/1000)+" seconds.";return}
+    if(await checkPass($("pw").value)){sessionStorage.removeItem("cp_fail");UNLOCK=true;sessionStorage.setItem("cp_adm_ok","1");if(SESS)enter(SESS);else render()}
+    else{const n=fails+1;sessionStorage.setItem("cp_fail",n);if(n>=5){sessionStorage.setItem("cp_until",Date.now()+30000);sessionStorage.setItem("cp_fail",0);el.textContent="Too many attempts. Locked for 30 seconds."}else el.textContent="Incorrect password. "+(5-n)+" attempts left.";$("pw").value=""}
+    return}
+  if(id==="lf"){doLogin();return}
+  if(id==="mf"){
+    const dbId=$("mid_db").value,tv=$("mtime").value;
+    const d={category:$("mc").value,league:$("ml").value.trim(),team_a:$("ma").value.trim(),team_b:$("mb").value.trim(),closes_at:tv?new Date(tv).toISOString():new Date(Date.now()+864e5).toISOString(),odds_a:+$("moa").value||1.85,odds_b:+$("mob").value||2.1};
+    if(!dbId)d.crowd_a=50;
+    const r=dbId?await db.from("matches").update(d).eq("id",dbId):await db.from("matches").insert(d);
+    if(r.error)return toast("Error saving match: "+r.error.message,"circle-alert");
+    act((dbId?"Updated match ":"Published match ")+d.team_a+" vs "+d.team_b);toast(dbId?"Match updated":"Match published to website");closeM();loadAll();return}
+  if(id==="sw"){
+    const m=MM(MOD),w=document.querySelector("input[name=w]:checked");if(!m||!w)return;
+    const res=await settleMatch(m.id,w.value);if(!res.ok)return toast("Could not settle: "+res.msg,"circle-alert");
+    if(res.fallback){const ids=[...new Set(S.preds.filter(p=>p.m===String(m.id)).map(p=>p.uid))];if(ids.length)await db.from("notifications").insert(ids.map(u=>({user_id:u,title:"Result declared",body:`${m.a} vs ${m.b}: ${w.value==="void"?"match voided":(w.value==="a"?m.a:m.b)+" won"}.`,icon:"award"})));toast("Result saved. Payouts were not run because settle_match() is not installed.","circle-alert")}
+    else toast("Winner saved. "+(res.wins||0)+" winners paid");
+    act("Match settled: "+m.a+" vs "+m.b);closeM();loadAll();return}
+  if(id==="wf"){doWallet(MOD,+$("wa").value,$("wt").value==="c",$("wr").value);return}
+  if(id==="cf"){S.cp.push({n:$("cn").value,code:$("cc").value.toUpperCase(),dc:$("cd").value,used:0,tot:+$("ct").value,on:1});save();closeM();toast("Coupon created");render();return}
+  if(id==="mnf"){const r=await db.from("notifications").insert({user_id:$("mn-uid").value,title:$("mn-t").value,body:$("mn-m").value,icon:"bell"});if(r.error)return toast(r.error.message,"circle-alert");toast("Notification sent");closeM();loadAll();return}
+  if(id==="ctf"){
+    const tid=$("ct-id").value,note=$("ct-note").value.trim(),r=await db.from("support_tickets").update({status:"closed",close_note:note}).eq("id",tid);
+    if(r.error)return toast(r.error.message,"circle-alert");
+    const t=TK(tid);if(t){t.st="closed";t.close_note=note;await db.from("notifications").insert({user_id:t.uid,title:"Ticket closed",body:"Your support ticket has been closed. Please rate your experience.",icon:"check"})}
+    toast("Ticket closed");closeM();render();loadAll();return}
+  if(id==="nf"){
+    if(!CPS.t||!CPS.m)return toast("Add a title and message","circle-alert");
+    const icon=CPS.ty==="Alert"?"bell":CPS.ty==="Result"?"award":CPS.ty==="Promo"?"gift":"shield";let rows;
+    if(CPS.aud==="one"){if(!CPS.uid)return toast("Select a user","circle-alert");rows=[{user_id:CPS.uid,title:CPS.t,body:CPS.m,icon}]}
+    else if(CPS.aud==="act")rows=S.users.filter(u=>u.st==="active").map(u=>({user_id:u.id,title:CPS.t,body:CPS.m,icon}));
+    else rows=[{user_id:null,title:CPS.t,body:CPS.m,icon}];
+    if(!rows.length)return toast("No recipients","circle-alert");
+    const r=await db.from("notifications").insert(rows);if(r.error)return toast("Error sending: "+r.error.message,"circle-alert");
+    act("Notification sent: "+CPS.t);toast("Notification sent");CPS.t="";CPS.m="";loadAll();return}
 });
 
-async function checkAuth() {
-  if (!db) return render();
-  var { data: { session } } = await db.auth.getSession();
-  if (session && session.user) {
-    var em = String(session.user.email || "").toLowerCase();
-    if (ADMIN_EMAILS.indexOf(em) >= 0) {
-      authState.googleAuthed = true;
-      authState.email = em;
-      authState.passAuthed = true;
-    } else {
-      toast("Unauthorized account", "alert-circle");
-      await db.auth.signOut();
-    }
-  }
-  render();
-  if (authState.googleAuthed && authState.passAuthed) {
-    loadAll();
-    initRealtime();
-  }
+/* =====================================================================
+   AUTH + BOOT
+   ===================================================================== */
+async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("")}
+async function checkPass(p){try{if(window.crypto&&crypto.subtle)return(await sha(p))===PASS_HASH}catch(e){}return btoa(p)===PASS_B64}
+const authRedirect=()=>location.origin+location.pathname;
+const cleanUrl=()=>{if(/access_token|code=|error/.test(location.hash+location.search))history.replaceState(null,"",location.pathname)};
+async function doLogin(){
+  if(!db){toast("Database not connected","circle-alert");return}
+  DENY="";toast("Opening Google sign in...","log-in");
+  const r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:authRedirect(),queryParams:{prompt:"select_account"}}});
+  if(r.error)toast("Sign in failed: "+r.error.message,"circle-alert");
+}
+async function doLogout(){try{if(db)await db.auth.signOut()}catch(e){}try{sessionStorage.removeItem("cp_adm_ok")}catch(e){}LOGIN=0;history.replaceState(null,"",location.pathname);location.reload()}
+async function enter(session){
+  const em=String(session.user.email||"").toLowerCase();
+  if(ADMIN_EMAILS.length&&!ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(em)){DENY=em+" is not an admin account.";UNLOCK=true;LOGIN=0;BOOTED=0;try{await db.auth.signOut()}catch(e){}render();return}
+  if(BOOTED&&LOGIN)return;
+  BOOTED=1;LOGIN=1;S.adm=session.user.email;cleanUrl();render();
+  try{await loadAll();initRealtime();const t=TKM?TK(TKM):null;if(t)loadMsgs(t)}catch(e){console.error(e);toast("Loaded with some errors","circle-alert")}
+}
+async function boot(){
+  if(!db){render();return}
+  db.auth.onAuthStateChange((ev,session)=>{
+    if(session&&(ev==="SIGNED_IN"||ev==="INITIAL_SESSION")){SESS=session;if(UNLOCK)setTimeout(()=>enter(session),0);else render()}
+    else if(ev==="SIGNED_OUT"){SESS=null;LOGIN=0;BOOTED=0;render()}
+  });
+  try{const s=await db.auth.getSession();if(s.data&&s.data.session){SESS=s.data.session;if(UNLOCK)enter(SESS);else render()}else render()}catch(e){render()}
 }
 
-checkAuth();
+/* ---------- realtime ---------- */
+let RT=0;
+function initRealtime(){
+  if(RT||!db)return;RT=1;
+  db.channel("adm-msgs").on("postgres_changes",{event:"INSERT",schema:"public",table:"ticket_messages"},p=>{
+    const n=p.new,t=TK(n.ticket_id);if(!t){reload();return}
+    const m=mapMsg(n);if(t.msgs&&!t.msgs.some(x=>x.id&&x.id===m.id))t.msgs.push(m);
+    t.lastTs=m.ts;t.lastSender=n.sender;
+    if(n.sender==="user"){
+      if(TKM===t.id&&S.page==="sup"){t.unread=0;db.from("ticket_messages").update({is_read:true}).eq("id",n.id).then(()=>{})}
+      else{t.unread=(t.unread||0)+1;toast("New message from "+tkUser(t),"life-buoy")}
+    }
+    if(S.page==="sup"){updateChat();updateList()}else render();
+  }).subscribe();
+  db.channel("adm-tickets").on("postgres_changes",{event:"INSERT",schema:"public",table:"support_tickets"},()=>{toast("New support ticket","life-buoy");reload()}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"support_tickets"},()=>reload()).subscribe();
+  db.channel("adm-money").on("postgres_changes",{event:"INSERT",schema:"public",table:"withdrawal_requests"},()=>{toast("New withdrawal request","landmark");reload()}).on("postgres_changes",{event:"INSERT",schema:"public",table:"payment_requests"},()=>{toast("New deposit request","banknote");reload()}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"wallet"},p=>{const u=S.users.find(x=>x.id===p.new.user_id);if(u&&u.wal!==Number(p.new.balance)){u.wal=Number(p.new.balance);if(["users","dash","wallets"].includes(S.page))render()}}).subscribe();
+  db.channel("adm-users").on("postgres_changes",{event:"INSERT",schema:"public",table:"users"},()=>reload()).on("postgres_changes",{event:"INSERT",schema:"public",table:"predictions"},()=>reload()).subscribe();
+}
+setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
+boot();
 </script>
 </body>
 </html>
