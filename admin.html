@@ -739,18 +739,19 @@ function shell() {
 }
 
 function loginV() {
-  if (!authState.googleAuthed) {
-    return `
-      <div class="login">
-        <div class="card">
-          <div class="brand" style="padding:0 0 16px;color:var(--ink)"><span class="mark"><i data-lucide="shield-check"></i></span>CricPulse <small>ADMIN</small></div>
-          <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
-          <p class="mut" style="margin:4px 0 16px">Authorized accounts only. Sign in with your registered Google ID.</p>
-          <button class="btn p w" data-a="google-login"><i data-lucide="log-in"></i> Sign In with Google</button>
+  return `
+    <div class="login">
+      <div class="card">
+        <div class="brand" style="padding:0 0 16px;color:var(--ink)">
+          <span class="mark"><i data-lucide="shield-check"></i></span>CricPulse <small>ADMIN</small>
         </div>
+        <h2 style="font-size:20px;font-weight:700">Administrator Sign In</h2>
+        <p class="mut" style="margin:4px 0 16px">Authorized account access only. Sign in with your registered Google account.</p>
+        <button class="btn p w" data-a="google-login"><i data-lucide="log-in"></i> Sign In with Google</button>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
 
   return `
     <div class="login">
@@ -946,6 +947,7 @@ async function checkAuth() {
     if (ADMIN_EMAILS.indexOf(em) >= 0) {
       authState.googleAuthed = true;
       authState.email = em;
+      authState.passAuthed = true; // Automatically unlocks dashboard on Google sign-in
     } else {
       toast("Unauthorized account", "alert-circle");
       await db.auth.signOut();
