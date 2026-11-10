@@ -79,8 +79,8 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 .clh{padding:12px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:10px}
 .clh .tabs button{padding:5px 10px;font-size:12px}
 #tk-list{overflow-y:auto;flex:1}
-.ti{display:flex;gap:11px;width:100%;padding:12px;border-bottom:1px solid var(--bd);position:relative}.ti:hover{background:var(--bg)}.ti.on{background:var(--prs)}.ti.un{background:color-mix(in srgb,var(--pr) 7%,transparent)}
-.ti .tb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.tl{display:flex;justify-content:space-between;gap:8px}.tl b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tl em{font-style:normal;font-size:11px;color:var(--mu);flex:none}
+.ti{display:flex;gap:11px;width:100%;padding:12px;border-bottom:1px solid var(--bd);position:relative}.ti:hover{background:var(--bg)}.ti.on{background:color-mix(in srgb,var(--pr) 15%,transparent);border-left:3px solid var(--pr)}.ti.un{background:color-mix(in srgb,var(--pr) 7%,transparent)}
+.ti .tb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.tl{display:flex;justify-content:space-between;gap:8px}.tl b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tl em{font-style:normal;font-size:11px;flex:none;font-weight:600}.tl em.green{color:var(--ok)}.tl em.red{color:var(--bad)}
 .ts2{font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm2{display:flex;gap:6px;align-items:center;margin-top:3px}
 .bd2{margin-left:auto;background:var(--pr);color:#fff;font-style:normal;font-size:11px;font-weight:700;border-radius:99px;min-width:19px;padding:0 6px;text-align:center}
 .cc{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
@@ -193,7 +193,7 @@ const normWd=v=>{v=String(v==null?"pending":v).toLowerCase();return(v==="approve
 const normTk=v=>{v=String(v==null?"open":v).toLowerCase();return(v==="closed"||v==="resolved"||v==="done")?"closed":(v==="pending"||v==="answered")?"pending":"open"};
 function mapUser(r,w){const c=COLS.users,wl=w?Number(w.balance||0):Number(r[c.wallet]||0);return{id:String(r[c.id]),name:r[c.name]||r.full_name||r[c.email]||"User",email:r[c.email]||"",city:r[c.city]||"",wal:wl,pts:Number(r[c.points]!=null?r[c.points]:(w&&w.points)||0),st:normSt(r[c.status]),joined:fd(r[c.created],1),ts:Date.parse(r[c.created])||0,kyc:(r[c.kyc]===true||r[c.kyc]===1||r[c.kyc]==="verified")?1:0}}
 function mapWd(r){const c=COLS.wd;return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),amt:Number(r[c.amount]||0),m:r[c.method]||"UPI",ac:r[c.account]||"",d:fd(r[c.created]),ts:Date.parse(r[c.created])||0,pts:Date.parse(r.processed_at)||0,st:normWd(r[c.status])}}
-function mapTk(r){const c=COLS.tk,ms=(r.ticket_messages||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)),last=ms[ms.length-1];return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),ts:Date.parse(r[c.created])||0,d:fd(r[c.created],1),msgs:null,rating:r.rating||0,close_note:r.close_note||"",unread:ms.filter(m=>m.sender==="user"&&!m.is_read).length,lastTs:last?Date.parse(last.created_at):(Date.parse(r[c.created])||0),lastSender:last?last.sender:"",count:ms.length}}
+function mapTk(r){const c=COLS.tk,ms=(r.ticket_messages||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)),last=ms[ms.length-1];return{id:String(r[c.id]),uid:String(r[c.user]==null?"":r[c.user]),nm:r.user_name||r.name||r.email||"",sub:r[c.subject]||"(no subject)",st:normTk(r[c.status]),pr:String(r[c.priority]||"normal").toLowerCase(),ts:Date.parse(r[c.created])||0,d:fd(r[c.created],1),msgs:null,rating:r.rating||0,close_note:r.close_note||"",unread:ms.filter(m=>m.sender==="user"&&!m.is_read).length,lastTs:last?Date.parse(last.created_at):(Date.parse(r[c.created])||0),lastSender:last?last.sender:"",lastMsgText:last?last.message:"",count:ms.length}}
 function mapMsg(r){const c=COLS.msg,s=String(r[c.sender]==null?"user":r[c.sender]).toLowerCase();return{id:String(r[c.id]||""),admin:(s==="admin"||s==="support"||s==="staff"),b:r[c.body]||r.body||r.content||r.text||"",t:fdt(r[c.created]),ts:Date.parse(r[c.created])||Date.now(),read:!!r.is_read}}
 const NEG=["withdraw","withdrawal","debit"];
 const TYL={deposit:"Deposit",credit:"Credit",debit:"Debit",win:"Reward",withdraw:"Withdrawal",withdrawal:"Withdrawal",refund:"Refund"};
@@ -360,7 +360,7 @@ const stChip=s=>`<span class="chip ${{open:"wa",pending:"",closed:"ok"}[s]}">${s
 function tkTabs(){const c=f=>f==="all"?S.tickets.length:S.tickets.filter(t=>t.st===f).length;return `<div class="tabs">${["open","pending","closed","all"].map(f=>`<button class="${TKF===f?"on":""}" data-act="kf" data-v="${f}">${f[0].toUpperCase()+f.slice(1)} ${c(f)}</button>`).join("")}</div>`}
 function tkList(){
   const q=TQ.toLowerCase(),l=S.tickets.filter(t=>(TKF==="all"||t.st===TKF)&&(!q||(tkUser(t)+t.sub+t.id).toLowerCase().includes(q))).sort((a,b)=>b.lastTs-a.lastTs);
-  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b><em>${rel(t.lastTs)}</em></span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc(t.sub)}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
+  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b><em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em></span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc((t.lastMsgText||t.sub).substring(0,30))}${(t.lastMsgText||t.sub).length>30?'...':''}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
 }
 function chatMsgs(t){
   if(!t.msgs)return '<div class="emp">Loading conversation...</div>';
@@ -371,7 +371,7 @@ function chatMsgs(t){
 }
 function chatPane(t){
   const n=tkUser(t),pris=["low","normal","high","urgent"];if(!pris.includes(t.pr))pris.push(t.pr);
-  return `<div class="ch"><button class="ib mb-only" data-act="tkback" aria-label="Back">${ic("arrow-left")}</button><span class="avt" style="background:${col(n)}">${ini(n)}</span><div class="grow"><b>${esc(n)}</b><small>${esc(t.sub)} · #${esc(t.id.slice(0,8))}</small></div>
+  return `<div class="ch"><button class="ib" data-act="tkback" aria-label="Back" style="margin-right:4px">${ic("arrow-left")}</button><span class="avt" style="background:${col(n)}">${ini(n)}</span><div class="grow"><b>${esc(n)}</b><small>${esc(t.sub)} · #${esc(t.id.slice(0,8))}</small></div>
     <select class="in sm" data-pri="${esc(t.id)}" aria-label="Priority">${pris.map(p=>`<option${p===t.pr?" selected":""}>${p}</option>`).join("")}</select>
     ${t.st==="closed"?`<button class="btn k s" data-act="tkreopen" data-v="${esc(t.id)}">Reopen</button>`:`<button class="btn r s" data-act="tkclose" data-v="${esc(t.id)}">Close ticket</button>`}</div>
   <div class="cm" id="cr-msgs">${chatMsgs(t)}</div>
@@ -388,7 +388,7 @@ function custPane(t){
   <h4>Private notes</h4><textarea class="in" id="cr-note" data-note="${esc(t.id)}" rows="4" placeholder="Only visible to you (saved in this browser)">${esc(tkNote(t.id))}</textarea>`;
 }
 function supV(){
-  let T=TKM?TK(TKM):null;if(TKM&&!T){saveTkm(null);T=null}
+  let T=TKM?TK(TKM):null;if(TKM&&!T&&S.tickets.length>0){saveTkm(null);T=null}
   return `<div class="hd"><div><h1>Support inbox</h1><small>Customer chats, ratings and ticket history</small></div><div class="sp"></div><button class="btn g" data-act="refresh">${ic("refresh-cw")}Refresh</button></div>
   <div class="chat${T?" is-open":""}"><aside class="cl"><div class="clh"><div class="tb2" style="margin:0"><input class="in" id="tks" placeholder="Search tickets" value="${esc(TQ)}"></div><div id="tk-tabs">${tkTabs()}</div></div><div id="tk-list">${tkList()}</div></aside>
   <section class="cc">${T?chatPane(T):`<div class="emp" style="margin:auto">${ic("life-buoy")}<p>Select a ticket to start replying.</p></div>`}</section>${T?`<aside class="cd">${custPane(T)}</aside>`:""}</div>`;
@@ -674,8 +674,19 @@ function initRealtime(){
   db.channel("adm-money").on("postgres_changes",{event:"INSERT",schema:"public",table:"withdrawal_requests"},()=>{toast("New withdrawal request","landmark");reload()}).on("postgres_changes",{event:"INSERT",schema:"public",table:"payment_requests"},()=>{toast("New deposit request","banknote");reload()}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"wallet"},p=>{const u=S.users.find(x=>x.id===p.new.user_id);if(u&&u.wal!==Number(p.new.balance)){u.wal=Number(p.new.balance);if(["users","dash","wallets"].includes(S.page))render()}}).subscribe();
   db.channel("adm-users").on("postgres_changes",{event:"INSERT",schema:"public",table:"users"},()=>reload()).on("postgres_changes",{event:"INSERT",schema:"public",table:"predictions"},()=>reload()).subscribe();
 }
+setInterval(()=>{
+  document.querySelectorAll('[data-timer]').forEach(el=>{
+    const ts=Number(el.dataset.timer);
+    if(!ts)return;
+    const s=Math.floor((Date.now()-ts)/1000);
+    if(s<60){el.textContent=s+"s"}
+    else{const m=Math.floor(s/60);const rs=s%60;el.textContent=m+"m "+rs+"s"}
+    if(Date.now()-ts>120000){el.classList.remove('green');el.classList.add('red')}
+    else{el.classList.remove('red');el.classList.add('green')}
+  });
+},1000);
 setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
-boot();
+ boot();
 </script>
 </body>
 </html>
