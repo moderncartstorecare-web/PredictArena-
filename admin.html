@@ -55,6 +55,7 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 .ov{position:fixed;inset:0;background:rgba(8,12,24,.55);display:grid;place-items:center;z-index:60;padding:16px;animation:fi .15s;overflow-y:auto}.md{background:var(--card);border-radius:12px;padding:24px;max-width:480px;width:100%}.md h3{font-size:17px}
 .toast{position:fixed;right:20px;top:calc(18px + env(safe-area-inset-top,0px));background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:8px;font-weight:500;z-index:80;display:flex;gap:9px;align-items:center;animation:fi .2s}
 .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--bd);border-radius:9px;padding:11px 12px;margin-bottom:8px;cursor:pointer}.opt:has(input:checked){border-color:var(--pr);background:var(--prs)}
+.unread-row { background-color: var(--prs) !important; }
 @media(max-width:860px){.sb{position:static;height:auto;width:100%;flex-direction:row;overflow-x:auto;padding:8px}.sb h6,.sb .brand,.sb>small{display:none}.nv{width:auto;white-space:nowrap}#app{flex-direction:column}.pg{padding:14px}.tp{padding:10px 14px}.fg{grid-template-columns:1fr}}
 </style>
 </head>
@@ -146,6 +147,13 @@ function renderRating(r) {
         stars += '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (i <= r ? '#eab308' : 'none') + '" stroke="' + (i <= r ? '#eab308' : 'var(--bd)') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; margin-right:2px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
     }
     return '<div style="display:flex; align-items:center; gap:2px;">' + stars + '</div>';
+}
+
+function renderMsgBody(b) {
+    if (b && b.startsWith('data:image')) {
+        return `<img src="${b}" style="max-width:100%; border-radius:6px; margin-top:4px;" />`;
+    }
+    return esc(b);
 }
 
 function fd(v,y){if(!v)return "";var d=new Date(v);if(isNaN(d))return String(v);return d.toLocaleDateString("en-IN",y?{day:"2-digit",month:"short",year:"numeric"}:{day:"2-digit",month:"short"})}
@@ -250,6 +258,8 @@ async function openTicket(id){
   t.msgs=(r.data||[]).map(mapMsg);
   // Mark user messages as read in DB
   db.from('ticket_messages').update({ is_read: true }).eq('ticket_id', id).eq('sender', 'user').then(function(){});
+  // Instantly mark as read in UI
+  t.unread = 0;
   render();
   setTimeout(function(){ 
       var el = document.getElementById('admin-chat-msgs'); 
@@ -382,9 +392,9 @@ function supV() {
         <button class="btn w" style="margin-top:12px" data-a="notify-user" data-v="${u.id}">${ic("bell")} Send Notification</button>
         <button class="btn w g" style="margin-top:8px" data-a="wallet-user" data-v="${u.id}">${ic("wallet")} Adjust Wallet</button>
       </div>
-      <div class="card" style="display:flex; flex-direction:column; height: 600px; padding:0;">
+      <div class="card" style="display:flex; flex-direction: column; height: 600px; padding:0;">
         <div style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;" id="admin-chat-msgs">
-           ${(t.msgs||[]).map(function(m){ return '<div style="align-self:'+(m.admin?'flex-end':'flex-start')+'; background:'+(m.admin?'var(--pr)':'var(--bg)')+'; color:'+(m.admin?'#fff':'var(--tx)')+'; padding:10px 14px; border-radius:12px; max-width:80%;">'+esc(m.b)+'<br><small style="opacity:0.7;font-size:10px;">'+esc(m.t)+'</small></div>'; }).join('')}
+           ${(t.msgs||[]).map(function(m){ return '<div style="align-self:'+(m.admin?'flex-end':'flex-start')+'; background:'+(m.admin?'var(--pr)':'var(--bg)')+'; color:'+(m.admin?'#fff':'var(--tx)')+'; padding:10px 14px; border-radius:12px; max-width:80%;">'+renderMsgBody(m.b)+'<br><small style="opacity:0.7;font-size:10px;">'+esc(m.t)+'</small></div>'; }).join('')}
         </div>
         ${t.st === 'closed' ? `<div style="padding:12px; text-align:center; border-top:1px solid var(--bd); color:var(--mu);">Ticket is closed.</div>` : `
         <div style="padding:12px; border-top:1px solid var(--bd); display:flex; gap:8px; background:var(--card);">
@@ -396,7 +406,11 @@ function supV() {
   }
   var l=S.tickets.filter(function(t){return TKF==="all"||t.st===TKF});
   return '<div class="hd"><div><h1>Support</h1><small>Customer tickets and conversations</small></div><div class="sp"></div><button class="btn g" data-a="refresh">'+ic("refresh-cw")+'Refresh</button></div><div class="tabs" style="margin-bottom:12px">'+["all","open","pending","closed"].map(function(f){return '<button class="'+(TKF===f?"on":"")+'" data-kf="'+f+'">'+(f==="all"?"All":f[0].toUpperCase()+f.slice(1))+'</button>'}).join("")+'</div><div class="card tw"><table><tr><th>Ticket</th><th>User</th><th>Subject</th><th>Last Response</th><th>Rating</th><th>Status</th><th></th></tr>'+(l.map(function(t){
-      return '<tr><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+'</td><td><b>'+esc(t.lastMsgTimeFormatted)+'</b><br><small>'+(t.lastMsgDate ? timeAgo(t.lastMsgDate) : '-')+'</small></td><td>'+renderRating(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
+      // Highlight unread rows
+      var rowClass = t.unread > 0 ? 'class="unread-row"' : '';
+      var badge = t.unread > 0 ? `<span style="background:var(--bad);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;margin-left:6px;">NEW</span>` : '';
+      
+      return '<tr '+rowClass+'><td><b>'+esc(t.id.slice(0,8))+'</b></td><td>'+esc(tkUser(t))+'</td><td>'+esc(t.sub)+' '+badge+'</td><td><b>'+esc(t.lastMsgTimeFormatted)+'</b><br><small>'+(t.lastMsgDate ? timeAgo(t.lastMsgDate) : '-')+'</small></td><td>'+renderRating(t.rating)+'</td><td><span class="chip '+({open:"wa",pending:"",closed:"ok"}[t.st])+'">'+t.st+'</span></td><td><div class="ac"><button class="btn s" data-tk="'+esc(t.id)+'">Open</button></div></td></tr>'
   }).join("")||'<tr><td colspan="7"><small>No tickets in this view.</small></td></tr>')+'</table></div>'
 }
 function notV(){var u=U(CPS.uid),rc=CPS.aud==="all"?TU():CPS.aud==="act"?AU():1;return '<div class="hd"><div><h1>Notifications</h1><small>Send announcements to everyone or to one user</small></div></div><div class="cols"><form class="card" id="nf"><h3>Compose</h3><div class="fg"><label class="f">Audience<select class="in" data-cp="aud"><option value="all"'+(CPS.aud==="all"?" selected":"")+'>All users</option><option value="act"'+(CPS.aud==="act"?" selected":"")+'>Active users only</option><option value="one"'+(CPS.aud==="one"?" selected":"")+'>Particular user</option></select></label>'+(CPS.aud==="one"?'<label class="f">User<select class="in" data-cp="uid">'+S.users.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===CPS.uid?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>':'<label class="f">Type<select class="in" data-cp="ty">'+["Promo","Result","Alert","Info"].map(function(t){return '<option'+(t===CPS.ty?" selected":"")+'>'+t+'</option>'}).join("")+'</select></label>')+'</div><label class="f">Title<input class="in" data-cp="t" value="'+esc(CPS.t)+'" maxlength="80" required></label><label class="f">Message<textarea class="in" data-cp="m" rows="4" maxlength="300" required>'+esc(CPS.m)+'</textarea></label><div class="hd" style="margin:0"><small>Recipients: <b>'+num(rc)+'</b></small><div class="sp"></div><button class="btn" type="submit">'+ic("send")+'Send notification</button></div></form><div class="card"><h3>Sent history</h3>'+S.sent.map(function(s){return '<div class="ls"><div class="ico">'+ic("bell")+'</div><div><b>'+esc(s.t)+'</b><small>'+esc(s.m)+'</small><small>'+esc(s.aud)+' · '+num(s.r)+' recipients · '+s.time+'</small></div></div>'}).join("")+'</div></div>'}
@@ -421,7 +435,7 @@ function render(){
   if(!LOGIN){r.innerHTML=loginV()}
   else{
     var v=VT[S.page]||VT.dash;
-    r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">@CricPulse Admin</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small>Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>';
+    r.innerHTML='<div id="app"><aside class="sb"><div class="brand"><span>'+ic("shield-check")+'</span>CricPulse Admin</div>'+nav()+'<small style="margin-top:auto;padding:8px 10px;color:#6b7694">@CricPulse Admin</small></aside><div class="main"><div class="tp"><b>'+v[0]+'</b><div class="sp"></div><small style="white-space:nowrap;padding-right:10px;">Today: 29 Oct 2026</small><button class="ib" data-a="eye" aria-label="Show or hide earnings">'+ic(EYE?"eye":"eye-off")+'</button><div class="av">AD</div></div><div class="pg">'+v[1]()+'</div></div></div>';
   }
   try{lucide.createIcons()}catch(e){}
 }
