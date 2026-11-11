@@ -1661,10 +1661,13 @@ window.addEventListener("load", async () => {
             const p = await CP_DB.getProfile(S.user.id); 
             if (p && p.balance !== undefined) { 
                 S.bal = p.balance; 
+                
+                // NEW FIX: Instantly add the notification to the user's local state
+                note("Top-up Successful", "Payment of ₹" + (new URLSearchParams(window.location.search).get('amount') || '') + " verified.", "wallet");
+                
                 save(); 
                 render(); 
             }
-
              } else {
             const errorMsg = error ? error.message : (data ? data.message : 'Unknown error');
             toast('Payment verification failed: ' + errorMsg, 'alert');
