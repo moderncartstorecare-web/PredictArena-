@@ -332,7 +332,7 @@ const FAQ = [
   ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
   ["How does the wallet work?","A correct pick credits your wallet. You can add funds and withdraw your winnings to your bank."],
   ["How are winners decided?","When a market closes, the official result is compared with your pick."],
-  ["How fast is support?","Our support team replies within 60 minutes in the in-app Support Center. You can also reach us on Instagram."],
+  ["How fast is support?","Our support team replies within 30 minutes in the in-app Support Center. You can also reach us on Instagram."],
   ["Is this gambling?","This is a skill-based prediction platform. Please play responsibly and follow local laws."]
 ];
 const VEN = ["","Wankhede Stadium, Mumbai","Capital Oval, New Delhi","Chinnaswamy Stadium, Bengaluru","Chepauk Ground, Chennai","Eden Gardens, Kolkata","Newlands, Cape Town","Official box office trackers","Official exchange closing data","Online final, India server"];
@@ -349,8 +349,8 @@ const META = {
   alerts:["Notifications","Activity on your account."],
   profile:["Profile","Details, preferences and security."],
   help:["Help and terms","How the platform works."],
-  support:["Support","We reply within 60 minutes."],
-  ticket:["Support chat","We reply within 60 minutes."],
+  support:["Support","We reply within 30 minutes."],
+  ticket:["Support chat","We reply within 30 minutes."],
   about:["About us",""],
   terms:["Terms & Conditions",""],
   privacy:["Privacy Policy",""],
@@ -564,7 +564,7 @@ function legalPage(kind) {
         <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is ₹100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
         
         <h2>4. Disputes</h2>
-        <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 60 minutes during business hours.</p>
+        <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 30 minutes during business hours.</p>
       `
     },
     about:{
@@ -696,8 +696,23 @@ const helpV = () => `<div class="stack">${faqH()}
 function supportV() {
   const open = S.tickets.filter(t => t.status != "closed").length;
   const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
-  return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"60 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
-<div class="grid2"><button class="tile" data-a="newticket">${ic("chat",18)}<div><b>Create a ticket</b><div class="mut s11">Chat with our team</div></div></button><button class="tile" data-a="instagram">${ic("instagram",18)}<div><b>Instagram</b><div class="mut s11">@${esc(ig)}</div></div></button></div>
+  return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"30 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
+<div class="grid2">
+  <button class="tile" data-a="newticket">
+    ${ic("chat",18)}
+    <div>
+      <b>Chat with Support</b>
+      <div class="mut s11">Talk to a real person</div>
+    </div>
+  </button>
+  <button class="tile" data-a="instagram">
+    ${ic("instagram",18)}
+    <div>
+      <b>Instagram</b>
+      <div class="mut s11">@${esc(ig)}</div>
+    </div>
+  </button>
+</div>
 <div class="card" style="padding:12px 14px 2px"><h3>Your tickets</h3>${S.tickets.length ? S.tickets.slice().reverse().map(t => `<button class="ln" data-a="openticket" data-v="${t.id}"><div class="grow"><b class="s12" style="display:block">${esc(t.subject)}</b><span class="mut s12">${t.msgs.length} message${t.msgs.length==1?"":"s"} · ${esc(t.updated)}</span></div><div class="row" style="gap:6px"><span class="pill ${t.status=="closed"?"":"ok"}">${t.status=="closed"?"Closed":"Open"}</span>${t.unread > 0 ? `<span class="dot" style="position:static;">${t.unread}</span>` : ''}</div></button>`).join("") : '<div class="empty">No tickets yet. Create one above.</div>'}</div>
 <div class="card"><h3>Common questions</h3>${faqH(3)}</div></div>`;
 }
@@ -1216,7 +1231,7 @@ async function createTicket() {
     
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
     
-    const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 60 minutes.`;
+    const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 30 minutes.`;
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
     
     await loadTickets();
@@ -1309,7 +1324,7 @@ document.addEventListener("click", async e => {
       S.ticketOpen = v; S.route = "ticket"; history.pushState({route: "ticket", ticketOpen: v}, "", ""); save(); render(); 
       loadTickets().then(() => { render(); supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); }); 
       break;
-    case "instagram": const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official"; window.open("https://instagram.com/" + ig, "_blank", "noopener"); break;
+    case "instagram": const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official"; window.open("https://www.instagram.com/skillclash.in_/" + ig, "_blank", "noopener"); break;
     case "sendmsg": {
       const ta = $("ti"), t2 = S.tickets.find(x => x.id == S.ticketOpen);
       if (!ta || !t2 || t2.status == "closed") return;
