@@ -649,7 +649,7 @@ function picksV() {
   }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
-  const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).reverse();
+  const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).sort((a,b) => b.ts - a.ts);
   return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
 <div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
 <div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
@@ -945,7 +945,7 @@ function applySession(session) {
       switchAcct(em);
       S.user = { id: session.user.id, n: (profile && profile.display_name) || em.split('@')[0] || "Player", e: em };
       S.bal = (profile && profile.balance) || 0;
-      S.txs = (tx || []).map(t => ({ type: t.type, amount: t.amount, n: t.description || t.note, status: t.status, date: new Date(t.created_at).toLocaleDateString("en-IN") }));
+      S.txs = (tx || []).map(t => ({ type: t.type, amount: t.amount, n: t.description || t.note, status: t.status, date: new Date(t.created_at).toLocaleDateString("en-IN"), ts: new Date(t.created_at).getTime() })).sort((a,b) => b.ts - a.ts);
       if (realNotifs.length > 0) { S.nts = realNotifs.map(n => ({ t: n.title, d: n.body, i: n.icon || "bell", r: n.is_read ? 1 : 0, ts: new Date(n.created_at).getTime() })); }
       initRealtimeSync();
       save();
@@ -1294,8 +1294,8 @@ document.addEventListener("click", async e => {
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
       const selectedApp = $("dm").value; 
-      const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
-      const currentUrl = window.location.origin + window.location.pathname;
+const orderId = 'CP-' + Math.floor(100000 + Math.random() * 900000);
+    const currentUrl = window.location.origin + window.location.pathname;
       
       t.disabled = true; t.textContent = 'Connecting to bank...';
       $("er").textContent = "";
