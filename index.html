@@ -620,8 +620,8 @@ function homeV() {
   
   const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
 
-  const activeMatches = MK.filter(m => left(m) > 0 && !m.isFinished).slice(0, 3);
-  const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
+const activeMatches = MK.filter(m => left(m) > 0 && !m.isFinished).slice(0, 3);
+const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
 
   return `<div class="stack">${kpi([["Wallet Balance",inr(S.bal),"Available to play"],["Total Won",inr(S.txs.filter(x=>x.type==="win").reduce((a,b)=>a+b.amount,0)),"Lifetime earnings"],["Total Predictions",t.n,t.d+" settled"],["Win Rate",t.p+"%",t.w+" correct"]])}
 
@@ -891,16 +891,11 @@ function shell() {
   
   const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>`;
 
-  // Check for unread support messages
-  const unreadCount = S.tickets.filter(t => t.unread > 0 && t.status !== 'closed').reduce((sum, t) => sum + t.unread, 0);
-  const unreadSupport = unreadCount > 0;
-
   return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
 <div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
 <main class="pg">${VIEWS[R]()}</main></div></div>
-<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}${i[0]=="more" && unreadSupport ? `<span style="position:absolute;top:2px;right:calc(50% - 18px);background:var(--pr);color:#fff;font-size:9px;font-weight:bold;padding:1px 4px;border-radius:10px;border:2px solid var(--sf);min-width:14px;text-align:center;">${unreadCount}</span>` : ''}</button>`; }).join("")}</nav>`;
-}
+<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
 
 function render() {
   const r = $("app");
@@ -1126,7 +1121,10 @@ function selectPaymentMethod(btn) {
   document.getElementById('dm').value = btn.dataset.method;
 }
 const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
-const moreSheet = () => sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift"],["ranks","Leaderboard","award"],["alerts","Notifications","bell"],["profile","Profile","user"],["support","Support","chat"],["help","Help and terms","help"]].map(([r,l,g]) => `<button class="tile" data-a="nav" data-v="${r}">${ic(g,18)}${l}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
+const moreSheet = () => {
+  const unreadSupportCount = S.tickets.filter(t => t.unread > 0 && t.status !== 'closed').reduce((sum, t) => sum + t.unread, 0);
+  return sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift",0],["ranks","Leaderboard","award",0],["alerts","Notifications","bell",0],["profile","Profile","user",0],["support","Support","chat",unreadSupportCount],["help","Help and terms","help",0]].map(([r,l,g,c]) => `<button class="tile" data-a="nav" data-v="${r}" style="position:relative">${ic(g,18)}${l}${c>0 ? `<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--pr);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">${c}</span>` : ''}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
+};
 function slipSheet() { sheet(`<h3 style="font-size:17px;margin-bottom:6px">Your slip</h3>${slipBody()}`); }
 
 async function loadTickets() {
