@@ -325,7 +325,7 @@ const DEMO_MK = [
   }
 ];
 
-let MK = [...DEMO_MK]; // Initialize with demo data immediately
+let MK = []; // Start empty to prevent demo glitch
 
 const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
 const FAQ = [
@@ -1201,8 +1201,8 @@ document.addEventListener("click", e => {
   if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
 
   switch(a) {
-    case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); render(); scrollTo(0,0); break;
-    case "sgo": closeSheet(); S.route = v; history.pushState({route: v}, "", ""); render(); scrollTo(0,0); break;
+     case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
+    case "sgo": closeSheet(); S.route = v; history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
     case "back": 
       S.pop = 0; closeSheet(); 
       history.back(); 
@@ -1251,7 +1251,7 @@ document.addEventListener("click", e => {
     case "slipsheet": slipSheet(); break;
     case "lockslip": lockPicks(Object.keys(S.slip)); break;
     case "lockm": lockPicks([v]); break;
-    case "open": S.route = "match"; S.mid = v; S.pop = 0; history.pushState({route: "match", mid: v}, "", ""); render(); scrollTo(0,0); break;
+    case "open": S.route = "match"; S.mid = v; S.pop = 0; history.pushState({route: "match", mid: v}, "", ""); save(); render(); scrollTo(0,0); break;
     case "pff": S.pff = v; render(); break;
     case "nf": S.nf = v; render(); break;
     case "rk": S.rk = v; render(); break;
@@ -1267,7 +1267,7 @@ document.addEventListener("click", e => {
     case "newticket": createTicket(); break;
     case "openticket": 
       closeSheet();
-      S.ticketOpen = v; S.route = "ticket"; history.pushState({route: "ticket", ticketOpen: v}, "", ""); render(); 
+      S.ticketOpen = v; S.route = "ticket"; history.pushState({route: "ticket", ticketOpen: v}, "", ""); save(); render(); 
       loadTickets().then(() => { render(); supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); }); 
       break;
     case "instagram": const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official"; window.open("https://instagram.com/" + ig, "_blank", "noopener"); break;
@@ -1340,14 +1340,15 @@ window.addEventListener('popstate', (e) => {
     if (e.state.mid) S.mid = e.state.mid;
     if (e.state.ticketOpen) S.ticketOpen = e.state.ticketOpen;
     if (e.state.pub) S.pub = e.state.pub;
+    save();
     render();
   } else {
     S.route = "home";
     S.pub = "land";
+    save();
     render();
   }
 });
-
 document.addEventListener("input", e => { if (e.target.id == "q") { S.q = e.target.value; $("ml").innerHTML = mlist(); } });
 document.addEventListener("keydown", e => {
   if (e.key == "Escape") closeSheet();
@@ -1509,6 +1510,13 @@ function initRealtimeSync() {
 }
 
 window.addEventListener("load", async () => {
+  // Restore route from browser history state (fixes refresh)
+  if (history.state && history.state.route) {
+     S.route = history.state.route;
+     if (history.state.mid) S.mid = history.state.mid;
+     if (history.state.ticketOpen) S.ticketOpen = history.state.ticketOpen;
+     if (history.state.pub) S.pub = history.state.pub;
+  }
   // 1. Immediate render to prevent white screen
   render(); 
 
@@ -1578,15 +1586,14 @@ window.addEventListener("load", async () => {
           B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
           q: m.question, s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
           w: m.crowd_a, oa: m.odds_a, ob: m.odds_b
-        }));
+          }));
       } else {
-        MK = [...DEMO_MK];
+        MK = [];
       }
       fetchLiveScores();
     } catch(e) { 
-      MK = [...DEMO_MK];
+      MK = [];
     }
-
     // 4. Safe Session Check (Ensures PC screen doesn't stay blank)
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     if (session) { 
