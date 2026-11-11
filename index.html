@@ -364,13 +364,13 @@ const RAIL = [
 
 /* ---- state ---- */
 const KEY = "cricpulse_v3";
-const PERSIST = ["user","bal","preds","cps","txs","nts","pf","theme","chk","tickets","le","slipStake","route","mid","ticketOpen","pub","au"];
+const PERSIST = ["user","bal","preds","cps","txs","nts","pf","theme","chk","tickets","le","slipStake","route","mid","ticketOpen","pub","au","showAllTx"];
 let S = {
   user:null, bal:0, preds:[], cps:[], txs:[],
   nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, ts:Date.now()}],
   pf:{em:1,re:1,rw:1}, theme:"", chk:"", route:"home", pub:"land", au:"in",
   cat:"all", q:"", slip:{}, slipStake:{}, mid:1, txf:"all", pff:"all", rk:"w", nf:"all", pop:0,
-  tickets:[], ticketOpen:null, authBusy:false
+  tickets:[], ticketOpen:null, authBusy:false, showAllTx: false
 };
 try {
   const r = JSON.parse(localStorage.getItem(KEY));
@@ -650,9 +650,20 @@ function picksV() {
 }
 function walletV() {
   const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).sort((a,b) => b.ts - a.ts);
+  
+  // Show only 5 if showAllTx is false
+  const displayList = S.showAllTx ? L : L.slice(0, 5);
+  
   return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
 <div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
-<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}${L.length ? L.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}</div>
+<div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}
+  
+  <div style="${S.showAllTx ? 'max-height: 380px; overflow-y: auto; padding-right: 4px;' : ''}">
+    ${L.length ? displayList.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}
+  </div>
+
+  ${L.length > 5 ? `<button class="btn g w" style="margin-top:10px; margin-bottom:6px;" data-a="toggletx">${S.showAllTx ? 'Show Less' : 'Show More Transactions'}</button>` : ''}
+</div>
 <details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
 }
 function rewardsV() {
@@ -1258,7 +1269,8 @@ document.addEventListener("click", async e => {
     case "pff": S.pff = v; render(); break;
     case "nf": S.nf = v; render(); break;
     case "rk": S.rk = v; render(); break;
-    case "txf": S.txf = v; render(); break;
+    case "txf": S.txf = v; S.showAllTx = false; render(); break;
+    case "toggletx": S.showAllTx = !S.showAllTx; save(); render(); break;
     case "settle": settle(v); break;
     case "claim": { const c = S.cps[Number(v)]; if (!c || c.cl) return; c.cl = 1; note("Reward claimed", c.t+". Code: "+c.code, "gift"); save(); toast("Reward claimed. Code ready.","gift"); render(); break; }
     case "copy": try{navigator.clipboard.writeText(v)}catch(x){} toast("Code "+v+" copied","copy"); break;
