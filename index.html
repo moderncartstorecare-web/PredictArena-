@@ -255,6 +255,31 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
 .stars .star { transition: color 0.2s; }
 .stars .star.active { color: #facc15; }
+
+/* CLAUDE CONTEST CSS */
+.tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
+.tie-input:focus{border-color:var(--ac);background:var(--sf)}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
+.tabs button{flex:1;text-align:center;height:36px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
+.tabs button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
+.panel[hidden]{display:none}
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px 8px;border-bottom:1px solid var(--ln);text-align:left}
+.table th:last-child,.table td:last-child{text-align:right}
+.table td{padding:12px 8px;border-bottom:1px solid var(--ln);font-size:13.5px}
+.table tr:last-child td{border:0}
+.rk{display:flex;align-items:center;gap:10px;font-weight:700}
+.rb{min-width:30px;height:26px;padding:0 7px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800}
+tr:first-child .rb{background:var(--grad);color:#fff}
+.pc{color:var(--i2);font-weight:600}.pr{font-weight:800;color:var(--ok)}
+.note{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}
+.ent{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}.ent:last-child{border:0}
+.ea{width:36px;height:36px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.ent.me .ea{background:var(--grad);color:#fff}.ent div:nth-child(2){flex:1;min-width:0}
+.ent b{display:block;font-size:13.5px}.ent small{color:var(--i3);font-size:12px}
+.rules{display:flex;flex-direction:column;gap:12px}.rl{display:flex;gap:12px;align-items:flex-start}
+.rn{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.rl b{display:block;font-size:13.5px}.rl small{color:var(--i3);font-size:12.5px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -798,117 +823,110 @@ function matchV() {
   const lk = S.preds.find(p => p.m == m.id);
   const cls = !left(m) || m.isFinished;
   
-  // Check if user already joined
-  if (lk) {
-    return `<div class="fc-wrap">
-      <div class="fc-header">
-        <button class="fc-back" data-a="back">${ic("back",20)}</button>
-        <div><h1 style="font-size:18px;margin:0;">Contest Joined</h1><small class="mut">Entry Confirmed</small></div>
-      </div>
-      <div class="fc-card" style="text-align:center;padding:40px 20px;">
-        <div style="width:60px;height:60px;border-radius:50%;background:var(--oks);color:var(--ok);display:grid;place-items:center;margin:0 auto 16px;">${ic("check",30)}</div>
-        <h2 style="font-size:20px;margin-bottom:8px;">You are in!</h2>
-        <p class="mut s12" style="margin-bottom:20px;">Your prediction for ${esc(full(m,lk.p))} has been locked.</p>
-        <div style="background:var(--s2);border-radius:12px;padding:14px;text-align:left;">
-          <div class="ln"><span class="mut">Your Pick</span><b>${esc(full(m,lk.p))}</b></div>
-          <div class="ln"><span class="mut">Entry Fee</span><b>₹50</b></div>
-          <div class="ln"><span class="mut">Tie-Breaker</span><b>${lk.tie_breaker || '-'}</b></div>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  if (cls) {
-    return `<div class="fc-wrap">
-      <div class="fc-header">
-        <button class="fc-back" data-a="back">${ic("back",20)}</button>
-        <div><h1 style="font-size:18px;margin:0;">Contest Closed</h1><small class="mut">Entries are no longer accepted</small></div>
-      </div>
-      <div class="empty" style="padding:40px;text-align:center;">This contest has ended.</div>
-    </div>`;
-  }
-
-  const sel = S.slip[m.id] || 'A';
-  const isTeamA = sel === 'A';
-  const isTeamB = sel === 'B';
-  
-  // Fixed pool calculation (e.g. 200 spots * 50 = 10,000)
   const totalSpots = 200;
   const poolAmt = totalSpots * 50;
-  
-  return `<div class="fc-wrap">
-    <div class="fc-header">
-      <button class="fc-back" data-a="back">${ic("back",20)}</button>
+
+  return `<div style="padding-bottom: 80px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <button class="ib" data-a="back">${ic("back",20)}</button>
       <div><h1 style="font-size:18px;margin:0;">Contest Details</h1><small class="mut">Fixed entry, guaranteed prizes</small></div>
     </div>
 
-    <!-- Match Selection -->
-    <div class="fc-card">
+    <!-- Match Card -->
+    <div class="card" style="padding:18px;margin-bottom:14px;">
       <div class="bt" style="margin-bottom:14px;">
         <span class="tag">${cl(m.c)}</span>
         <span class="pill am">${cdt(m)}</span>
       </div>
       <h2 style="font-size:20px;font-weight:800;margin-bottom:16px;">${esc(ttl(m))}</h2>
       
-      <div class="fc-picks">
-        <label class="fc-radio">
-          <input type="radio" name="fc_pick" value="A" ${isTeamA ? 'checked' : ''} onchange="window.selectSide('${m.id}', 'A')">
-          <div class="fc-box">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <label class="pk" style="position:relative">
+          <input type="radio" name="w" value="A" ${lk && lk.p === 'A' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} style="position:absolute;inset:0;opacity:0;z-index:2;cursor:pointer;">
+          <div class="pb" style="border:2px solid ${lk && lk.p === 'A' ? 'var(--ac)' : 'var(--ln2)'}; background:${lk && lk.p === 'A' ? 'var(--acs)' : 'var(--sf)'}; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between;">
             <strong>${esc(m.A[1])}</strong>
-            <span style="width:20px;height:20px;border-radius:50%;border:2px solid ${isTeamA?'var(--ac)':'var(--ln2)'};background:${isTeamA?'var(--ac)':'transparent'};"></span>
+            <span class="rc" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;${lk && lk.p === 'A' ? 'background:var(--ac);border-color:var(--ac);color:#fff;' : ''}">${lk && lk.p === 'A' ? ic("check",12) : ''}</span>
           </div>
         </label>
-        <label class="fc-radio">
-          <input type="radio" name="fc_pick" value="B" ${isTeamB ? 'checked' : ''} onchange="window.selectSide('${m.id}', 'B')">
-          <div class="fc-box">
+        <label class="pk" style="position:relative">
+          <input type="radio" name="w" value="B" ${lk && lk.p === 'B' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} style="position:absolute;inset:0;opacity:0;z-index:2;cursor:pointer;">
+          <div class="pb" style="border:2px solid ${lk && lk.p === 'B' ? 'var(--ac)' : 'var(--ln2)'}; background:${lk && lk.p === 'B' ? 'var(--acs)' : 'var(--sf)'}; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between;">
             <strong>${esc(m.B[1])}</strong>
-            <span style="width:20px;height:20px;border-radius:50%;border:2px solid ${isTeamB?'var(--ac)':'var(--ln2)'};background:${isTeamB?'var(--ac)':'transparent'};"></span>
+            <span class="rc" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;${lk && lk.p === 'B' ? 'background:var(--ac);border-color:var(--ac);color:#fff;' : ''}">${lk && lk.p === 'B' ? ic("check",12) : ''}</span>
           </div>
         </label>
       </div>
 
       <div style="margin-top:16px;">
         <label class="s12" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
-        <input type="number" id="tie-input-${m.id}" class="fc-input" placeholder="e.g. 24" value="${S.tieBreaker || ''}">
+        <input type="number" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
         <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
       </div>
     </div>
 
     <!-- Prize Pool -->
-    <div class="fc-card fc-pool">
+    <div class="card" style="background:var(--grad);color:#fff;border:0;padding:22px 20px;margin-bottom:14px;">
       <div class="bt">
         <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85;">Guaranteed Prize Pool</span>
-        <span style="background:rgba(255,255,255,.16);padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;">Entry: ₹50</span>
+        <span style="background:rgba(255,255,255,.16);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700;">Entry: ₹50</span>
       </div>
-      <div class="amt">₹${poolAmt.toLocaleString('en-IN')}</div>
-      <div style="font-size:12px;opacity:.85;">Paid out whether or not all spots fill</div>
-      <div class="bar"><i></i></div>
-      <div class="bt" style="margin-top:8px;font-size:11px;font-weight:600;">
+      <div style="font-size:38px;font-weight:800;letter-spacing:-.04em;margin:6px 0 2px;">₹${poolAmt.toLocaleString('en-IN')}</div>
+      <div style="font-size:12px;opacity:.85;font-weight:500;">Paid out whether or not all spots fill</div>
+      <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:18px;">
+        <div style="height:100%;width:75%;background:#fff;"></div>
+      </div>
+      <div class="bt" style="margin-top:7px;font-size:12px;font-weight:600;">
         <span>Spots filled</span><span>150 / ${totalSpots}</span>
       </div>
     </div>
 
-    <!-- Prize Table -->
-    <div class="fc-card">
-      <h3 style="font-size:15px;margin-bottom:14px;">Prize Breakdown</h3>
-      <table class="fc-table">
-        <thead><tr><th>Rank</th><th style="text-align:right;">Prize</th></tr></thead>
-        <tbody>
-          <tr><td><b>Rank 1</b></td><td class="amt-col">₹3,000</td></tr>
-          <tr><td><b>Rank 2</b></td><td class="amt-col">₹1,500</td></tr>
-          <tr><td><b>Rank 3 - 5</b></td><td class="amt-col">₹1,000 <small class="mut">each</small></td></tr>
-          <tr><td><b>Rank 6 - 10</b></td><td class="amt-col">₹500 <small class="mut">each</small></td></tr>
-        </tbody>
-      </table>
+    <!-- Tabs & Table -->
+    <div class="card" style="padding:18px;margin-bottom:14px;">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="prizes">Prizes</button>
+        <button role="tab" aria-selected="false" data-tab="entries">Entries</button>
+        <button role="tab" aria-selected="false" data-tab="rules">Rules</button>
+      </div>
+      
+      <div class="panel" id="p-prizes">
+        <table class="table">
+          <thead><tr><th>Rank</th><th>Share</th><th>Prize</th></tr></thead>
+          <tbody>
+            <tr><td><div class="rk"><span class="rb">1</span>Rank 1</div></td><td class="pc">30%</td><td class="pr">₹3,000</td></tr>
+            <tr><td><div class="rk"><span class="rb">2</span>Rank 2</div></td><td class="pc">15%</td><td class="pr">₹1,500</td></tr>
+            <tr><td><div class="rk"><span class="rb">3-5</span>Rank 3 - 5</div></td><td class="pc">10% each</td><td class="pr">₹1,000</td></tr>
+            <tr><td><div class="rk"><span class="rb">6-10</span>Rank 6 - 10</div></td><td class="pc">5% each</td><td class="pr">₹500</td></tr>
+          </tbody>
+        </table>
+        <div class="note">${ic("info",14)}<span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
+      </div>
+      <div class="panel" id="p-entries" hidden>
+        <div class="ent me"><div class="ea">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill">${lk ? lk.p : 'A'}</span></div>
+        <div class="ent"><div class="ea">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill">A</span></div>
+        <div class="ent"><div class="ea">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill">B</span></div>
+      </div>
+      <div class="panel" id="p-rules" hidden>
+        <div class="rules">
+          <div class="rl"><span class="rn">1</span><div><b>Pick the match winner</b><small>Choose one team before the contest closes. One entry per player and it cannot be changed after joining.</small></div></div>
+          <div class="rl"><span class="rn">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning team is ranked above all other entries.</small></div></div>
+          <div class="rl"><span class="rn">3</span><div><b>Earliest entry wins ties</b><small>Among correct picks, the player who joined earlier gets the higher rank.</small></div></div>
+          <div class="rl"><span class="rn">4</span><div><b>Abandoned or tied match</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
+        </div>
+      </div>
     </div>
 
-    <!-- Join Button -->
-    <button class="btn p w" style="height:56px;font-size:16px;border-radius:16px;margin-top:10px;" onclick="window.joinContest('${m.id}')">
-      Join Contest for ₹50
-    </button>
+    <!-- Fixed Bottom CTA -->
+    <div style="position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px;background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln);">
+      <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+        <div><small style="display:block;font-size:11px;color:var(--i3);">Entry fee</small><b style="font-size:15px;font-weight:800;">₹50</b></div>
+        <button style="flex:1;height:52px;border-radius:15px;background:${lk ? 'var(--oks)' : 'var(--grad)'};color:${lk ? 'var(--ok)' : '#fff'};font-weight:800;font-size:15.5px;box-shadow:${lk ? 'none' : '0 10px 22px -6px rgba(30,79,216,.5)'};" 
+          onclick="window.joinContest('${m.id}')" ${lk || cls ? 'disabled' : ''}>
+          ${lk ? 'You are in' : cls ? 'Contest closed' : 'Join Contest for ₹50'}
+        </button>
+      </div>
+    </div>
   </div>`;
 }
-
 const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, support:supportV, ticket:ticketV, match:matchV};
 const MORE = ["rewards","ranks","alerts","profile","support","help"];
 
@@ -1124,6 +1142,24 @@ window.selectSide = function(id, side) {
   save();
   render();
 };
+
+// 1. Handle Tab Switching
+document.addEventListener("click", function(e) {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) {
+    const container = tab.closest(".tabs");
+    container.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", "false"));
+    tab.setAttribute("aria-selected", "true");
+    
+    const target = tab.dataset.tab;
+    ["prizes", "entries", "rules"].forEach(k => {
+      const panel = document.getElementById(`p-${k}`);
+      if(panel) panel.hidden = k !== target;
+    });
+  }
+});
+
+// 2. Handle Join Contest
 
 window.joinContest = async function(matchId) {
   const m = mkt(matchId);
