@@ -641,8 +641,11 @@ function picksV() {
   const L = S.preds.filter(p => f=="all"||(f=="p"?!p.res:p.res==f)).slice().reverse();
   return chips("pff",f,[["all","All "+cnt("all")],["p","Pending "+cnt("p")],["w","Won "+cnt("w")],["l","Lost "+cnt("l")]]) + `<div class="card" style="padding:0 14px">${L.length ? L.map(p => { 
     const m = mkt(p.m); 
-    if (!m) return ''; 
-    return `<div class="ln"><div class="grow"><button class="nm" data-a="open" data-v="${m.id}">${esc(ttl(m))}</button><div class="mut s12">Pick: ${esc(full(m,p.p))} · Stake: ${inr(p.stake)} · Odds: ${p.odds}x</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
+    const title = m ? ttl(m) : `Match #${String(p.m).slice(-6)}`;
+    const team = m ? full(m, p.p) : (p.p === 'A' ? 'Team A' : 'Team B');
+    const btnAttr = m ? `data-a="open" data-v="${m.id}"` : `style="cursor:default"`;
+    
+    return `<div class="ln"><div class="grow"><button class="nm" ${btnAttr}>${esc(title)}</button><div class="mut s12">Pick: ${esc(team)} · Stake: ${inr(p.stake)} · Odds: ${p.odds}x</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
   }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
@@ -1517,8 +1520,8 @@ window.addEventListener("load", async () => {
      if (history.state.ticketOpen) S.ticketOpen = history.state.ticketOpen;
      if (history.state.pub) S.pub = history.state.pub;
   }
-  // 1. Immediate render to prevent white screen
-  render(); 
+  // 1. Wait for data before rendering to prevent empty state flash
+  // render(); <-- Removed to fix flicker
 
   try {
     applyTheme();
