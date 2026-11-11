@@ -221,7 +221,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .yc-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border:0;border-radius:16px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;letter-spacing:.01em;box-shadow:0 10px 24px -8px rgba(30,91,240,.6);transition:all .15s ease}
 .yc-cta:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
 .yc-cta:active:not(:disabled){transform:scale(.98)}
-.yc-cta:disabled{opacity:.6;box-shadow:none;transform:none;cursor:not-allowed}
+.yc-cta:disabled{opacity:.75;box-shadow:none;transform:none;cursor:not-allowed;color:rgba(255,255,255,0.85) !important;font-weight:600;}
 .yc-foot{display:grid;justify-items:center;gap:6px;margin-top:-4px;text-align:center}
 .yc-note{font-size:11px;color:var(--i3)}
 @container (max-width:340px){.yc-head{padding:14px}.yc-form{padding:14px;gap:18px}.yc-card{padding:12px;gap:12px}.yc-odds b{font-size:24px}.yc-amt{font-size:28px}.yc-cur{font-size:23px}}
@@ -762,7 +762,7 @@ function matchV() {
   // Default selection to A if nothing is selected
   if (!lk && !S.slip[m.id]) {
     S.slip[m.id] = 'A';
-    S.slipStake[m.id] = S.slipStake[m.id] || 50;
+    S.slipStake[m.id] = Math.max(50, S.slipStake[m.id] || 50);
     save();
   }
   
@@ -771,7 +771,7 @@ function matchV() {
   const isTeamA = sel === 'A';
   const isTeamB = sel === 'B';
   const odds = isTeamA ? m.oa : m.ob;
-  const currentStake = S.slipStake[m.id] || 50;
+  const currentStake = Math.max(50, S.slipStake[m.id] || 50);
   const potential = Math.round(currentStake * odds);
   const profit = potential - currentStake;
 
@@ -844,7 +844,7 @@ function matchV() {
           </fieldset>
 
           <div>
-            <label class="yc-label" for="stake-input-${m.id}">Enter your stake <small>Min ₹10 · Max ₹10,000</small></label>
+            <label class="yc-label" for="stake-input-${m.id}">Enter your stake <small>Min ₹50 · Max ₹10,000</small></label>
             <div class="yc-field">
               <span class="yc-cur" aria-hidden="true">₹</span>
               <input class="yc-amt" id="stake-input-${m.id}" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0" value="${currentStake}" oninput="updateStake('${m.id}', this.value)" ${cls ? 'disabled' : ''}>
@@ -1122,7 +1122,7 @@ const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
   <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
-  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" step="50" placeholder="Enter amount (Min ₹50, Multiples of ₹50)"></div>  
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount (50, 100, 300, 500, 1000)"></div>
   <div class="fld">
     <label>Payment method</label>
     <div class="pay-method-grid">
@@ -1320,9 +1320,11 @@ document.addEventListener("click", async e => {
     case "damt": $("da").value = v; break;
     case "depok": {
       const x = Number($("da").value);
-      if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
-      if (x % 50 !== 0) { $("er").textContent = "Deposit amount must be a multiple of ₹50 (e.g., 50, 100, 150)."; return; }
-      if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
+      const allowedAmounts = [50, 100, 300, 500, 1000];
+      if (!allowedAmounts.includes(x)) { 
+        $("er").textContent = "Invalid amount. Please choose exactly 50, 100, 300, 500, or 1000."; 
+        return; 
+      }
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
       const selectedApp = $("dm").value; 
