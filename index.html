@@ -984,9 +984,18 @@ function lockPicks(ids) {
   if (!ok.length) { render(); return; }
 
   let totalStake = 0;
+  let hasError = false;
+  
   ok.forEach(id => {
-    totalStake += (S.slipStake[id] || 0);
+    const st = (S.slipStake[id] || 0);
+    if (st < 50 || st % 10 !== 0) hasError = true;
+    totalStake += st;
   });
+
+  if (hasError) {
+    toast("Invalid stake amount. Minimum is ₹50 and must be a multiple of 10.", "alert");
+    return;
+  }
 
   if (S.bal < totalStake) {
     toast(`Insufficient balance. You need ${inr(totalStake)}.`, "alert");
@@ -1035,7 +1044,7 @@ function settle(id) {
 
 window.updateStake = function(id, val) {
   let num = parseFloat(val);
-  if (isNaN(num) || num < 10) num = 10;
+  if (isNaN(num) || num < 50) num = 50; 
   S.slipStake[id] = num;
   save();
 
@@ -1057,10 +1066,21 @@ window.updateStake = function(id, val) {
   if (lblProfit) lblProfit.textContent = '+' + inr(profit);
 
   if (btn) {
-    if (num >= 10 && num <= 10000 && sel) {
+    // Must be >= 50, <= 10000, and a multiple of 10
+    if (num >= 50 && num <= 10000 && num % 10 === 0 && sel) {
       btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Confirm Bet';
     } else {
       btn.disabled = true;
+      btn.style.opacity = '0.6';
+      if (num < 50) {
+        btn.textContent = 'Minimum stake is ₹50';
+      } else if (num % 10 !== 0) {
+        btn.textContent = 'Stake must be a multiple of ₹10';
+      } else {
+        btn.textContent = 'Confirm Bet';
+      }
     }
   }
 };
@@ -1102,8 +1122,7 @@ const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
   <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
-  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount (Min ₹50)"></div>
-  
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" step="50" placeholder="Enter amount (Min ₹50, Multiples of ₹50)"></div>  
   <div class="fld">
     <label>Payment method</label>
     <div class="pay-method-grid">
@@ -1302,6 +1321,7 @@ document.addEventListener("click", async e => {
     case "depok": {
       const x = Number($("da").value);
       if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
+      if (x % 50 !== 0) { $("er").textContent = "Deposit amount must be a multiple of ₹50 (e.g., 50, 100, 150)."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
