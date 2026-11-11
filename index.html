@@ -1642,9 +1642,10 @@ window.addEventListener("load", async () => {
                 render(); 
             }
 
-          } else {
-            toast('Payment verification failed. Please contact support.', 'alert');
-            console.error('Payment verification error:', error || data?.message);
+             } else {
+            const errorMsg = error ? error.message : (data ? data.message : 'Unknown error');
+            toast('Payment verification failed: ' + errorMsg, 'alert');
+            console.error('Payment verification error:', error, data);
           }
         }
         else if (status === 'failed' || status === 'timeout') { 
