@@ -1193,7 +1193,7 @@ async function createTicket() {
   }
 }
 /* one-click handlers */
-document.addEventListener("click", e => {
+document.addEventListener("click", async e => {
   const t = e.target.closest("[data-a]");
   if (!t) {
     if (S.pop && !e.target.closest(".pp")) { S.pop = 0; render(); }
