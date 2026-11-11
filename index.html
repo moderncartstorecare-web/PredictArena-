@@ -364,7 +364,7 @@ const RAIL = [
 
 /* ---- state ---- */
 const KEY = "cricpulse_v3";
-const PERSIST = ["user","bal","preds","cps","txs","nts","pf","theme","chk","tickets","le","slipStake"];
+const PERSIST = ["user","bal","preds","cps","txs","nts","pf","theme","chk","tickets","le","slipStake","route","mid","ticketOpen","pub","au"];
 let S = {
   user:null, bal:0, preds:[], cps:[], txs:[],
   nts:[{t:"Welcome to CricPulse", d:"Entry is free on every market. Start predicting now.", i:"shield", r:0, ts:Date.now()}],
@@ -418,6 +418,13 @@ function liveText(m) {
        return `Live · ${m.liveData.scoreA} vs ${m.liveData.scoreB}`;
     }
     return m.liveData.statusText;
+  }
+  // Fallback based on time if API fails
+  if (m.closes_at) {
+    const closeTime = new Date(m.closes_at).getTime();
+    const now = Date.now();
+    if (now > closeTime + (3 * 60 * 60 * 1000)) return "Match Ended";
+    if (now > closeTime) return "Live";
   }
   return "Match yet to start";
 }
@@ -613,14 +620,14 @@ function homeV() {
   
   const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
 
-  const activeMatches = MK.filter(m => !m.isFinished).slice(0, 3);
+  const activeMatches = MK.filter(m => left(m) > 0 && !m.isFinished).slice(0, 3);
   const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
 
   return `<div class="stack">${kpi([["Wallet Balance",inr(S.bal),"Available to play"],["Total Won",inr(S.txs.filter(x=>x.type==="win").reduce((a,b)=>a+b.amount,0)),"Lifetime earnings"],["Total Predictions",t.n,t.d+" settled"],["Win Rate",t.p+"%",t.w+" correct"]])}
 
 ${activeMatches.length ? `<div class="card" style="padding:12px 14px 2px"><div class="bt" style="margin-bottom:2px"><h3>Featured Markets</h3></div>${activeMatches.map(m => row(m)).join("")}</div>` : ''}
 
-${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in ${cdt(m)}</div></div>${ic("chevR",16)}</button>`).join("")}</div>` : ''}
+${closingSoon.length ? `<div class="card" style="padding:12px 14px 2px"><h3>Closing soon</h3>${closingSoon.map(m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="mut s12">${cl(m.c)}, closes in <span data-cd="${m.id}">${cdt(m)}</span></div></div>${ic("chevR",16)}</button>`).join("")}</div>` : ''}
 
 <div class="card" style="padding:12px 14px 2px"><h3>Recent picks</h3>${S.preds.length ? S.preds.slice(-3).reverse().map(p => { 
   const m = mkt(p.m); 
@@ -885,13 +892,14 @@ function shell() {
   const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>`;
 
   // Check for unread support messages
-  const unreadSupport = S.tickets.some(t => t.unread > 0 && t.status !== 'closed');
+  const unreadCount = S.tickets.filter(t => t.unread > 0 && t.status !== 'closed').reduce((sum, t) => sum + t.unread, 0);
+  const unreadSupport = unreadCount > 0;
 
   return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
 <div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
 <main class="pg">${VIEWS[R]()}</main></div></div>
-<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}${i[0]=="more" && unreadSupport ? `<span class="dot" style="top:4px;right:calc(50% - 14px);"></span>` : ''}</button>`; }).join("")}</nav>`;
+<nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}${i[0]=="more" && unreadSupport ? `<span style="position:absolute;top:2px;right:calc(50% - 18px);background:var(--pr);color:#fff;font-size:9px;font-weight:bold;padding:1px 4px;border-radius:10px;border:2px solid var(--sf);min-width:14px;text-align:center;">${unreadCount}</span>` : ''}</button>`; }).join("")}</nav>`;
 }
 
 function render() {
@@ -1068,6 +1076,8 @@ window.selectSide = function(id, side) {
 
 window.rateTicket = async function(id, rating) {
   if (!S.user) return;
+  const existing = S.tickets.find(x => x.id == id);
+  if (existing && existing.rating > 0) return toast('You have already rated this ticket.', 'star');
   const { error } = await supabase.from('support_tickets').update({ rating: rating }).eq('id', id);
   if (error) return toast('Error submitting rating', 'x');
   toast('Thanks for your feedback!', 'star');
@@ -1192,16 +1202,12 @@ document.addEventListener("click", e => {
   if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
 
   switch(a) {
-    case "nav": S.route = v; S.pop = 0; closeSheet(); render(); scrollTo(0,0); break;
-    case "sgo": closeSheet(); S.route = v; render(); scrollTo(0,0); break;
+    case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); render(); scrollTo(0,0); break;
+    case "sgo": closeSheet(); S.route = v; history.pushState({route: v}, "", ""); render(); scrollTo(0,0); break;
     case "back": 
       S.pop = 0; closeSheet(); 
-      if (S.route === "ticket") {
-        S.route = "support";
-      } else {
-        S.route = S.user ? "home" : "land";
-      }
-      render(); scrollTo(0,0); break;
+      history.back(); 
+      break;
     case "page": S.pub = v; if (S.user) S.route = v; closeSheet(); render(); scrollTo(0,0); break;
     case "home0": S.pub = "land"; render(); scrollTo(0,0); break;
     case "auth": S.pub = "auth"; S.au = v; render(); break;
@@ -1246,7 +1252,7 @@ document.addEventListener("click", e => {
     case "slipsheet": slipSheet(); break;
     case "lockslip": lockPicks(Object.keys(S.slip)); break;
     case "lockm": lockPicks([v]); break;
-    case "open": S.route = "match"; S.mid = v; S.pop = 0; render(); scrollTo(0,0); break;
+    case "open": S.route = "match"; S.mid = v; S.pop = 0; history.pushState({route: "match", mid: v}, "", ""); render(); scrollTo(0,0); break;
     case "pff": S.pff = v; render(); break;
     case "nf": S.nf = v; render(); break;
     case "rk": S.rk = v; render(); break;
@@ -1262,7 +1268,7 @@ document.addEventListener("click", e => {
     case "newticket": createTicket(); break;
     case "openticket": 
       closeSheet();
-      S.ticketOpen = v; S.route = "ticket"; render(); 
+      S.ticketOpen = v; S.route = "ticket"; history.pushState({route: "ticket", ticketOpen: v}, "", ""); render(); 
       loadTickets().then(() => { render(); supabase.from('ticket_messages').update({ is_read: true }).eq('ticket_id', v).eq('sender', 'admin').then(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 150); }); 
       break;
     case "instagram": const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official"; window.open("https://instagram.com/" + ig, "_blank", "noopener"); break;
@@ -1325,6 +1331,21 @@ document.addEventListener("click", e => {
       const x = S.txs[Number(v)]; if (!x || x.status != "pending") return;
       x.status = "cancelled"; S.bal += x.amount; note("Withdrawal cancelled",inr2(x.amount)+" returned to your wallet.","x"); save(); toast("Withdrawal cancelled.","x"); render(); break;
     }
+  }
+});
+
+// Handle Phone Back Button / Swipe
+window.addEventListener('popstate', (e) => {
+  if (e.state) {
+    S.route = e.state.route || "home";
+    if (e.state.mid) S.mid = e.state.mid;
+    if (e.state.ticketOpen) S.ticketOpen = e.state.ticketOpen;
+    if (e.state.pub) S.pub = e.state.pub;
+    render();
+  } else {
+    S.route = "home";
+    S.pub = "land";
+    render();
   }
 });
 
@@ -1405,7 +1426,10 @@ setInterval(async () => {
        let changed = false;
        liveMatches.forEach(m => { if (!MK.find(x => x.id === m.id)) changed = true; });
        if (changed) {
-         MK = liveMatches.map(m => ({
+         MK = liveMatches.filter(m => {
+            if (!m.closes_at) return true;
+            return (new Date(m.closes_at).getTime() + (30 * 60 * 60 * 1000)) > Date.now();
+         }).map(m => ({
           id: m.id, c: m.category, lg: m.league,
           A: [String(m.team_a || 'Option A').split(' ')[0], m.team_a || 'Option A'], 
           B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
@@ -1546,7 +1570,10 @@ window.addEventListener("load", async () => {
     try {
       const liveMatches = await CP_DB.getMatches();
       if (liveMatches && liveMatches.length > 0) {
-        MK = liveMatches.map(m => ({
+        MK = liveMatches.filter(m => {
+            if (!m.closes_at) return true;
+            return (new Date(m.closes_at).getTime() + (30 * 60 * 60 * 1000)) > Date.now();
+        }).map(m => ({
           id: m.id, c: m.category, lg: m.league,
           A: [String(m.team_a || 'Option A').split(' ')[0], m.team_a || 'Option A'], 
           B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
