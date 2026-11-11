@@ -1185,18 +1185,51 @@ async function loadTickets() {
   if (!S.user || !window.CP_DB) return;
   try {
     const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
-    S.tickets = (data || []).map(t => {
+    
+    // Calculate the time 48 hours ago
+    const fortyEightHoursAgo = Date.now() - (48 * 60 * 60 * 1000);
+
+    S.tickets = (data || []).filter(t => {
+      // If ticket is closed, check if it's older than 48 hours
+      if (t.status === 'closed') {
+        // Find the last message time, or use created_at if no messages
+        const lastMsg = t.ticket_messages && t.ticket_messages.length > 0 
+          ? t.ticket_messages[t.ticket_messages.length - 1].created_at 
+          : t.created_at;
+        
+        const closeTime = new Date(lastMsg).getTime();
+        
+        // Only keep the ticket if it was closed less than 48 hours ago
+        return closeTime > fortyEightHoursAgo;
+      }
+      // Always keep open tickets
+      return true;
+    }).map(t => {
       const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
+      
+      // Find the most recent date to display (last message or created_at)
+      const lastMsgDate = t.ticket_messages && t.ticket_messages.length > 0 
+          ? new Date(t.ticket_messages[t.ticket_messages.length - 1].created_at) 
+          : new Date(t.created_at);
+
       return {
-        id: t.id, subject: t.subject, status: t.status, updated: new Date(t.created_at).toLocaleDateString(), unread: unread,
-        rating: t.rating || 0, close_note: t.close_note || '',
-        msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({ me: m.sender === 'user', text: m.message, at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }))
+        id: t.id, 
+        subject: t.subject, 
+        status: t.status, 
+        updated: lastMsgDate.toLocaleDateString(), // Shows the actual last update date
+        unread: unread,
+        rating: t.rating || 0, 
+        close_note: t.close_note || '',
+        msgs: (t.ticket_messages || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at)).map(m => ({ 
+            me: m.sender === 'user', 
+            text: m.message, 
+            at: new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
+        }))
       };
     });
     save();
   } catch(e) { console.error("Tickets load failed", e); }
 }
-
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
   
