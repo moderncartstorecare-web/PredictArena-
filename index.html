@@ -1292,19 +1292,42 @@ document.addEventListener("click", e => {
       if (!x || x < 1) { $("er").textContent = "Minimum deposit is ₹1."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
+      
       const selectedApp = $("dm").value; 
       const orderId = 'ORD' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6).toUpperCase();
       const currentUrl = window.location.origin + window.location.pathname;
-      t.disabled = true; t.textContent = 'Creating payment...';
+      
+      t.disabled = true; t.textContent = 'Connecting to bank...';
+      $("er").textContent = "";
+
+      // 1. Create the order in the database FIRST and WAIT for it
       if (window.CP_DB && CP_DB.ready && S.user && S.user.id) {
-        supabase.from('payment_requests').insert({ user_id: S.user.id, txn_id: orderId, amount_inr: x, tokens_to_credit: x, status: 'pending' }).then(r => { if (r.error) console.error('Payment request insert failed', r.error); });
+        const { error } = await supabase.from('payment_requests').insert({
+            user_id: S.user.id, 
+            txn_id: orderId, 
+            amount_inr: x, 
+            tokens_to_credit: x, 
+            status: 'pending' 
+        });
+
+        // If the database fails to save, STOP and show the error. Do not open ZapUPI.
+        if (error) {
+            console.error("Insert failed:", error);
+            $("er").textContent = "Database error: " + error.message;
+            t.disabled = false; 
+            t.textContent = 'Continue to pay';
+            return; 
+        }
       }
+
+      t.textContent = 'Redirecting to payment...';
+
+      // 2. NOW open the payment gateway
       ZapUPI.createOrder({
         zap_key: 'zapce570e671e2f07f3bc9837566a44ec4c', order_id: orderId, amount: x.toString(),
         preferred_app: selectedApp === 'upi' ? null : selectedApp, 
         success_url: currentUrl + '?status=success&order_id=' + orderId, failed_url: currentUrl + '?status=failed&order_id=' + orderId, timeout_url: currentUrl + '?status=timeout&order_id=' + orderId,
       }, {
-        // THIS IS THE FIX: Changed from window.open to window.location.href
         onResponse: function(paymentUrl) { if (paymentUrl) window.location.href = paymentUrl; t.disabled = false; t.textContent = 'Continue to pay'; },
         onError: function(err) { $("er").textContent = err || "Payment failed to initialize."; t.disabled = false; t.textContent = 'Continue to pay'; }
       });
