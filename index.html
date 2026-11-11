@@ -1102,7 +1102,7 @@ const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
   <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
-  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="1" placeholder="Enter amount (Min ₹1)"></div>
+  <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount (Min ₹50)"></div>
   
   <div class="fld">
     <label>Payment method</label>
@@ -1301,7 +1301,7 @@ document.addEventListener("click", async e => {
     case "damt": $("da").value = v; break;
     case "depok": {
       const x = Number($("da").value);
-      if (!x || x < 1) { $("er").textContent = "Minimum deposit is ₹1."; return; }
+      if (!x || x < 50) { $("er").textContent = "Minimum deposit is ₹50."; return; }
       if (x > 100000) { $("er").textContent = "Maximum deposit is ₹1,00,000."; return; }
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
