@@ -251,7 +251,7 @@ async function loadAll(quiet){
     S.txReal=r[8].error?null:D(8).map(x=>{const ty=String(x.type||"").toLowerCase(),a=Number(x.amount||0);return{uid:String(x.user_id||""),ty,amt:NEG.includes(ty)?-Math.abs(a):Math.abs(a),n:x.description||x.note||"",d:fdt(x.created_at),ts:Date.parse(x.created_at)||0,st:x.status||""}});
     if(!r[3].error){const g={};D(3).forEach(x=>{const k=(x.created_at||"")+"|"+x.title;(g[k]=g[k]||{t:x.title,m:x.body,ts:Date.parse(x.created_at),n:0,uid:x.user_id}).n++});S.sent=Object.values(g).sort((a,b)=>b.ts-a.ts).slice(0,40).map(x=>({t:x.t,m:x.m,time:fdt(x.ts),aud:x.uid?(x.n===1?userName(x.uid):x.n+" users"):"All users",r:x.uid?x.n:TU()}))}
     if(!r[4].error){const old={};S.tickets.forEach(t=>old[t.id]=t);S.tickets=D(4).map(mapTk);S.tickets.forEach(t=>{if(old[t.id]&&old[t.id].msgs)t.msgs=old[t.id].msgs})}
-    if(!r[5].error)S.matches=D(5).map(x=>{const cl=x.closes_at?new Date(x.closes_at):null,settled=x.status==="settled"||!!x.winner,mp=S.preds.filter(p=>p.m===String(x.id)),A=mp.filter(p=>p.c==="A").length,B=mp.filter(p=>p.c==="B").length,tot=A+B;return{id:x.id,c:x.category,l:x.league,a:x.team_a,b:x.team_b,closes_at:x.closes_at,when:cl?fdt(x.closes_at):"",st:settled?"settled":(cl&&cl<new Date())?"closed":"upcoming",win:x.winner?String(x.winner).toLowerCase():null,pa:tot?Math.round(A/tot*100):(x.crowd_a||50),n:tot,api_id:x.cricket_match_id||"",oa:x.odds_a||1.85,ob:x.odds_b||2.1}});
+    if(!r[5].error)S.matches=D(5).map(x=>{const cl=x.closes_at?new Date(x.closes_at):null,settled=x.status==="settled"||!!x.winner,mp=S.preds.filter(p=>p.m===String(x.id)),A=mp.filter(p=>p.c==="A").length,B=mp.filter(p=>p.c==="B").length,tot=A+B;return{id:x.id,c:x.category,l:x.league,a:x.team_a,b:x.team_b,q:x.question||"",closes_at:x.closes_at,when:cl?fdt(x.closes_at):"",st:settled?"settled":(cl&&cl<new Date())?"closed":"upcoming",win:x.winner?String(x.winner).toLowerCase():null,pa:tot?Math.round(A/tot*100):(x.crowd_a||50),n:tot,api_id:x.cricket_match_id||"",oa:x.odds_a||1.85,ob:x.odds_b||2.1}});
     if(!r[9].error){D(9).forEach(x=>{if(x.key in ST_DEF)ST[x.key]=x.value});try{localStorage.setItem("cp_settings",JSON.stringify(ST))}catch(e){}}
   }catch(e){console.error(e);if(!quiet)toast("Network error while loading data","circle-alert")}
   MC={};rebuildTx();render();
@@ -360,7 +360,7 @@ const stChip=s=>`<span class="chip ${{open:"wa",pending:"",closed:"ok"}[s]}">${s
 function tkTabs(){const c=f=>f==="all"?S.tickets.length:S.tickets.filter(t=>t.st===f).length;return `<div class="tabs">${["open","pending","closed","all"].map(f=>`<button class="${TKF===f?"on":""}" data-act="kf" data-v="${f}">${f[0].toUpperCase()+f.slice(1)} ${c(f)}</button>`).join("")}</div>`}
 function tkList(){
   const q=TQ.toLowerCase(),l=S.tickets.filter(t=>(TKF==="all"||t.st===TKF)&&(!q||(tkUser(t)+t.sub+t.id).toLowerCase().includes(q))).sort((a,b)=>b.lastTs-a.lastTs);
-  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b><em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em></span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc((t.lastMsgText||t.sub).substring(0,30))}${(t.lastMsgText||t.sub).length>30?'...':''}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
+  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b>${t.st==="closed" ? `<em>${rel(t.lastTs)}</em>` : `<em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em>`}</span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc((t.lastMsgText||t.sub).substring(0,30))}${(t.lastMsgText||t.sub).length>30?'...':''}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
 }
 function chatMsgs(t){
   if(!t.msgs)return '<div class="emp">Loading conversation...</div>';
@@ -476,6 +476,7 @@ function matchModal(m){
   modal(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;border-bottom:1px solid var(--bd);padding-bottom:14px"><div class="ico" style="width:42px;height:42px">${ic(e?"pencil":"plus")}</div><div><h3 style="margin:0">${e?"Edit match":"Create new match"}</h3><small>Fill in the details to publish</small></div></div>
   <form id="mf"><div class="fg"><label class="f">Category<select class="in" id="mc" data-leagues>${[["cricket","Cricket"],["football","Football"],["kabaddi","Kabaddi"],["esports","Esports"],["indian","Indian events"]].map(o=>`<option value="${o[0]}"${cat===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select></label>
     <label class="f">League / event<input class="in" id="ml" list="lgl" value="${e?esc(m.l):""}" placeholder="e.g. IPL 2026" required><datalist id="lgl">${(LEAGUES[cat]||[]).map(l=>`<option value="${l}">`).join("")}</datalist></label></div>
+  <label class="f">Match Title / Question (Optional)<input class="in" id="mq" value="${e?esc(m.q||""):""}" placeholder="e.g. Who will win in this UP election?" style="margin-bottom:10px;"></label>
   <div class="fg">${fld("Team A / option A","ma",e?m.a:"")}${fld("Team B / option B","mb",e?m.b:"")}</div>
   <div class="fg">${fld("Odds A","moa",e?m.oa:1.85,"number")}${fld("Odds B","mob",e?m.ob:2.1,"number")}</div>
   <label class="f">Predictions close at<input class="in" type="datetime-local" id="mtime" value="${dt}" required></label>
@@ -596,7 +597,7 @@ document.addEventListener("submit",async e=>{
   if(id==="lf"){doLogin();return}
   if(id==="mf"){
     const dbId=$("mid_db").value,tv=$("mtime").value;
-    const d={category:$("mc").value,league:$("ml").value.trim(),team_a:$("ma").value.trim(),team_b:$("mb").value.trim(),closes_at:tv?new Date(tv).toISOString():new Date(Date.now()+864e5).toISOString(),odds_a:+$("moa").value||1.85,odds_b:+$("mob").value||2.1};
+    const d={category:$("mc").value,league:$("ml").value.trim(),team_a:$("ma").value.trim(),team_b:$("mb").value.trim(),question:$("mq").value.trim(),closes_at:tv?new Date(tv).toISOString():new Date(Date.now()+864e5).toISOString(),odds_a:+$("moa").value||1.85,odds_b:+$("mob").value||2.1};
     if(!dbId)d.crowd_a=50;
     const r=dbId?await db.from("matches").update(d).eq("id",dbId):await db.from("matches").insert(d);
     if(r.error)return toast("Error saving match: "+r.error.message,"circle-alert");
