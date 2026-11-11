@@ -1294,7 +1294,7 @@ document.addEventListener("click", async e => {
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
       const selectedApp = $("dm").value; 
-const orderId = 'CP-' + Math.floor(100000 + Math.random() * 900000);
+const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
     const currentUrl = window.location.origin + window.location.pathname;
       
       t.disabled = true; t.textContent = 'Connecting to bank...';
