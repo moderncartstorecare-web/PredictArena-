@@ -256,7 +256,83 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .stars .star { transition: color 0.2s; }
 .stars .star.active { color: #facc15; }
 
-/* CLAUDE CONTEST CSS */
+/* EXACT CLAUDE CSS */
+:root{
+  --bg:#f5f7fc;--sf:#fff;--s2:#eef2fa;--ink:#0d1526;--i2:#475069;--i3:#7b8499;--ln:#e4e8f1;--ln2:#d3d9e6;
+  --ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
+  --grad:linear-gradient(135deg,#2563f5 0%,#1e4fd8 45%,#1c2a55 100%);
+  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
+  --sh:0 1px 2px rgba(13,21,38,.04),0 8px 24px rgba(13,21,38,.05)
+}
+.app-c{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.ib-c{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
+.ib-c:hover{background:var(--s2);color:var(--ink)}.ib-c:active{transform:scale(.96)}
+.ttl-c{flex:1;min-width:0}.ttl-c h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.ttl-c p{font-size:12px;color:var(--i3);font-weight:500}
+.wal-c{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;flex:none}
+.wal-c svg{color:var(--ac)}
+.main-c{flex:1;padding:16px 16px calc(112px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.card-c{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px;box-shadow:var(--sh)}
+.row-c{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tag-c{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.timer-c{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;transition:background .3s,color .3s}
+.timer-c.urgent{background:var(--nos);color:var(--no)}.timer-c.closed{background:var(--s2);color:var(--i3)}
+.ev-c{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
+.vs-c{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
+.tm-c{display:flex;align-items:center;gap:10px;min-width:0}.tm-c.b{flex-direction:row-reverse;text-align:right}
+.av-c{width:46px;height:46px;border-radius:13px;background:var(--grad);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;letter-spacing:.02em;flex:none;box-shadow:0 6px 14px -4px rgba(30,91,240,.45)}
+.av-c.alt{background:linear-gradient(135deg,#7aa2ff,#2f55c9)}
+.tm-c b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.15}.tm-c small{display:block;font-size:12px;color:var(--i3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsp-c{font-size:11px;font-weight:800;color:var(--i3);background:var(--sf);border:1px solid var(--ln);padding:3px 9px;border-radius:99px;letter-spacing:.06em}
+.lab-c{display:flex;justify-content:space-between;margin:20px 0 9px;font-size:12px;font-weight:600;color:var(--i2)}.lab-c span:last-child{color:var(--ac)}
+.picks-c{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pk-c{position:relative}.pk-c input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0}.pk-c input:disabled{cursor:not-allowed}
+.pb-c{border:2px solid var(--ln2);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--sf);transition:border-color .15s,background .15s,transform .1s}
+.pk-c input:not(:disabled):hover+.pb-c{border-color:var(--ac)}.pk-c input:active+.pb-c{transform:scale(.985)}
+.pk-c input:checked+.pb-c{border-color:var(--ac);background:var(--acs)}.pk-c input:disabled:not(:checked)+.pb-c{opacity:.5}
+.pb-c strong{font-size:14px;font-weight:700}.pk-c input:checked+.pb-c strong{color:var(--ac2)}
+.rc-c{width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;transition:all .15s;color:#fff;flex:none}
+.rc-c svg{opacity:0;transform:scale(.6);transition:all .15s}
+.pk-c input:checked+.pb-c .rc-c{background:var(--ac);border-color:var(--ac)}.pk-c input:checked+.pb-c .rc-c svg{opacity:1;transform:scale(1)}
+.entry-c{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--oks);color:var(--ok);font-weight:600;font-size:13px;align-items:center;gap:10px}
+.entry-c.on{display:flex}.entry-c small{display:block;font-weight:500;opacity:.85}
+.pool-c{background:var(--grad);color:#fff;border:0;position:relative;overflow:hidden;padding:22px 20px;box-shadow:0 14px 30px -10px rgba(30,79,216,.5)}
+.pool-c:before{content:"";position:absolute;top:-60px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}
+.pool-c>*{position:relative}
+.pl-c{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+.fee-c{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700}
+.amt-c{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:6px 0 2px}.gtd-c{font-size:12px;opacity:.85;font-weight:500}
+.pgr-c{margin-top:18px}.pgi-c{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:7px}
+.bar-c{height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}.bar-c i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.55);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.mini-c{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px;border-top:1px solid rgba(255,255,255,.2);padding-top:14px}
+.mini-c div+div{border-left:1px solid rgba(255,255,255,.2);padding-left:14px}.mini-c small{display:block;font-size:11px;opacity:.8;font-weight:500}.mini-c b{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.seg-c{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
+.seg-c button{flex:1;text-align:center;height:36px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
+.seg-c button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
+.panel-c[hidden]{display:none}
+.table-c{width:100%;border-collapse:collapse}
+.table-c th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px 8px;border-bottom:1px solid var(--ln);text-align:left}
+.table-c th:last-child,.table-c td:last-child{text-align:right}
+.table-c td{padding:12px 8px;border-bottom:1px solid var(--ln);font-size:13.5px}.table-c tr:last-child td{border:0}
+.rk-c{display:flex;align-items:center;gap:10px;font-weight:700}
+.rb-c{min-width:30px;height:26px;padding:0 7px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800}
+.table-c tr:first-child .rb-c{background:var(--grad);color:#fff}
+.pc-c{color:var(--i2);font-weight:600}.pr-c{font-weight:800;color:var(--ok)}
+.note-c{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}
+.ent-c{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}.ent-c:last-child{border:0}
+.ea-c{width:36px;height:36px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.ent-c.me .ea-c{background:var(--grad);color:#fff}.ent-c div:nth-child(2){flex:1;min-width:0}.ent-c b{display:block;font-size:13.5px}.ent-c small{color:var(--i3);font-size:12px}
+.pill-c{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--i2)}
+.ent-c.me .pill-c{background:var(--acs);color:var(--ac)}
+.rules-c{display:flex;flex-direction:column;gap:12px}.rl-c{display:flex;gap:12px;align-items:flex-start}
+.rn-c{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.rl-c b{display:block;font-size:13.5px}.rl-c small{color:var(--i3);font-size:12.5px;line-height:1.4}
+.cta-c{position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+.cin-c{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.cs-c{min-width:0}.cs-c small{display:block;font-size:11px;color:var(--i3);font-weight:500}.cs-c b{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.go-c{flex:1;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s,box-shadow .15s;text-align:center}
+.go-c:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px)}.go-c:active:not(:disabled){transform:scale(.985)}
+.go-c:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.go-c.done{background:var(--oks);color:var(--ok);box-shadow:none}
 .tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
 .tie-input:focus{border-color:var(--ac);background:var(--sf)}
 .tabs{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
@@ -822,110 +898,108 @@ function matchV() {
   
   const lk = S.preds.find(p => p.m == m.id);
   const cls = !left(m) || m.isFinished;
-  
+  const sel = S.slip[m.id] || 'A';
+
   const totalSpots = 200;
   const poolAmt = totalSpots * 50;
+  const currentFilled = lk ? 151 : 150;
+  const pct = Math.round(currentFilled / totalSpots * 100);
 
-  return `<div style="padding-bottom: 80px;">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-      <button class="ib" data-a="back">${ic("back",20)}</button>
-      <div><h1 style="font-size:18px;margin:0;">Contest Details</h1><small class="mut">Fixed entry, guaranteed prizes</small></div>
-    </div>
+  return `
+  <div class="app-c">
+    <header class="top-c">
+      <button class="ib-c" data-a="back" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <div class="ttl-c"><h1>Contest Details</h1><p>Fixed entry, guaranteed prizes</p></div>
+      <button class="wal-c" data-a="nav" data-v="wallet" aria-label="Wallet balance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span>${inr(S.bal)}</span></button>
+    </header>
 
-    <!-- Match Card -->
-    <div class="card" style="padding:18px;margin-bottom:14px;">
-      <div class="bt" style="margin-bottom:14px;">
-        <span class="tag">${cl(m.c)}</span>
-        <span class="pill am">${cdt(m)}</span>
-      </div>
-      <h2 style="font-size:20px;font-weight:800;margin-bottom:16px;">${esc(ttl(m))}</h2>
-      
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <label class="pk" style="position:relative">
-          <input type="radio" name="w" value="A" ${lk && lk.p === 'A' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} style="position:absolute;inset:0;opacity:0;z-index:2;cursor:pointer;">
-          <div class="pb" style="border:2px solid ${lk && lk.p === 'A' ? 'var(--ac)' : 'var(--ln2)'}; background:${lk && lk.p === 'A' ? 'var(--acs)' : 'var(--sf)'}; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between;">
-            <strong>${esc(m.A[1])}</strong>
-            <span class="rc" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;${lk && lk.p === 'A' ? 'background:var(--ac);border-color:var(--ac);color:#fff;' : ''}">${lk && lk.p === 'A' ? ic("check",12) : ''}</span>
+    <main class="main-c">
+      <section class="card-c">
+        <div class="row-c"><span class="tag-c">${cl(m.c)}</span>
+          <span class="timer-c" role="timer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-cd="${m.id}">${cdt(m)}</span></span></div>
+        <h2 class="ev-c">${esc(ttl(m))}</h2>
+        <div class="vs-c">
+          <div class="tm-c">
+            <div class="av-c">${m.A[0].slice(0,2).toUpperCase()}</div>
+            <div><b>${esc(m.A[1])}</b><small>${esc(m.lg)}</small></div>
           </div>
-        </label>
-        <label class="pk" style="position:relative">
-          <input type="radio" name="w" value="B" ${lk && lk.p === 'B' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} style="position:absolute;inset:0;opacity:0;z-index:2;cursor:pointer;">
-          <div class="pb" style="border:2px solid ${lk && lk.p === 'B' ? 'var(--ac)' : 'var(--ln2)'}; background:${lk && lk.p === 'B' ? 'var(--acs)' : 'var(--sf)'}; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between;">
-            <strong>${esc(m.B[1])}</strong>
-            <span class="rc" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;${lk && lk.p === 'B' ? 'background:var(--ac);border-color:var(--ac);color:#fff;' : ''}">${lk && lk.p === 'B' ? ic("check",12) : ''}</span>
+          <span class="vsp-c">VS</span>
+          <div class="tm-c b">
+            <div class="av-c alt">${m.B[0].slice(0,2).toUpperCase()}</div>
+            <div><b>${esc(m.B[1])}</b><small>${esc(m.lg)}</small></div>
           </div>
-        </label>
-      </div>
-
-      <div style="margin-top:16px;">
-        <label class="s12" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
-        <input type="number" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
-        <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
-      </div>
-    </div>
-
-    <!-- Prize Pool -->
-    <div class="card" style="background:var(--grad);color:#fff;border:0;padding:22px 20px;margin-bottom:14px;">
-      <div class="bt">
-        <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85;">Guaranteed Prize Pool</span>
-        <span style="background:rgba(255,255,255,.16);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700;">Entry: ₹50</span>
-      </div>
-      <div style="font-size:38px;font-weight:800;letter-spacing:-.04em;margin:6px 0 2px;">₹${poolAmt.toLocaleString('en-IN')}</div>
-      <div style="font-size:12px;opacity:.85;font-weight:500;">Paid out whether or not all spots fill</div>
-      <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:18px;">
-        <div style="height:100%;width:75%;background:#fff;"></div>
-      </div>
-      <div class="bt" style="margin-top:7px;font-size:12px;font-weight:600;">
-        <span>Spots filled</span><span>150 / ${totalSpots}</span>
-      </div>
-    </div>
-
-    <!-- Tabs & Table -->
-    <div class="card" style="padding:18px;margin-bottom:14px;">
-      <div class="tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-tab="prizes">Prizes</button>
-        <button role="tab" aria-selected="false" data-tab="entries">Entries</button>
-        <button role="tab" aria-selected="false" data-tab="rules">Rules</button>
-      </div>
-      
-      <div class="panel" id="p-prizes">
-        <table class="table">
-          <thead><tr><th>Rank</th><th>Share</th><th>Prize</th></tr></thead>
-          <tbody>
-            <tr><td><div class="rk"><span class="rb">1</span>Rank 1</div></td><td class="pc">30%</td><td class="pr">₹3,000</td></tr>
-            <tr><td><div class="rk"><span class="rb">2</span>Rank 2</div></td><td class="pc">15%</td><td class="pr">₹1,500</td></tr>
-            <tr><td><div class="rk"><span class="rb">3-5</span>Rank 3 - 5</div></td><td class="pc">10% each</td><td class="pr">₹1,000</td></tr>
-            <tr><td><div class="rk"><span class="rb">6-10</span>Rank 6 - 10</div></td><td class="pc">5% each</td><td class="pr">₹500</td></tr>
-          </tbody>
-        </table>
-        <div class="note">${ic("info",14)}<span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
-      </div>
-      <div class="panel" id="p-entries" hidden>
-        <div class="ent me"><div class="ea">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill">${lk ? lk.p : 'A'}</span></div>
-        <div class="ent"><div class="ea">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill">A</span></div>
-        <div class="ent"><div class="ea">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill">B</span></div>
-      </div>
-      <div class="panel" id="p-rules" hidden>
-        <div class="rules">
-          <div class="rl"><span class="rn">1</span><div><b>Pick the match winner</b><small>Choose one team before the contest closes. One entry per player and it cannot be changed after joining.</small></div></div>
-          <div class="rl"><span class="rn">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning team is ranked above all other entries.</small></div></div>
-          <div class="rl"><span class="rn">3</span><div><b>Earliest entry wins ties</b><small>Among correct picks, the player who joined earlier gets the higher rank.</small></div></div>
-          <div class="rl"><span class="rn">4</span><div><b>Abandoned or tied match</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
         </div>
-      </div>
-    </div>
+        <div class="lab-c"><span>Pick the winner</span><span>${lk ? 'Locked' : 'Required'}</span></div>
+        <div class="picks-c">
+          <label class="pk-c">
+            <input type="radio" name="w" value="A" ${sel === 'A' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} onchange="window.selectSide('${m.id}', 'A')">
+            <div class="pb-c"><strong>${esc(m.A[1])}</strong><span class="rc-c"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+          </label>
+          <label class="pk-c">
+            <input type="radio" name="w" value="B" ${sel === 'B' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} onchange="window.selectSide('${m.id}', 'B')">
+            <div class="pb-c"><strong>${esc(m.B[1])}</strong><span class="rc-c"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+          </label>
+        </div>
+        <div style="margin-top:16px;">
+          <label class="s12" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
+          <input type="number" id="tie-input-${m.id}" class="inp" style="margin-top:8px; font-weight:700;" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
+          <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
+        </div>
+        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(full(m,lk.p))}</span><small>Entry confirmed</small></div></div>` : ''}
+      </section>
 
-    <!-- Fixed Bottom CTA -->
-    <div style="position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px;background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln);">
-      <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px;">
-        <div><small style="display:block;font-size:11px;color:var(--i3);">Entry fee</small><b style="font-size:15px;font-weight:800;">₹50</b></div>
-        <button style="flex:1;height:52px;border-radius:15px;background:${lk ? 'var(--oks)' : 'var(--grad)'};color:${lk ? 'var(--ok)' : '#fff'};font-weight:800;font-size:15.5px;box-shadow:${lk ? 'none' : '0 10px 22px -6px rgba(30,79,216,.5)'};" 
-          onclick="window.joinContest('${m.id}')" ${lk || cls ? 'disabled' : ''}>
-          ${lk ? 'You are in' : cls ? 'Contest closed' : 'Join Contest for ₹50'}
+      <section class="card-c pool-c">
+        <div class="row-c"><span class="pl-c">Guaranteed prize pool</span><span class="fee-c">Entry ₹50</span></div>
+        <div class="amt-c">₹${poolAmt.toLocaleString('en-IN')}</div><div class="gtd-c">Paid out whether or not all spots fill</div>
+        <div class="pgr-c"><div class="pgi-c"><span>Spots filled</span><span>${currentFilled} / ${totalSpots} spots (${totalSpots - currentFilled} left)</span></div><div class="bar-c" role="progressbar"><i style="width:${pct}%"></i></div></div>
+        <div class="mini-c"><div><small>Winners</small><b>10</b></div><div><small>First prize</small><b>₹3,000</b></div><div><small>Entry</small><b>₹50</b></div></div>
+      </section>
+
+      <section class="card-c">
+        <div class="seg-c" role="tablist">
+          <button role="tab" aria-selected="true" data-tab="prizes">Prizes</button>
+          <button role="tab" aria-selected="false" data-tab="entries">Entries</button>
+          <button role="tab" aria-selected="false" data-tab="rules">Rules</button>
+        </div>
+        <div class="panel-c" id="p-prizes" role="tabpanel">
+          <table class="table-c">
+            <thead><tr><th>Rank</th><th>Share</th><th>Prize</th></tr></thead>
+            <tbody>
+              <tr><td><div class="rk-c"><span class="rb-c">1</span>Rank 1</div></td><td class="pc-c">30%</td><td class="pr-c">₹3,000</td></tr>
+              <tr><td><div class="rk-c"><span class="rb-c">2</span>Rank 2</div></td><td class="pc-c">15%</td><td class="pr-c">₹1,500</td></tr>
+              <tr><td><div class="rk-c"><span class="rb-c">3-5</span>Rank 3 - 5</div></td><td class="pc-c">10% each</td><td class="pr-c">₹1,000</td></tr>
+              <tr><td><div class="rk-c"><span class="rb-c">6-10</span>Rank 6 - 10</div></td><td class="pc-c">5% each</td><td class="pr-c">₹500</td></tr>
+            </tbody>
+          </table>
+          <div class="note-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
+        </div>
+        <div class="panel-c" id="p-entries" role="tabpanel" hidden>
+          ${lk ? `<div class="ent-c me"><div class="ea-c">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill-c">${lk.p}</span></div>` : ''}
+          <div class="ent-c"><div class="ea-c">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill-c">A</span></div>
+          <div class="ent-c"><div class="ea-c">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill-c">B</span></div>
+          <div class="ent-c"><div class="ea-c">R</div><div><b>Rohan K.</b><small>12 min ago</small></div><span class="pill-c">A</span></div>
+        </div>
+        <div class="panel-c" id="p-rules" role="tabpanel" hidden>
+          <div class="rules-c">
+            <div class="rl-c"><span class="rn-c">1</span><div><b>Pick the match winner</b><small>Choose one team before the contest closes. One entry per player and it cannot be changed after joining.</small></div></div>
+            <div class="rl-c"><span class="rn-c">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning team is ranked above all other entries.</small></div></div>
+            <div class="rl-c"><span class="rn-c">3</span><div><b>Earliest entry wins ties</b><small>Among correct picks, the player who joined earlier gets the higher rank.</small></div></div>
+            <div class="rl-c"><span class="rn-c">4</span><div><b>Abandoned or tied match</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="cta-c">
+      <div class="cin-c">
+        <div class="cs-c"><small>Entry fee</small><b>₹50</b></div>
+        <button class="go-c ${lk ? 'done' : ''}" onclick="window.joinContest('${m.id}')" ${lk || cls ? 'disabled' : ''}>
+          ${lk ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>You are in</span>' : cls ? 'Contest closed' : '<span>Join contest for ₹50</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'}
         </button>
       </div>
-    </div>
-  </div>`;
+    </footer>
+  </div>
+  `;
 }
 const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, support:supportV, ticket:ticketV, match:matchV};
 const MORE = ["rewards","ranks","alerts","profile","support","help"];
@@ -1162,11 +1236,11 @@ document.addEventListener("click", function(e) {
 // 2. Handle Join Contest
 
 window.joinContest = async function(matchId) {
+  const pick = S.slip[matchId] || 'A';
+  const tieInput = document.getElementById(`tie-input-${matchId}`);
+  const tieBreaker = tieInput ? tieInput.value : '';
   const m = mkt(matchId);
-  const pick = S.slip[matchId];
-  const tieBreaker = document.getElementById(`tie-input-${matchId}`).value;
-  
-  if (!pick) return toast("Please select a team first.", "alert");
+
   if (!tieBreaker) return toast("Please enter a tie-breaker answer.", "alert");
   if (S.bal < 50) return toast("Insufficient balance. You need ₹50.", "alert");
   if (!S.user || !S.user.id) return toast("Please log in to join.", "alert");
@@ -1175,7 +1249,6 @@ window.joinContest = async function(matchId) {
   if (btn) { btn.disabled = true; btn.textContent = "Joining..."; }
 
   try {
-    // 1. Insert into Supabase
     const { error } = await supabase.from('predictions').insert({
       user_id: S.user.id,
       match_id: matchId,
@@ -1186,15 +1259,12 @@ window.joinContest = async function(matchId) {
 
     if (error) throw error;
 
-    // 2. Deduct balance and save locally
     S.bal -= 50;
-    S.preds.push({ id: Date.now(), m: matchId, p: pick, stake: 50, odds: 1, res: null, pay: 0, tie_breaker: tieBreaker });
-    delete S.slip[matchId];
-    
-    // 3. Save & render
+    addTx("stake", 50, "Contest Entry: " + ttl(m), "completed");
+    S.preds.push({ id: Date.now(), m: matchId, p: pick, stake: 50, odds: 1, res: null, pay: 0, tie_breaker: tieBreaker, ts: Date.now() });
     save(); 
     toast("Contest joined successfully!", "check");
-    render();
+    render(); 
 
   } catch (e) {
     console.error(e);
@@ -1202,7 +1272,6 @@ window.joinContest = async function(matchId) {
     if (btn) { btn.disabled = false; btn.textContent = "Join Contest for ₹50"; }
   }
 };
-
 window.rateTicket = async function(id, rating) {
   if (!S.user) return;
   const existing = S.tickets.find(x => x.id == id);
