@@ -1627,24 +1627,27 @@ window.addEventListener("load", async () => {
         const orderId = params.get('order_id');
         if (!orderId) return;
         if (status === 'success' && S.user && S.user.id) {
-          const { error } = await supabase.from('payment_requests').update({ status: 'approved' }).eq('txn_id', orderId).eq('user_id', S.user.id);
-          if (!error) { 
-            toast('Payment successful. Wallet will update shortly...', 'check'); 
+          
+          // Call our new secure database function
+          const { data, error } = await supabase.rpc('verify_payment', { p_txn_id: orderId });
+          
+          if (!error && data && data.ok) { 
+            toast('Payment successful. Wallet updated!', 'check'); 
             
-            // Poll balance for 10 seconds in case webhook is slow
-            let attempts = 0;
-            const fetchBalance = setInterval(async () => {
-                const p = await CP_DB.getProfile(S.user.id); 
-                if (p && p.balance !== undefined && p.balance !== S.bal) {
-                    S.bal = p.balance; save(); render();
-                    clearInterval(fetchBalance);
-                }
-                attempts++;
-                if(attempts > 5) clearInterval(fetchBalance);
-            }, 2000);
+            // Immediately fetch the new balance from the database
+            const p = await CP_DB.getProfile(S.user.id); 
+            if (p && p.balance !== undefined) { 
+                S.bal = p.balance; 
+                save(); 
+                render(); 
+            }
 
+          } else {
+            toast('Payment verification failed. Please contact support.', 'alert');
+            console.error('Payment verification error:', error || data?.message);
           }
-        } else if (status === 'failed' || status === 'timeout') { 
+        }
+        else if (status === 'failed' || status === 'timeout') { 
           toast('Payment ' + status + '. Try again.', 'x'); 
         }
         history.replaceState({}, document.title, window.location.pathname);
