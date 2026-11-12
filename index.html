@@ -228,7 +228,12 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 @container (min-width:460px){.yc-head{padding:18px 20px 16px}.yc-form{padding:20px;gap:22px}.yc-card{padding:16px}.yc-odds b{font-size:32px}}
 @media (prefers-reduced-motion:reduce){.yc *,.yc *::before,.yc *::after{transition:none!important}}
 
-/* Contest Specific CSS */
+/* Rating Stars */
+.stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
+.stars .star { transition: color 0.2s; }
+.stars .star.active { color: #facc15; }
+
+/* ================= 1) CSS from Claude ================= */
 .fc-wrap { padding: 0 0 20px; }
 .fc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .fc-back { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--ln2); background: var(--sf); display: grid; place-items: center; color: var(--i2); }
@@ -251,21 +256,9 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .fc-table .amt-col { text-align: right; font-weight: 800; color: var(--ok); }
 .fc-input { width: 100%; border: 2px solid var(--ln2); border-radius: 12px; padding: 12px; background: var(--s2); font-size: 15px; font-weight: 700; outline: 0; margin-top: 8px; }
 .fc-input:focus { border-color: var(--ac); background: var(--sf); }
-/* Rating Stars */
-.stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
-.stars .star { transition: color 0.2s; }
-.stars .star.active { color: #facc15; }
-
 /* EXACT CLAUDE CSS */
-:root{
-  --bg:#f5f7fc;--sf:#fff;--s2:#eef2fa;--ink:#0d1526;--i2:#475069;--i3:#7b8499;--ln:#e4e8f1;--ln2:#d3d9e6;
-  --ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
-  --grad:linear-gradient(135deg,#2563f5 0%,#1e4fd8 45%,#1c2a55 100%);
-  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
-  --sh:0 1px 2px rgba(13,21,38,.04),0 8px 24px rgba(13,21,38,.05)
-}
 .app-c{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
 .ib-c{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
 .ib-c:hover{background:var(--s2);color:var(--ink)}.ib-c:active{transform:scale(.96)}
 .ttl-c{flex:1;min-width:0}.ttl-c h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.ttl-c p{font-size:12px;color:var(--i3);font-weight:500}
@@ -276,7 +269,6 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .row-c{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .tag-c{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .timer-c{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;transition:background .3s,color .3s}
-.timer-c.urgent{background:var(--nos);color:var(--no)}.timer-c.closed{background:var(--s2);color:var(--i3)}
 .ev-c{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
 .vs-c{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
 .tm-c{display:flex;align-items:center;gap:10px;min-width:0}.tm-c.b{flex-direction:row-reverse;text-align:right}
@@ -327,7 +319,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .rules-c{display:flex;flex-direction:column;gap:12px}.rl-c{display:flex;gap:12px;align-items:flex-start}
 .rn-c{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
 .rl-c b{display:block;font-size:13.5px}.rl-c small{color:var(--i3);font-size:12.5px;line-height:1.4}
-.cta-c{position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+.cta-c{position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
 .cin-c{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
 .cs-c{min-width:0}.cs-c small{display:block;font-size:11px;color:var(--i3);font-weight:500}.cs-c b{font-size:15px;font-weight:800;letter-spacing:-.02em}
 .go-c{flex:1;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s,box-shadow .15s;text-align:center}
@@ -335,27 +327,8 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .go-c:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.go-c.done{background:var(--oks);color:var(--ok);box-shadow:none}
 .tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
 .tie-input:focus{border-color:var(--ac);background:var(--sf)}
-.tabs{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
-.tabs button{flex:1;text-align:center;height:36px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
-.tabs button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
-.panel[hidden]{display:none}
-.table{width:100%;border-collapse:collapse}
-.table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px 8px;border-bottom:1px solid var(--ln);text-align:left}
-.table th:last-child,.table td:last-child{text-align:right}
-.table td{padding:12px 8px;border-bottom:1px solid var(--ln);font-size:13.5px}
-.table tr:last-child td{border:0}
-.rk{display:flex;align-items:center;gap:10px;font-weight:700}
-.rb{min-width:30px;height:26px;padding:0 7px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800}
-tr:first-child .rb{background:var(--grad);color:#fff}
-.pc{color:var(--i2);font-weight:600}.pr{font-weight:800;color:var(--ok)}
-.note{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}
-.ent{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}.ent:last-child{border:0}
-.ea{width:36px;height:36px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
-.ent.me .ea{background:var(--grad);color:#fff}.ent div:nth-child(2){flex:1;min-width:0}
-.ent b{display:block;font-size:13.5px}.ent small{color:var(--i3);font-size:12px}
-.rules{display:flex;flex-direction:column;gap:12px}.rl{display:flex;gap:12px;align-items:flex-start}
-.rn{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
-.rl b{display:block;font-size:13.5px}.rl small{color:var(--i3);font-size:12.5px;line-height:1.4}
+/* addition: on desktop there is no bottom nav, and the sidebar is 220px wide */
+@media(min-width:900px){.cta-c{left:220px;bottom:0}}
 </style>
 </head>
 <body>
@@ -414,8 +387,8 @@ const P = {
 const ic = (n,s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
 const $ = i => document.getElementById(i);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const inr = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
-const inr2 = n => "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+const inr = n => "🪙" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
+const inr2 = n => "🪙" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
 const ni = n => Math.round(n).toLocaleString("en-IN");
 
 const CATS = [
@@ -451,7 +424,7 @@ const DEMO_MK = [
 
 let MK = []; // Start empty to prevent demo glitch
 
-const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
+const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["🪙50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
 const FAQ = [
   ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
   ["How does the wallet work?","A correct pick credits your wallet. You can add funds and withdraw your winnings to your bank."],
@@ -598,7 +571,7 @@ function landing() {
       <h1>Call the match. <em>Win real money.</em></h1>
       <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
       <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get Started Free</button><button class="btn grow" data-a="auth" data-v="in">Login</button></div>
-      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
+      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>🪙0</b>Entry fee</div></div>
     </div>
     <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
   </section>
@@ -685,7 +658,7 @@ function legalPage(kind) {
         <p>All deposits made via UPI or other payment methods are final once credited to your wallet. We do not charge any processing fees on deposits. If a deposit fails but money is deducted, it will be automatically reconciled and credited within 3-5 business days as per your bank's policy.</p>
         
         <h2>3. Withdrawals</h2>
-        <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is ₹100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
+        <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is 🪙100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
         
         <h2>4. Disputes</h2>
         <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 30 minutes during business hours.</p>
@@ -726,12 +699,12 @@ const slipBody = () => {
     const potential = Math.round(stake * odds);
     totalPotential += potential;
     return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="50" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
-    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: 🪙</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: 🪙${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
-  html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
-  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">₹${totalPotential}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Stake</span><b>🪙${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">🪙${totalPotential}</b></div>`;
   html += `<button class="btn p w" style="margin-top:8px" data-a="lockslip">${ic("lock",14)} Lock Picks</button>`;
   return html;
 };
@@ -788,7 +761,7 @@ function walletV() {
 
   ${L.length > 5 ? `<button class="btn g w" style="margin-top:10px; margin-bottom:6px;" data-a="toggletx">${S.showAllTx ? 'Show Less' : 'Show More Transactions'}</button>` : ''}
 </div>
-<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
+<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>🪙100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>🪙0</b></div></div></details></div>`;
 }
 function rewardsV() {
   const un = S.cps.filter(c => !c.cl).length;
@@ -895,95 +868,88 @@ function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); 
 function matchV() {
   const m = mkt(S.mid);
   if (!m) return '<div class="card empty">Market not found or has ended.</div>';
-  
+
   const lk = S.preds.find(p => p.m == m.id);
   const cls = !left(m) || m.isFinished;
-  const sel = S.slip[m.id] || 'A';
+  const sel = lk ? lk.p : (S.slip[m.id] || 'A');
+  const dis = lk || cls ? 'disabled' : '';
+  const cn = n => '🪙' + Math.round(n).toLocaleString('en-IN');
 
-  const totalSpots = 200;
-  const poolAmt = totalSpots * 50;
+  const totalSpots = 200, fee = 50, poolAmt = totalSpots * fee;
   const currentFilled = lk ? 151 : 150;
   const pct = Math.round(currentFilled / totalSpots * 100);
+  const tiers = [['1', 'Rank 1', 30, ''], ['2', 'Rank 2', 15, ''], ['3-5', 'Rank 3 - 5', 10, ' each'], ['6-10', 'Rank 6 - 10', 5, ' each']];
+  const tick = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const side = (k) => `<label class="pk-c">
+            <input type="radio" name="w" value="${k}" ${sel === k ? 'checked' : ''} ${dis} onchange="window.selectSide('${m.id}', '${k}')">
+            <div class="pb-c"><strong>${esc(m[k][1])}</strong><span class="rc-c">${tick}</span></div>
+          </label>`;
 
   return `
   <div class="app-c">
     <header class="top-c">
-      <button class="ib-c" data-a="back" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <button class="ib-c" data-a="nav" data-v="markets" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
       <div class="ttl-c"><h1>Contest Details</h1><p>Fixed entry, guaranteed prizes</p></div>
-      <button class="wal-c" data-a="nav" data-v="wallet" aria-label="Wallet balance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span>${inr(S.bal)}</span></button>
+      <button class="wal-c" data-a="nav" data-v="wallet" aria-label="Wallet balance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span>${cn(S.bal)}</span></button>
     </header>
 
     <main class="main-c">
       <section class="card-c">
-        <div class="row-c"><span class="tag-c">${cl(m.c)}</span>
+        <div class="row-c"><span class="tag-c">${esc(cl(m.c))}</span>
           <span class="timer-c" role="timer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-cd="${m.id}">${cdt(m)}</span></span></div>
         <h2 class="ev-c">${esc(ttl(m))}</h2>
         <div class="vs-c">
           <div class="tm-c">
-            <div class="av-c">${m.A[0].slice(0,2).toUpperCase()}</div>
+            <div class="av-c">${esc(m.A[0].slice(0, 2).toUpperCase())}</div>
             <div><b>${esc(m.A[1])}</b><small>${esc(m.lg)}</small></div>
           </div>
           <span class="vsp-c">VS</span>
           <div class="tm-c b">
-            <div class="av-c alt">${m.B[0].slice(0,2).toUpperCase()}</div>
+            <div class="av-c alt">${esc(m.B[0].slice(0, 2).toUpperCase())}</div>
             <div><b>${esc(m.B[1])}</b><small>${esc(m.lg)}</small></div>
           </div>
         </div>
         <div class="lab-c"><span>Pick the winner</span><span>${lk ? 'Locked' : 'Required'}</span></div>
-        <div class="picks-c">
-          <label class="pk-c">
-            <input type="radio" name="w" value="A" ${sel === 'A' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} onchange="window.selectSide('${m.id}', 'A')">
-            <div class="pb-c"><strong>${esc(m.A[1])}</strong><span class="rc-c"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-          </label>
-          <label class="pk-c">
-            <input type="radio" name="w" value="B" ${sel === 'B' ? 'checked' : ''} ${lk || cls ? 'disabled' : ''} onchange="window.selectSide('${m.id}', 'B')">
-            <div class="pb-c"><strong>${esc(m.B[1])}</strong><span class="rc-c"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-          </label>
-        </div>
+        <div class="picks-c">${side('A')}${side('B')}</div>
         <div style="margin-top:16px;">
-          <label class="s12" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
-          <input type="number" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
+          <label class="s12" for="tie-input-${m.id}" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
+          <input type="number" inputmode="numeric" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${dis} value="${lk && lk.tie_breaker ? esc(lk.tie_breaker) : ''}">
           <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
         </div>
-        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(full(m,lk.p))}</span><small>Entry confirmed</small></div></div>` : ''}
+        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(m[lk.p][1])}</span><small>Entry confirmed</small></div></div>` : ''}
       </section>
 
       <section class="card-c pool-c">
-        <div class="row-c"><span class="pl-c">Guaranteed prize pool</span><span class="fee-c">Entry ₹50</span></div>
-        <div class="amt-c">₹${poolAmt.toLocaleString('en-IN')}</div><div class="gtd-c">Paid out whether or not all spots fill</div>
-        <div class="pgr-c"><div class="pgi-c"><span>Spots filled</span><span>${currentFilled} / ${totalSpots} spots (${totalSpots - currentFilled} left)</span></div><div class="bar-c" role="progressbar"><i style="width:${pct}%"></i></div></div>
-        <div class="mini-c"><div><small>Winners</small><b>10</b></div><div><small>First prize</small><b>₹3,000</b></div><div><small>Entry</small><b>₹50</b></div></div>
+        <div class="row-c"><span class="pl-c">Guaranteed prize pool</span><span class="fee-c">Entry ${cn(fee)}</span></div>
+        <div class="amt-c">${cn(poolAmt)}</div><div class="gtd-c">Paid out whether or not all spots fill</div>
+        <div class="pgr-c"><div class="pgi-c"><span>Spots filled</span><span>${currentFilled} / ${totalSpots} spots (${totalSpots - currentFilled} left)</span></div><div class="bar-c" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
+        <div class="mini-c"><div><small>Winners</small><b>10</b></div><div><small>First prize</small><b>${cn(poolAmt * 0.3)}</b></div><div><small>Entry</small><b>${cn(fee)}</b></div></div>
       </section>
 
       <section class="card-c">
         <div class="seg-c" role="tablist">
-          <button role="tab" aria-selected="true" data-tab="prizes">Prizes</button>
-          <button role="tab" aria-selected="false" data-tab="entries">Entries</button>
-          <button role="tab" aria-selected="false" data-tab="rules">Rules</button>
+          <button role="tab" aria-selected="true" onclick="window.fcTab(this,'prizes')">Prizes</button>
+          <button role="tab" aria-selected="false" onclick="window.fcTab(this,'entries')">Entries</button>
+          <button role="tab" aria-selected="false" onclick="window.fcTab(this,'rules')">Rules</button>
         </div>
         <div class="panel-c" id="p-prizes" role="tabpanel">
           <table class="table-c">
             <thead><tr><th>Rank</th><th>Share</th><th>Prize</th></tr></thead>
-            <tbody>
-              <tr><td><div class="rk-c"><span class="rb-c">1</span>Rank 1</div></td><td class="pc-c">30%</td><td class="pr-c">₹3,000</td></tr>
-              <tr><td><div class="rk-c"><span class="rb-c">2</span>Rank 2</div></td><td class="pc-c">15%</td><td class="pr-c">₹1,500</td></tr>
-              <tr><td><div class="rk-c"><span class="rb-c">3-5</span>Rank 3 - 5</div></td><td class="pc-c">10% each</td><td class="pr-c">₹1,000</td></tr>
-              <tr><td><div class="rk-c"><span class="rb-c">6-10</span>Rank 6 - 10</div></td><td class="pc-c">5% each</td><td class="pr-c">₹500</td></tr>
-            </tbody>
+            <tbody>${tiers.map(t => `<tr><td><div class="rk-c"><span class="rb-c">${t[0]}</span>${t[1]}</div></td><td class="pc-c">${t[2]}%${t[3]}</td><td class="pr-c">${cn(poolAmt * t[2] / 100)}</td></tr>`).join('')}</tbody>
           </table>
-          <div class="note-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
+          <div class="note-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex:none"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
         </div>
         <div class="panel-c" id="p-entries" role="tabpanel" hidden>
-          ${lk ? `<div class="ent-c me"><div class="ea-c">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill-c">${lk.p}</span></div>` : ''}
-          <div class="ent-c"><div class="ea-c">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill-c">A</span></div>
-          <div class="ent-c"><div class="ea-c">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill-c">B</span></div>
-          <div class="ent-c"><div class="ea-c">R</div><div><b>Rohan K.</b><small>12 min ago</small></div><span class="pill-c">A</span></div>
+          ${lk ? `<div class="ent-c me"><div class="ea-c">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill-c">${esc(m[lk.p][0])}</span></div>` : ''}
+          <div class="ent-c"><div class="ea-c">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill-c">${esc(m.A[0])}</span></div>
+          <div class="ent-c"><div class="ea-c">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill-c">${esc(m.B[0])}</span></div>
+          <div class="ent-c"><div class="ea-c">R</div><div><b>Rohan K.</b><small>12 min ago</small></div><span class="pill-c">${esc(m.A[0])}</span></div>
         </div>
         <div class="panel-c" id="p-rules" role="tabpanel" hidden>
           <div class="rules-c">
             <div class="rl-c"><span class="rn-c">1</span><div><b>Pick the match winner</b><small>Choose one team before the contest closes. One entry per player and it cannot be changed after joining.</small></div></div>
             <div class="rl-c"><span class="rn-c">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning team is ranked above all other entries.</small></div></div>
-            <div class="rl-c"><span class="rn-c">3</span><div><b>Earliest entry wins ties</b><small>Among correct picks, the player who joined earlier gets the higher rank.</small></div></div>
+            <div class="rl-c"><span class="rn-c">3</span><div><b>Closest margin wins ties</b><small>Among correct picks, the closest winning-margin prediction ranks higher. If still equal, the earlier entry ranks higher.</small></div></div>
             <div class="rl-c"><span class="rn-c">4</span><div><b>Abandoned or tied match</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
           </div>
         </div>
@@ -992,9 +958,9 @@ function matchV() {
 
     <footer class="cta-c">
       <div class="cin-c">
-        <div class="cs-c"><small>Entry fee</small><b>₹50</b></div>
-        <button class="go-c ${lk ? 'done' : ''}" onclick="window.joinContest('${m.id}')" ${lk || cls ? 'disabled' : ''}>
-          ${lk ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>You are in</span>' : cls ? 'Contest closed' : '<span>Join contest for ₹50</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'}
+        <div class="cs-c"><small>Entry fee</small><b>${cn(fee)}</b></div>
+        <button class="go-c ${lk ? 'done' : ''}" onclick="window.joinContest('${m.id}')" ${dis}>
+          ${lk ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>You are in</span>' : cls ? 'Contest closed' : `<span>Join contest for ${cn(fee)}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`}
         </button>
       </div>
     </footer>
@@ -1102,7 +1068,7 @@ function lockPicks(ids) {
   });
 
   if (hasError) {
-    toast("Invalid stake amount. Minimum is ₹50 and must be a multiple of 10.", "alert");
+    toast("Invalid stake amount. Minimum is 🪙50 and must be a multiple of 10.", "alert");
     return;
   }
 
@@ -1184,9 +1150,9 @@ window.updateStake = function(id, val) {
       btn.disabled = true;
       btn.style.opacity = '0.6';
       if (num < 50) {
-        btn.textContent = 'Minimum stake is ₹50';
+        btn.textContent = 'Minimum stake is 🪙50';
       } else if (num % 10 !== 0) {
-        btn.textContent = 'Stake must be a multiple of ₹10';
+        btn.textContent = 'Stake must be a multiple of 🪙10';
       } else {
         btn.textContent = 'Confirm Bet';
       }
@@ -1218,20 +1184,11 @@ window.selectSide = function(id, side) {
 };
 
 // 1. Handle Tab Switching
-document.addEventListener("click", function(e) {
-  const tab = e.target.closest("[data-tab]");
-  if (tab) {
-    const container = tab.closest(".tabs");
-    container.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", "false"));
-    tab.setAttribute("aria-selected", "true");
-    
-    const target = tab.dataset.tab;
-    ["prizes", "entries", "rules"].forEach(k => {
-      const panel = document.getElementById(`p-${k}`);
-      if(panel) panel.hidden = k !== target;
-    });
-  }
-});
+window.fcTab = function (btn, id) {
+  var root = btn.closest('.card-c');
+  root.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b === btn); });
+  root.querySelectorAll('.panel-c').forEach(function (p) { p.hidden = p.id !== 'p-' + id; });
+};
 
 // 2. Handle Join Contest
 window.joinContest = async function(matchId) {
@@ -1241,7 +1198,7 @@ window.joinContest = async function(matchId) {
   const m = mkt(matchId);
 
   if (!tieBreaker) return toast("Please enter a tie-breaker answer.", "alert");
-  if (S.bal < 50) return toast("Insufficient balance. You need ₹50.", "alert");
+  if (S.bal < 50) return toast("Insufficient balance. You need 🪙50.", "alert");
   if (!S.user || !S.user.id) return toast("Please log in to join.", "alert");
 
   const btn = document.querySelector(`button[onclick="window.joinContest('${matchId}')"]`);
@@ -1268,7 +1225,7 @@ window.joinContest = async function(matchId) {
   } catch (e) {
     console.error(e);
     toast("Error joining contest: " + e.message, "alert");
-    if (btn) { btn.disabled = false; btn.textContent = "Join Contest for ₹50"; }
+    if (btn) { btn.disabled = false; btn.textContent = "Join Contest for 🪙50"; }
   }
 };
 
@@ -1289,7 +1246,7 @@ const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••"
 const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
-  <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
+  <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">🪙${v}</button>`).join("")}</div>
   <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount e.g. 50, 100"></div>
   <div class="fld">
     <label>Payment method</label>
@@ -1322,7 +1279,7 @@ function selectPaymentMethod(btn) {
   btn.classList.add('selected');
   document.getElementById('dm').value = btn.dataset.method;
 }
-const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
+const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min 🪙100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
 const moreSheet = () => {
   const unreadSupportCount = S.tickets.filter(t => t.unread > 0 && t.status !== 'closed').reduce((sum, t) => sum + t.unread, 0);
   return sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift",0],["ranks","Leaderboard","award",0],["alerts","Notifications","bell",0],["profile","Profile","user",0],["support","Support","chat",unreadSupportCount],["help","Help and terms","help",0]].map(([r,l,g,c]) => `<button class="tile" data-a="nav" data-v="${r}" style="position:relative">${ic(g,18)}${l}${c>0 ? `<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--pr);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">${c}</span>` : ''}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
@@ -1568,11 +1525,11 @@ const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
       });
       break;
     }
-    case "wd": if(S.bal < 100){toast("Minimum withdrawal is ₹100.","x"); return;} wdSheet(); break;
+    case "wd": if(S.bal < 100){toast("Minimum withdrawal is 🪙100.","x"); return;} wdSheet(); break;
     case "wmax": $("wa").value = Math.floor(S.bal); break;
     case "wdok": {
       const x = Number($("wa").value), d = $("wt").value.trim(), er = $("er");
-      if (!x || x < 100) { er.textContent = "Minimum withdrawal is ₹100."; return; }
+      if (!x || x < 100) { er.textContent = "Minimum withdrawal is 🪙100."; return; }
       if (x > S.bal) { er.textContent = "Amount exceeds your balance."; return; }
       if (!d) { er.textContent = "Enter a destination."; return; }
       t.disabled = true; t.textContent = "Processing...";
@@ -1898,7 +1855,7 @@ window.addEventListener("load", async () => {
                 S.bal = p.balance; 
                 
                 // NEW FIX: Instantly add the notification to the user's local state
-                note("Top-up Successful", "Payment of ₹" + (new URLSearchParams(window.location.search).get('amount') || '') + " verified.", "wallet");
+                note("Top-up Successful", "Payment of 🪙" + (new URLSearchParams(window.location.search).get('amount') || '') + " verified.", "wallet");
                 
                 save(); 
                 render(); 
