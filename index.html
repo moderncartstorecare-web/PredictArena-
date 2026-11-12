@@ -726,7 +726,7 @@ const slipBody = () => {
     const potential = Math.round(stake * odds);
     totalPotential += potential;
     return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="50" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
     </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
@@ -942,7 +942,7 @@ function matchV() {
         </div>
         <div style="margin-top:16px;">
           <label class="s12" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
-          <input type="number" id="tie-input-${m.id}" class="inp" style="margin-top:8px; font-weight:700;" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
+          <input type="number" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${lk || cls ? 'disabled' : ''} value="${lk && lk.tie_breaker ? lk.tie_breaker : ''}">
           <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
         </div>
         ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(full(m,lk.p))}</span><small>Entry confirmed</small></div></div>` : ''}
@@ -1234,7 +1234,6 @@ document.addEventListener("click", function(e) {
 });
 
 // 2. Handle Join Contest
-
 window.joinContest = async function(matchId) {
   const pick = S.slip[matchId] || 'A';
   const tieInput = document.getElementById(`tie-input-${matchId}`);
@@ -1272,6 +1271,7 @@ window.joinContest = async function(matchId) {
     if (btn) { btn.disabled = false; btn.textContent = "Join Contest for ₹50"; }
   }
 };
+
 window.rateTicket = async function(id, rating) {
   if (!S.user) return;
   const existing = S.tickets.find(x => x.id == id);
