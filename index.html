@@ -13,13 +13,13 @@
 <style>
 /* ===== design tokens ===== */
 :root{
-  --bg:#f6f7fb;--sf:#fff;--s2:#eff2f8;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;--ln:#e3e7ee;--ln2:#d0d6e2;
+  --bg:#f5f7fc;--sf:#fff;--s2:#eef2fa;--ink:#0d1526;--i2:#475069;--i3:#7b8499;--ln:#e4e8f1;--ln2:#d3d9e6;
   --ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
-  --grad: linear-gradient(135deg, #1e5bf0, #1c2a55);
+  --grad:linear-gradient(135deg,#2563f5 0%,#1e4fd8 45%,#1c2a55 100%);
   --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
   --sh:0 1px 2px rgba(13,21,38,.04),0 8px 24px rgba(13,21,38,.05)
 }
-:root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
+:root[data-theme=dark]{--bg:#080b12;--sf:#10151f;--s2:#171d2a;--ink:#e9edf6;--i2:#a3acbd;--i3:#707a8e;--ln:#1f2735;--ln2:#2b3447;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#15203d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}input,select,textarea{font:inherit;color:inherit}svg{display:block;flex:none}h1,h2,h3,p{margin:0}
@@ -51,7 +51,7 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .top h1{font-size:17px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .sub{display:none;font-size:13px;color:var(--i3)}.dk{display:none}
 .wc{height:38px;padding:0 11px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;flex:none}
 .pg{padding:12px 14px calc(88px + env(safe-area-inset-bottom));max-width:1100px}
-.pg.contest-pg{padding:0 0 calc(88px + env(safe-area-inset-bottom));max-width:none}
+.pg.contest-pg{padding:0;max-width:none}
 .bn{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;background:var(--sf);border-top:1px solid var(--ln);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}.bn button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10.5px;font-weight:500;color:var(--i3)}.bn button.on{color:#1e5bf0;font-weight:600}
 .sbar{position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:55;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .pp{position:fixed;right:10px;top:calc(60px + env(safe-area-inset-top));width:min(340px,calc(100vw - 20px));background:var(--sf);border:1px solid var(--ln2);border-radius:14px;box-shadow:0 16px 40px -12px rgba(15,23,41,.3);z-index:70;overflow:hidden}
@@ -126,86 +126,95 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .stars .star { transition: color 0.2s; }
 .stars .star.active { color: #facc15; }
 
-/* ====== FIXED CONTEST DETAILS UI ====== */
-.app-c{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
-.ib-c{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
-.ib-c:hover{background:var(--s2);color:var(--ink)}.ib-c:active{transform:scale(.96)}
-.ttl-c{flex:1;min-width:0}.ttl-c h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.ttl-c p{font-size:12px;color:var(--i3);font-weight:500}
-.wal-c{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;flex:none}
-.wal-c svg{color:var(--ac)}
-.main-c{flex:1;padding:16px 16px calc(150px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
-.card-c{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px;box-shadow:var(--sh)}
-.row-c{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.tag-c{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.timer-c{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;transition:background .3s,color .3s}
-.timer-c.urgent{background:var(--nos);color:var(--no)}.timer-c.closed{background:var(--s2);color:var(--i3)}
-.ev-c{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
-.vs-c{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
-.tm-c{display:flex;align-items:center;gap:10px;min-width:0}.tm-c.b{flex-direction:row-reverse;text-align:right}
-.av-c{width:46px;height:46px;border-radius:13px;background:var(--grad);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;letter-spacing:.02em;flex:none;box-shadow:0 6px 14px -4px rgba(30,91,240,.45)}
-.av-c.alt{background:linear-gradient(135deg,#7aa2ff,#2f55c9)}
-.tm-c b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.15}.tm-c small{display:block;font-size:12px;color:var(--i3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vsp-c{font-size:11px;font-weight:800;color:var(--i3);background:var(--sf);border:1px solid var(--ln);padding:3px 9px;border-radius:99px;letter-spacing:.06em}
-.lab-c{display:flex;justify-content:space-between;margin:20px 0 9px;font-size:12px;font-weight:600;color:var(--i2)}.lab-c span:last-child{color:var(--ac)}
-.picks-c{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pk-c{position:relative}.pk-c input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0}.pk-c input:disabled{cursor:not-allowed}
-.pb-c{border:2px solid var(--ln2);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--sf);transition:border-color .15s,background .15s,transform .1s}
-.pk-c input:not(:disabled):hover+.pb-c{border-color:var(--ac)}.pk-c input:active+.pb-c{transform:scale(.985)}
-.pk-c input:checked+.pb-c{border-color:var(--ac);background:var(--acs)}.pk-c input:disabled:not(:checked)+.pb-c{opacity:.5}
-.pb-c strong{font-size:14px;font-weight:700}.pk-c input:checked+.pb-c strong{color:var(--ac2)}
-.rc-c{width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;transition:all .15s;color:#fff;flex:none}
-.rc-c svg{opacity:0;transform:scale(.6);transition:all .15s}
-.pk-c input:checked+.pb-c .rc-c{background:var(--ac);border-color:var(--ac)}.pk-c input:checked+.pb-c .rc-c svg{opacity:1;transform:scale(1)}
-.entry-c{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--oks);color:var(--ok);font-weight:600;font-size:13px;align-items:center;gap:10px}
-.entry-c.on{display:flex}.entry-c small{display:block;font-weight:500;opacity:.85}
-.pool-c{background:var(--grad);color:#fff;border:0;position:relative;overflow:hidden;padding:22px 20px;box-shadow:0 14px 30px -10px rgba(30,79,216,.5)}
-.pool-c:before{content:"";position:absolute;top:-60px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}
-.pool-c>*{position:relative}
-.pl-c{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
-.fee-c{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700}
-.amt-c{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:6px 0 2px}.gtd-c{font-size:12px;opacity:.85;font-weight:500}
-.pgr-c{margin-top:18px}.pgi-c{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:7px}
-.bar-c{height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}.bar-c i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.55);transition:width .7s cubic-bezier(.2,.8,.2,1)}
-.mini-c{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px;border-top:1px solid rgba(255,255,255,.2);padding-top:14px}
-.mini-c div+div{border-left:1px solid rgba(255,255,255,.2);padding-left:14px}.mini-c small{display:block;font-size:11px;opacity:.8;font-weight:500}.mini-c b{font-size:16px;font-weight:800;letter-spacing:-.02em}
-.seg-c{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
-.seg-c button{flex:1;text-align:center;height:36px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
-.seg-c button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
-.panel-c[hidden]{display:none}
-.table-c{width:100%;border-collapse:collapse}
-.table-c th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px 8px;border-bottom:1px solid var(--ln);text-align:left}
-.table-c th:last-child,.table-c td:last-child{text-align:right}
-.table-c td{padding:12px 8px;border-bottom:1px solid var(--ln);font-size:13.5px}.table-c tr:last-child td{border:0}
-.rk-c{display:flex;align-items:center;gap:10px;font-weight:700}
-.rb-c{min-width:30px;height:26px;padding:0 7px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800}
-.table-c tr:first-child .rb-c{background:var(--grad);color:#fff}
-.pc-c{color:var(--i2);font-weight:600}.pr-c{font-weight:800;color:var(--ok)}
-.note-c{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}
-.ent-c{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}.ent-c:last-child{border:0}
-.ea-c{width:36px;height:36px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
-.ent-c.me .ea-c{background:var(--grad);color:#fff}.ent-c div:nth-child(2){flex:1;min-width:0}.ent-c b{display:block;font-size:13.5px}.ent-c small{color:var(--i3);font-size:12px}
-.pill-c{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--i2)}
-.ent-c.me .pill-c{background:var(--acs);color:var(--ac)}
-.rules-c{display:flex;flex-direction:column;gap:12px}.rl-c{display:flex;gap:12px;align-items:flex-start}
-.rn-c{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
-.rl-c b{display:block;font-size:13.5px}.rl-c small{color:var(--i3);font-size:12.5px;line-height:1.4}
-.cta-c{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:45;padding:12px 16px;background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
-.cin-c{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
-.cs-c{min-width:0}.cs-c small{display:block;font-size:11px;color:var(--i3);font-weight:500}.cs-c b{font-size:15px;font-weight:800;letter-spacing:-.02em}
-.go-c{flex:1;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s,box-shadow .15s;text-align:center}
-.go-c:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px)}.go-c:active:not(:disabled){transform:scale(.985)}
-.go-c:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.go-c.done{background:var(--oks);color:var(--ok);box-shadow:none}
-.tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
-.tie-input:focus{border-color:var(--ac);background:var(--sf)}
-@media(min-width:900px){
-  .cta-c{left:220px;bottom:0;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
-  .main-c{padding-bottom:100px}
+/* ====== EXACT CONTEST DETAILS PAGE STYLES ====== */
+.c-wrap{min-height:100vh;display:flex;flex-direction:column}
+.c-top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln);padding-top:env(safe-area-inset-top)}
+.c-top-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 16px}
+.c-ib{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
+.c-ib:hover{background:var(--s2);color:var(--ink)}.c-ib:active{transform:scale(.96)}
+.c-ttl{flex:1;min-width:0}.c-ttl h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.c-ttl p{font-size:12px;color:var(--i3);font-weight:500}
+.c-wal{height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;flex:none}.c-wal svg{color:var(--ac)}
+.c-main{flex:1;width:100%;max-width:1080px;margin:0 auto;padding:16px 16px calc(140px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.c-col-l,.c-col-r{display:contents}
+#c-hero{order:1}#c-pool{order:2}#c-tabs{order:3}#c-join{display:none}
+.c-card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px;box-shadow:var(--sh)}
+.c-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.c-rr{display:flex;align-items:center;gap:8px}
+.c-tag{display:inline-flex;align-items:center;padding:4px 11px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.c-timer{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;white-space:nowrap;transition:background .3s,color .3s}
+.c-timer.urgent{background:var(--nos);color:var(--no)}.c-timer.closed{background:var(--s2);color:var(--i3)}
+.c-sh-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--ln);display:grid;place-items:center;color:var(--i2);background:var(--sf)}.c-sh-btn:hover{background:var(--s2);color:var(--ink)}
+.c-ev{font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
+.c-vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
+.c-tm{display:flex;align-items:center;gap:11px;min-width:0}.c-tm.b{flex-direction:row-reverse;text-align:right}.c-tm>div:last-child{min-width:0}
+.c-av{width:48px;height:48px;border-radius:14px;background:var(--grad);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;letter-spacing:.02em;flex:none;box-shadow:0 6px 14px -4px rgba(30,91,240,.45)}
+.c-av.alt{background:linear-gradient(135deg,#7aa2ff,#2f55c9)}
+.c-tm b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.2;overflow-wrap:anywhere}.c-tm small{display:block;font-size:12px;color:var(--i3);font-weight:500;margin-top:1px}
+.c-vsp{font-size:11px;font-weight:800;color:var(--i3);background:var(--sf);border:1px solid var(--ln);padding:3px 9px;border-radius:99px;letter-spacing:.06em}
+.c-lab{display:flex;justify-content:space-between;margin:20px 0 9px;font-size:12px;font-weight:600;color:var(--i2)}.c-lab span:last-child{color:var(--ac)}
+.c-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c-pk{position:relative;display:block}.c-pk input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0}.c-pk input:disabled{cursor:not-allowed}
+.c-pb{border:2px solid var(--ln2);border-radius:14px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--sf);transition:border-color .15s,background .15s,transform .1s}
+.c-pk input:not(:disabled):hover+.c-pb{border-color:var(--ac)}.c-pk input:active+.c-pb{transform:scale(.985)}
+.c-pk input:checked+.c-pb{border-color:var(--ac);background:var(--acs)}.c-pk input:disabled:not(:checked)+.c-pb{opacity:.5}
+.c-pb strong{font-size:14.5px;font-weight:700;overflow-wrap:anywhere}.c-pk input:checked+.c-pb strong{color:var(--ac2)}
+.c-rc{width:22px;height:22px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;transition:all .15s;color:#fff;flex:none}
+.c-rc svg{opacity:0;transform:scale(.6);transition:all .15s}.c-pk input:checked+.c-pb .c-rc{background:var(--ac);border-color:var(--ac)}.c-pk input:checked+.c-pb .c-rc svg{opacity:1;transform:scale(1)}
+.c-entry{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--oks);color:var(--ok);font-weight:700;font-size:13px;align-items:center;gap:10px}.c-entry.on{display:flex}.c-entry small{display:block;font-weight:500;opacity:.85}
+.c-pool{background:var(--grad);color:#fff;border:0;position:relative;overflow:hidden;padding:22px 20px;box-shadow:0 14px 30px -10px rgba(30,79,216,.5)}
+.c-pool:before{content:"";position:absolute;top:-60px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}.c-pool>*{position:relative}
+.c-pl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+.c-fee{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700;white-space:nowrap}
+.c-amt{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:8px 0 2px}.c-gtd{font-size:12px;opacity:.85;font-weight:500}
+.c-pgi{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:600;margin:18px 0 7px}
+.c-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}.c-bar i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.55);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.c-fast{display:none;margin-top:8px;font-size:12px;font-weight:700}.c-fast.on{display:block}
+.c-mini{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px;border-top:1px solid rgba(255,255,255,.2);padding-top:14px}
+.c-mini div+div{border-left:1px solid rgba(255,255,255,.2);padding-left:14px}.c-mini small{display:block;font-size:11px;opacity:.8;font-weight:500}.c-mini b{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.c-seg{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
+.c-seg button{flex:1;text-align:center;height:38px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
+.c-seg button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
+.c-panel[hidden]{display:none}
+.c-table{width:100%;border-collapse:collapse}.c-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px;border-bottom:1px solid var(--ln);text-align:left}
+.c-table th:last-child,.c-table td:last-child{text-align:right}.c-table td{padding:13px 8px;border-bottom:1px solid var(--ln);font-size:14px}.c-table tr:last-child td{border:0}
+.c-rk{display:flex;align-items:center;gap:11px;font-weight:700}
+.c-rb{min-width:34px;height:28px;padding:0 8px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800;white-space:nowrap}
+.c-table tr:first-child .c-rb{background:var(--grad);color:#fff}.c-rk small{color:var(--i3);font-weight:500;font-size:12px}
+.c-pr{font-weight:800;color:var(--ok);white-space:nowrap}
+.c-note{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}.c-note svg{margin-top:2px}
+.c-rules{display:flex;flex-direction:column;gap:14px}.c-rl{display:flex;gap:12px;align-items:flex-start}
+.c-rn{width:28px;height:28px;border-radius:9px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.c-rl b{display:block;font-size:14px}.c-rl small{color:var(--i3);font-size:12.5px;line-height:1.45;display:block}
+.c-sum{display:flex;flex-direction:column}.c-sr{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--ln);font-size:13.5px}.c-sr:last-child{border:0}.c-sr span{color:var(--i2)}.c-sr b{font-weight:700;text-align:right}.c-sr.t b{font-size:16px;color:var(--ac)}
+.c-go{width:100%;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s;text-align:center}
+.c-go:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px)}.c-go:active:not(:disabled){transform:scale(.985)}
+.c-go:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.c-go.done{background:var(--oks);color:var(--ok);box-shadow:none}
+.c-cta{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:45;padding:12px 16px;background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+.c-cin{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}.c-cs{min-width:0;flex:none}.c-cs small{display:block;font-size:11px;color:var(--i3);font-weight:500}.c-cs b{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.c-cin .c-go{flex:1}
+.c-ov{position:fixed;inset:0;z-index:100;background:rgba(8,12,22,.55);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}.c-ov.on{opacity:1;pointer-events:auto}
+.c-sheet{background:var(--sf);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:10px 18px calc(18px + env(safe-area-inset-bottom));transform:translateY(24px);transition:transform .25s cubic-bezier(.2,.8,.2,1)}.c-ov.on .c-sheet{transform:none}
+.c-grab{width:42px;height:4px;border-radius:4px;background:var(--ln2);margin:0 auto 14px}
+.c-sheet h2{font-size:18px;font-weight:800;letter-spacing:-.02em}.c-sheet>div>p{color:var(--i3);font-size:13px;margin:2px 0 14px}
+.c-sbox{background:var(--s2);border-radius:16px;padding:4px 14px;margin-bottom:14px}
+.c-warn{display:flex;gap:10px;background:var(--nos);color:var(--no);border-radius:14px;padding:11px 13px;font-size:13px;font-weight:600;margin-bottom:14px}
+.c-btns{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.c-bt{height:50px;border-radius:14px;font-weight:700;font-size:14.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ln2);background:var(--sf)}
+.c-bt.p{background:var(--grad);color:#fff;border:0;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);font-weight:800}.c-bt:disabled{opacity:.7;cursor:wait}
+.c-spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+@media(min-width:960px){
+  .c-main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start;padding:24px 16px 40px}
+  .c-col-l,.c-col-r{display:flex;flex-direction:column;gap:16px;order:0}
+  .c-col-r{position:sticky;top:88px}
+  #c-hero,#c-pool,#c-tabs{order:0}#c-join{display:block}
+  .c-cta{display:none}
+  .c-ev{font-size:24px}.c-card{padding:22px}
+  .c-ov{align-items:center}.c-sheet{border-radius:22px;padding:22px}.c-grab{display:none}
 }
+@media(max-width:380px){.c-tm small{display:none}.c-amt{font-size:33px}.c-cs{display:none}.c-vs{padding:12px}.c-av{width:42px;height:42px}}
+@media(max-width:560px){.c-ev{font-size:19px}.c-vs{grid-template-columns:1fr 1fr;gap:8px}.c-vsp{display:none}.c-tm.b{flex-direction:row;text-align:left}}
 </style>
 </head>
 <body>
-<!-- Loader to prevent blank white screen on refresh -->
 <div id="app"><div style="display:flex;justify-content:center;align-items:center;height:100vh;color:var(--i2);font-weight:600;">Loading CricPulse...</div></div>
 <div id="sh"></div>
 <div class="tw" id="tw"></div>
@@ -479,14 +488,19 @@ function legalPage(kind) {
       title:"Terms & Conditions",
       body:`
         <p>Welcome to CricPulse. By accessing or using our platform, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the platform.</p>
+        
         <h2>1. Eligibility & Jurisdiction</h2>
         <p>You must be at least 18 years of age to create an account. By using CricPulse, you represent that you are legally permitted to participate in skill-based online games in your jurisdiction. <strong>Residents of states where online gaming/prediction is restricted (including but not limited to Andhra Pradesh, Assam, Nagaland, Odisha, Sikkim, Tamil Nadu, and Telangana) are strictly prohibited from using this platform.</strong> You are solely responsible for ensuring compliance with your local laws.</p>
+        
         <h2>2. Nature of the Game</h2>
         <p>CricPulse is a "Game of Skill." The outcome of our prediction markets is based on your knowledge, analysis, and judgment of the respective sports or events. It is not a game of chance, lottery, or gambling.</p>
+        
         <h2>3. Account & Wallet</h2>
         <p>Only one account is permitted per user. Multi-accounting or using automated bots will result in immediate account suspension and forfeiture of funds. Your wallet balance can be used to enter prediction markets and can be withdrawn subject to our Refund Policy. We reserve the right to verify your identity (KYC) before processing withdrawals.</p>
+        
         <h2>4. Limitation of Liability</h2>
         <p>CricPulse is not liable for any financial loss, data loss, or emotional distress resulting from your participation. We do not guarantee continuous, uninterrupted access to the platform.</p>
+        
         <h2>5. Governing Law</h2>
         <p>These terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in the state where CricPulse's registered office is located.</p>
       `
@@ -495,12 +509,16 @@ function legalPage(kind) {
       title:"Privacy Policy",
       body:`
         <p>At CricPulse, we take your privacy seriously. This policy outlines how we collect, use, and protect your personal information in compliance with the Indian Information Technology Act, 2000.</p>
+        
         <h2>1. Information We Collect</h2>
         <p>We collect your Google profile information (Name, Email, Profile Picture) during sign-up. We also collect transaction data, wallet history, and device information (IP address, browser type) to ensure platform security and prevent fraud.</p>
+        
         <h2>2. How We Use Your Data</h2>
         <p>Your data is used strictly to operate your account, process deposits/withdrawals via secure payment gateways (such as ZapUPI), provide customer support, and comply with legal obligations.</p>
+        
         <h2>3. Data Sharing</h2>
         <p>We do not sell your personal data. We only share data with trusted third-party service providers (like payment gateways and cloud hosting providers) necessary to run the platform.</p>
+        
         <h2>4. Security & Retention</h2>
         <p>We use industry-standard encryption to protect your data. Your financial records are retained as long as required by Indian tax and financial regulations. You may request account deletion via the Support Center, subject to settlement of pending dues.</p>
       `
@@ -509,12 +527,16 @@ function legalPage(kind) {
       title:"Refund Policy",
       body:`
         <p>This Refund Policy governs the deposit, withdrawal, and refund of funds on the CricPulse platform.</p>
+        
         <h2>1. Market Voidance & Refunds</h2>
         <p>If a prediction market is abandoned, tied, cancelled, or voided due to unforeseen circumstances or incorrect official results, all entries and the associated stake amounts will be automatically refunded to your CricPulse wallet within 24 hours.</p>
+        
         <h2>2. Deposits</h2>
         <p>All deposits made via UPI or other payment methods are final once credited to your wallet. We do not charge any processing fees on deposits. If a deposit fails but money is deducted, it will be automatically reconciled and credited within 3-5 business days as per your bank's policy.</p>
+        
         <h2>3. Withdrawals</h2>
         <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is ₹100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
+        
         <h2>4. Disputes</h2>
         <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 30 minutes during business hours.</p>
       `
@@ -607,14 +629,17 @@ function walletV() {
   return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
 <div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
 <div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}
+  
   <div style="${S.showAllTx ? 'max-height: 380px; overflow-y: auto; padding-right: 4px;' : ''}">
     ${L.length ? displayList.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}
   </div>
+
   ${L.length > 5 ? `<button class="btn g w" style="margin-top:10px; margin-bottom:6px;" data-a="toggletx">${S.showAllTx ? 'Show Less' : 'Show More Transactions'}</button>` : ''}
 </div>
 <details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
 }
 function rewardsV() {
+  const un = S.cps.filter(c => !c.cl).length;
   return `<div class="stack"><div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
 <details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
 }
@@ -626,7 +651,7 @@ function ranksV() {
 }
 const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
 function profileV() {
-  const u = S.user;
+  const u = S.user, t = tally();
   const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
   return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)}</div></div></div></div>
 <div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
@@ -641,6 +666,7 @@ const helpV = () => `<div class="stack">${faqH()}
 
 /* support center */
 function supportV() {
+  const open = S.tickets.filter(t => t.status != "closed").length;
   const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
   return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"30 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
 <div class="grid2">
@@ -712,12 +738,134 @@ function ticketV() {
 }
 
 /* =========================================================
-   NEW CONTEST DETAILS PAGE (matchV)
+   EXACT CONTEST DETAILS VIEW (matchV) - NO TIE BREAKER
    ========================================================= */
-window.fcTab = function (btn, id) {
-  var root = btn.closest('.card-c');
-  root.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b === btn); });
-  root.querySelectorAll('.panel-c').forEach(function (p) { p.hidden = p.id !== 'p-' + id; });
+function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
+
+window.cTabSwitch = function(btn, target) {
+  const card = btn.closest('.c-card');
+  if (!card) return;
+  card.querySelectorAll('.c-seg button[data-t]').forEach(x => x.setAttribute('aria-selected', x === btn ? 'true' : 'false'));
+  ['prizes', 'rules'].forEach(k => {
+    const p = document.getElementById('cp-' + k);
+    if (p) p.hidden = k !== target;
+  });
+};
+
+window.cShare = async function(matchId) {
+  const m = mkt(matchId);
+  if (!m) return;
+  const titleText = ttl(m);
+  const d = {
+    title: "CricPulse: " + titleText,
+    text: "Join this contest on CricPulse. Entry ₹50, prize pool ₹10,000.",
+    url: location.href.split("?")[0]
+  };
+  try {
+    if (navigator.share) { await navigator.share(d); return; }
+    await navigator.clipboard.writeText(d.url);
+    toast("Contest link copied");
+  } catch(e) {
+    if (e && e.name !== "AbortError") toast("Could not share. Copy the link from the address bar.", "x");
+  }
+};
+
+window.cOpenConfirmSheet = function(matchId) {
+  const m = mkt(matchId);
+  if (!m) return;
+  const lk = S.preds.find(p => String(p.m) === String(m.id));
+  const cls = !left(m) || m.isFinished;
+  const pick = S.slip[m.id] || 'A';
+  if (lk || cls) return;
+
+  const fee = 50;
+  const spotsTotal = 200;
+  const spotsFilled = 150;
+  if (spotsFilled >= spotsTotal) return toast("This contest is now full", "x");
+
+  const bal = Number(S.bal || 0);
+  const after = bal - fee;
+  const short = fee - bal;
+  const pickedName = full(m, pick);
+
+  sheet(`
+    <div>
+      <h2 style="font-size:18px;font-weight:800;letter-spacing:-.02em">Confirm your entry</h2>
+      <p class="mut s12" style="margin:2px 0 14px">Review the details before you join.</p>
+      <div class="c-sbox c-sum">
+        <div class="c-sr"><span>Contest</span><b>${esc(ttl(m))}</b></div>
+        <div class="c-sr"><span>Your pick</span><b>${esc(pickedName)}</b></div>
+        <div class="c-sr"><span>Entry fee</span><b>${inr(fee)}</b></div>
+        <div class="c-sr"><span>Wallet balance</span><b>${inr(bal)}</b></div>
+        <div class="c-sr t"><span>Balance after joining</span><b>${after >= 0 ? inr(after) : "Not enough"}</b></div>
+      </div>
+      ${after < 0 ? `<div class="c-warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><span>You need ${inr(short)} more to join this contest.</span></div>` : ""}
+      <div class="c-btns">
+        <button class="c-bt" onclick="closeSheet()">Cancel</button>
+        ${after < 0
+          ? `<button class="c-bt p" onclick="closeSheet(); depSheet();">Add ${inr(short)}</button>`
+          : `<button class="c-bt p" id="cConfirmBtn" onclick="window.cConfirmJoin('${m.id}')">Confirm and join</button>`}
+      </div>
+    </div>
+  `);
+};
+
+window.cConfirmJoin = async function(matchId) {
+  const m = mkt(matchId);
+  if (!m) return;
+  const pick = S.slip[matchId] || 'A';
+  const fee = 50;
+
+  if (S.bal < fee) {
+    closeSheet();
+    toast("Insufficient wallet balance", "x");
+    return;
+  }
+  if (!S.user || !S.user.id) {
+    closeSheet();
+    toast("Please log in to join.", "x");
+    return;
+  }
+
+  const btn = document.getElementById("cConfirmBtn");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="c-spin"></span><span>Confirming...</span>';
+  }
+
+  try {
+    if (window.CP_DB && CP_DB.ready) {
+      const { error } = await supabase.from('predictions').insert({
+        user_id: S.user.id,
+        match_id: matchId,
+        prediction_choice: pick,
+        amount: fee
+      });
+      if (error) throw error;
+    }
+
+    const entryId = "CP" + Date.now().toString(36).toUpperCase().slice(-6);
+    S.bal -= fee;
+    addTx("stake", fee, "Contest Entry: " + ttl(m), "completed");
+    S.preds.push({
+      id: entryId,
+      m: matchId,
+      p: pick,
+      stake: fee,
+      odds: pick === 'A' ? m.oa : m.ob,
+      res: null,
+      pay: 0,
+      ts: Date.now()
+    });
+    save();
+    closeSheet();
+    render();
+    toast("Entry confirmed. Good luck!");
+  } catch (err) {
+    console.error(err);
+    closeSheet();
+    toast(err.message || "Could not join. Please try again.", "x");
+  }
 };
 
 function matchV() {
@@ -726,97 +874,191 @@ function matchV() {
 
   const lk = S.preds.find(p => String(p.m) === String(m.id));
   const cls = !left(m) || m.isFinished;
-  const sel = lk ? lk.p : (S.slip[m.id] || 'A');
-  const dis = lk || cls ? 'disabled' : '';
-  const cn = n => '₹' + Math.round(n).toLocaleString('en-IN');
+  const pick = lk ? lk.p : (S.slip[m.id] || 'A');
+  if (!lk && !S.slip[m.id]) {
+    S.slip[m.id] = 'A';
+    save();
+  }
 
-  const totalSpots = 200, fee = 50, poolAmt = totalSpots * fee;
-  const currentFilled = lk ? 151 : 150;
-  const pct = Math.round(currentFilled / totalSpots * 100);
-  const tiers = [['1', 'Rank 1', 30, ''], ['2', 'Rank 2', 15, ''], ['3-5', 'Rank 3 - 5', 10, ' each'], ['6-10', 'Rank 6 - 10', 5, ' each']];
-  const tick = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-  const side = (k) => `<label class="pk-c">
-            <input type="radio" name="w" value="${k}" ${sel === k ? 'checked' : ''} ${dis} onchange="window.selectSide('${m.id}', '${k}')">
-            <div class="pb-c"><strong>${esc(m[k][1])}</strong><span class="rc-c">${tick}</span></div>
-          </label>`;
+  const fee = 50;
+  const spots = 200;
+  const filled = Math.min(spots, 150 + (lk ? 1 : 0));
+  const spotsLeft = spots - filled;
+  const pct = Math.round(filled / spots * 100);
+  const pool = fee * spots;
+  const isFull = filled >= spots;
+  const locked = !!lk || cls || isFull;
+
+  const prizes = [[1,1,30],[2,2,15],[3,5,10],[6,10,5]];
+  const prizeRows = prizes.map(([a,b,p]) => ({
+    label: a === b ? "Rank " + a : "Rank " + a + " - " + b,
+    badge: a === b ? String(a) : a + "-" + b,
+    each: b > a,
+    amt: pool * p / 100
+  }));
+
+  const CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const ARROW = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+
+  const ctaContent = lk
+    ? CHECK.replace('width="12" height="12"', 'width="18" height="18"') + '<span>You are in</span>'
+    : cls
+      ? 'Contest closed'
+      : isFull
+        ? 'Contest full'
+        : `<span>Join contest for ${inr(fee)}</span>${ARROW}`;
+
+  const keyA = m.A[0].replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || 'A';
+  const keyB = m.B[0].replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || 'B';
+
+  const entryTimeStr = lk && lk.ts
+    ? new Date(lk.ts).toLocaleString("en-IN", { day:"2-digit", month:"short", hour:"numeric", minute:"2-digit" })
+    : "Just now";
 
   return `
-  <div class="app-c">
-    <header class="top-c">
-      <button class="ib-c" data-a="nav" data-v="markets" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-      <div class="ttl-c"><h1>Contest Details</h1><p>Fixed entry, guaranteed prizes</p></div>
-      <button class="wal-c" data-a="nav" data-v="wallet" aria-label="Wallet balance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span>${cn(S.bal)}</span></button>
+  <div class="c-wrap">
+    <header class="c-top">
+      <div class="c-top-in">
+        <button class="c-ib" data-a="nav" data-v="markets" aria-label="Go back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="c-ttl">
+          <h1>Contest Details</h1>
+          <p>Fixed entry, guaranteed prizes</p>
+        </div>
+        <button class="c-wal" data-a="nav" data-v="wallet" aria-label="Wallet balance">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+          <span>${inr(S.bal)}</span>
+        </button>
+      </div>
     </header>
 
-    <main class="main-c">
-      <section class="card-c">
-        <div class="row-c"><span class="tag-c">${esc(cl(m.c))}</span>
-          <span class="timer-c" role="timer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-cd="${m.id}">${cdt(m)}</span></span></div>
-        <h2 class="ev-c">${esc(ttl(m))}</h2>
-        <div class="vs-c">
-          <div class="tm-c">
-            <div class="av-c">${esc(m.A[0].slice(0, 2).toUpperCase())}</div>
-            <div><b>${esc(m.A[1])}</b><small>${esc(m.lg)}</small></div>
+    <main class="c-main">
+      <div class="c-col-l">
+        <section class="c-card" id="c-hero" aria-labelledby="c-evt">
+          <div class="c-row">
+            <span class="c-tag">${esc(cl(m.c))}</span>
+            <div class="c-rr">
+              <span class="c-timer ${cls ? 'closed' : (left(m) < 3600 ? 'urgent' : '')}" role="timer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span data-cd="${m.id}">${cdt(m)}</span>
+              </span>
+              <button class="c-sh-btn" onclick="window.cShare('${m.id}')" aria-label="Share contest">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </button>
+            </div>
           </div>
-          <span class="vsp-c">VS</span>
-          <div class="tm-c b">
-            <div class="av-c alt">${esc(m.B[0].slice(0, 2).toUpperCase())}</div>
-            <div><b>${esc(m.B[1])}</b><small>${esc(m.lg)}</small></div>
-          </div>
-        </div>
-        <div class="lab-c"><span>Pick the winner</span><span>${lk ? 'Locked' : 'Required'}</span></div>
-        <div class="picks-c">${side('A')}${side('B')}</div>
-        <div style="margin-top:16px;">
-          <label class="s12" for="tie-input-${m.id}" style="font-weight:600;color:var(--i2);">Tie-Breaker: Predict winning margin</label>
-          <input type="number" inputmode="numeric" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${dis} value="${lk && lk.tie_breaker ? esc(lk.tie_breaker) : ''}">
-          <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
-        </div>
-        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(m[lk.p][1])}</span><small>Entry confirmed${lk.tie_breaker ? ' · Tie-breaker: ' + esc(lk.tie_breaker) : ''}</small></div></div>` : ''}
-      </section>
 
-      <section class="card-c pool-c">
-        <div class="row-c"><span class="pl-c">Guaranteed prize pool</span><span class="fee-c">Entry ${cn(fee)}</span></div>
-        <div class="amt-c">${cn(poolAmt)}</div><div class="gtd-c">Paid out whether or not all spots fill</div>
-        <div class="pgr-c"><div class="pgi-c"><span>Spots filled</span><span>${currentFilled} / ${totalSpots} spots (${totalSpots - currentFilled} left)</span></div><div class="bar-c" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div>
-        <div class="mini-c"><div><small>Winners</small><b>10</b></div><div><small>First prize</small><b>${cn(poolAmt * 0.3)}</b></div><div><small>Entry</small><b>${cn(fee)}</b></div></div>
-      </section>
+          <h2 class="c-ev" id="c-evt">${esc(ttl(m))}</h2>
 
-      <section class="card-c">
-        <div class="seg-c" role="tablist">
-          <button role="tab" aria-selected="true" onclick="window.fcTab(this,'prizes')">Prizes</button>
-          <button role="tab" aria-selected="false" onclick="window.fcTab(this,'entries')">Entries</button>
-          <button role="tab" aria-selected="false" onclick="window.fcTab(this,'rules')">Rules</button>
-        </div>
-        <div class="panel-c" id="p-prizes" role="tabpanel">
-          <table class="table-c">
-            <thead><tr><th>Rank</th><th>Share</th><th>Prize</th></tr></thead>
-            <tbody>${tiers.map(t => `<tr><td><div class="rk-c"><span class="rb-c">${t[0]}</span>${t[1]}</div></td><td class="pc-c">${t[2]}%${t[3]}</td><td class="pr-c">${cn(poolAmt * t[2] / 100)}</td></tr>`).join('')}</tbody>
-          </table>
-          <div class="note-c"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex:none"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Prizes are fixed and credited to your wallet within minutes of the result.</span></div>
-        </div>
-        <div class="panel-c" id="p-entries" role="tabpanel" hidden>
-          ${lk ? `<div class="ent-c me"><div class="ea-c">YOU</div><div><b>You</b><small>Just now</small></div><span class="pill-c">${esc(m[lk.p][0])}</span></div>` : ''}
-          <div class="ent-c"><div class="ea-c">A</div><div><b>Aarav S.</b><small>4 min ago</small></div><span class="pill-c">${esc(m.A[0])}</span></div>
-          <div class="ent-c"><div class="ea-c">P</div><div><b>Priya M.</b><small>8 min ago</small></div><span class="pill-c">${esc(m.B[0])}</span></div>
-          <div class="ent-c"><div class="ea-c">R</div><div><b>Rohan K.</b><small>12 min ago</small></div><span class="pill-c">${esc(m.A[0])}</span></div>
-        </div>
-        <div class="panel-c" id="p-rules" role="tabpanel" hidden>
-          <div class="rules-c">
-            <div class="rl-c"><span class="rn-c">1</span><div><b>Pick the match winner</b><small>Choose one team before the contest closes. One entry per player and it cannot be changed after joining.</small></div></div>
-            <div class="rl-c"><span class="rn-c">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning team is ranked above all other entries.</small></div></div>
-            <div class="rl-c"><span class="rn-c">3</span><div><b>Closest margin wins ties</b><small>Among correct picks, the closest winning-margin prediction ranks higher. If still equal, the earlier entry ranks higher.</small></div></div>
-            <div class="rl-c"><span class="rn-c">4</span><div><b>Abandoned or tied match</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
+          <div class="c-vs">
+            <div class="c-tm">
+              <div class="c-av">${esc(keyA)}</div>
+              <div><b>${esc(m.A[1])}</b><small>${esc(m.lg)}</small></div>
+            </div>
+            <span class="c-vsp">VS</span>
+            <div class="c-tm b">
+              <div class="c-av alt">${esc(keyB)}</div>
+              <div><b>${esc(m.B[1])}</b><small>${esc(m.lg)}</small></div>
+            </div>
           </div>
-        </div>
-      </section>
+
+          <div class="c-lab">
+            <span>Pick the winner</span>
+            <span>${lk ? 'Locked' : cls ? 'Closed' : 'Required'}</span>
+          </div>
+
+          <div class="c-picks">
+            <label class="c-pk">
+              <input type="radio" name="w" value="A" ${pick === 'A' ? 'checked' : ''} ${locked ? 'disabled' : ''} onchange="window.selectSide('${m.id}','A')" aria-label="Pick ${esc(m.A[1])}">
+              <div class="c-pb"><strong>${esc(m.A[1])}</strong><span class="c-rc">${CHECK}</span></div>
+            </label>
+            <label class="c-pk">
+              <input type="radio" name="w" value="B" ${pick === 'B' ? 'checked' : ''} ${locked ? 'disabled' : ''} onchange="window.selectSide('${m.id}','B')" aria-label="Pick ${esc(m.B[1])}">
+              <div class="c-pb"><strong>${esc(m.B[1])}</strong><span class="c-rc">${CHECK}</span></div>
+            </label>
+          </div>
+
+          <div class="c-entry ${lk ? 'on' : ''}" aria-live="polite">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+            <div>
+              <span>${lk ? 'You joined with ' + esc(full(m, lk.p)) : ''}</span>
+              <small>${lk ? 'Entry ' + esc(lk.id) + ' · ' + entryTimeStr : ''}</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="c-card" id="c-tabs">
+          <div class="c-seg" role="tablist">
+            <button role="tab" aria-selected="true" data-t="prizes" onclick="window.cTabSwitch(this,'prizes')">Prizes</button>
+            <button role="tab" aria-selected="false" data-t="rules" onclick="window.cTabSwitch(this,'rules')">Rules</button>
+          </div>
+
+          <div class="c-panel" id="cp-prizes" role="tabpanel">
+            <table class="c-table">
+              <thead><tr><th>Rank</th><th>Prize</th></tr></thead>
+              <tbody>
+                ${prizeRows.map(r => `
+                  <tr>
+                    <td>
+                      <div class="c-rk">
+                        <span class="c-rb">${r.badge}</span>
+                        <span>${r.label}${r.each ? ' <small>each</small>' : ''}</span>
+                      </div>
+                    </td>
+                    <td class="c-pr">${inr(r.amt)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div class="c-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span>Prizes are fixed and credited to your wallet within minutes of the result.</span>
+            </div>
+          </div>
+
+          <div class="c-panel" id="cp-rules" role="tabpanel" hidden>
+            <div class="c-rules">
+              <div class="c-rl"><span class="c-rn">1</span><div><b>Pick the winner</b><small>Choose one option before the contest closes. One entry per player, and it cannot be changed after joining.</small></div></div>
+              <div class="c-rl"><span class="c-rn">2</span><div><b>Correct picks rank first</b><small>Everyone who picked the winning option is ranked above all other entries.</small></div></div>
+              <div class="c-rl"><span class="c-rn">3</span><div><b>Earliest entry wins ties</b><small>Among correct picks, the player who joined earlier gets the higher rank.</small></div></div>
+              <div class="c-rl"><span class="c-rn">4</span><div><b>Cancelled or tied result</b><small>The entry fee is refunded to your wallet automatically.</small></div></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="c-col-r">
+        <section class="c-card c-pool" id="c-pool" aria-label="Prize pool">
+          <div class="c-row"><span class="c-pl">Guaranteed prize pool</span><span class="c-fee">Entry ${inr(fee)}</span></div>
+          <div class="c-amt">${inr(pool)}</div>
+          <div class="c-gtd">Paid out whether or not all spots fill</div>
+          <div class="c-pgi"><span>Spots filled</span><span>${filled} / ${spots} (${spotsLeft} left)</span></div>
+          <div class="c-bar" role="progressbar" aria-label="Spots filled" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+          <div class="c-fast ${spotsLeft > 0 && spotsLeft <= 25 ? 'on' : ''}">Filling fast. Only a few spots left.</div>
+          <div class="c-mini">
+            <div><small>Winners</small><b>${prizes[prizes.length - 1][1]}</b></div>
+            <div><small>First prize</small><b>${inr(prizeRows[0].amt)}</b></div>
+            <div><small>Entry</small><b>${inr(fee)}</b></div>
+          </div>
+        </section>
+
+        <section class="c-card" id="c-join" aria-label="Join contest">
+          <div class="c-sum">
+            <div class="c-sr"><span>Entry fee</span><b>${inr(fee)}</b></div>
+            <div class="c-sr"><span>Wallet balance</span><b>${inr(S.bal)}</b></div>
+            <div class="c-sr"><span>Spots left</span><b>${spotsLeft}</b></div>
+            <div class="c-sr t"><span>You pay</span><b>${inr(fee)}</b></div>
+          </div>
+          <button class="c-go ${lk ? 'done' : ''}" style="margin-top:14px" onclick="window.cOpenConfirmSheet('${m.id}')" ${locked ? 'disabled' : ''}>${ctaContent}</button>
+        </section>
+      </div>
     </main>
 
-    <footer class="cta-c">
-      <div class="cin-c">
-        <div class="cs-c"><small>Entry fee</small><b>${cn(fee)}</b></div>
-        <button class="go-c ${lk ? 'done' : ''}" onclick="window.joinContest('${m.id}')" ${dis}>
-          ${lk ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>You are in</span>' : cls ? 'Contest closed' : `<span>Join contest for ${cn(fee)}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`}
-        </button>
+    <footer class="c-cta">
+      <div class="c-cin">
+        <div class="c-cs"><small>Entry fee</small><b>${inr(fee)}</b></div>
+        <button class="c-go ${lk ? 'done' : ''}" onclick="window.cOpenConfirmSheet('${m.id}')" ${locked ? 'disabled' : ''}>${ctaContent}</button>
       </div>
     </footer>
   </div>
@@ -908,6 +1150,7 @@ async function doLogout() {
   S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); cleanAuthUrl(); render(); scrollTo(0,0);
 }
 
+// UPDATED LOCK PICKS TO HANDLE REAL MONEY
 function lockPicks(ids) {
   const ok = ids.filter(id => left(mkt(id)) > 0);
   if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
@@ -975,59 +1218,62 @@ window.updateStake = function(id, val) {
   if (isNaN(num) || num < 50) num = 50; 
   S.slipStake[id] = num;
   save();
+
+  const m = mkt(id);
+  if (!m) return;
+  
+  const sel = S.slip[id];
+  const odds = sel == "A" ? m.oa : m.ob;
+  const potential = sel ? Math.round(num * odds) : 0;
+  const profit = potential - num;
+
+  const lblStake = document.getElementById(`yc-stake-${id}`);
+  const lblReturn = document.getElementById(`yc-return-${id}`);
+  const lblProfit = document.getElementById(`yc-profit-${id}`);
+  const btn = document.querySelector(`.yc-cta`);
+
+  if (lblStake) lblStake.textContent = inr(num);
+  if (lblReturn) lblReturn.textContent = inr(potential);
+  if (lblProfit) lblProfit.textContent = '+' + inr(profit);
+
+  if (btn) {
+    if (num >= 50 && num <= 10000 && num % 10 === 0 && sel) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Confirm Bet';
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      if (num < 50) {
+        btn.textContent = 'Minimum stake is ₹50';
+      } else if (num % 10 !== 0) {
+        btn.textContent = 'Stake must be a multiple of ₹10';
+      } else {
+        btn.textContent = 'Confirm Bet';
+      }
+    }
+  }
 };
 
 window.incrementStake = function(id, add) {
   const inputEl = document.getElementById(`stake-input-${id}`);
-  let current = parseFloat(inputEl ? inputEl.value : 50);
-  if (isNaN(current) || current < 50 || current % 10 !== 0) current = 50;
-  let next = Math.min(10000, current + add);
+  let current = parseFloat(inputEl.value);
+  
+  if (isNaN(current) || current < 50 || current % 10 !== 0) {
+    current = 50;
+  }
+  
+  let next = current + add;
+  if (next > 10000) next = 10000;
+  
   S.slipStake[id] = next;
   if (inputEl) inputEl.value = next;
+  
   updateStake(id, next);
 };
-
 window.selectSide = function(id, side) {
   S.slip[id] = side;
   save();
-};
-
-window.joinContest = async function(matchId) {
-  const pick = S.slip[matchId] || 'A';
-  const tieInput = document.getElementById(`tie-input-${matchId}`);
-  const tieBreaker = tieInput ? tieInput.value : '';
-  const m = mkt(matchId);
-
-  if (!tieBreaker) return toast("Please enter a tie-breaker answer.", "alert");
-  if (S.bal < 50) return toast("Insufficient balance. You need ₹50.", "alert");
-  if (!S.user || !S.user.id) return toast("Please log in to join.", "alert");
-
-  const btn = document.querySelector(`button[onclick="window.joinContest('${matchId}')"]`);
-  if (btn) { btn.disabled = true; btn.textContent = "Joining..."; }
-
-  try {
-    const { error } = await supabase.from('predictions').insert({
-      user_id: S.user.id,
-      match_id: matchId,
-      prediction_choice: pick,
-      amount: 50,
-      tie_breaker: Number(tieBreaker)
-    });
-
-    if (error) throw error;
-
-    S.bal -= 50;
-    addTx("stake", 50, "Contest Entry: " + ttl(m), "completed");
-    S.preds.push({ id: Date.now(), m: matchId, p: pick, stake: 50, odds: 1, res: null, pay: 0, tie_breaker: tieBreaker, ts: Date.now() });
-    save(); 
-    toast("Contest joined successfully!", "check");
-    render(); 
-
-  } catch (e) {
-    console.error(e);
-    toast("Error joining contest: " + e.message, "alert");
-    if (btn) { btn.disabled = false; btn.innerHTML = '<span>Join contest for ₹50</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'; }
-  }
 };
 
 window.rateTicket = async function(id, rating) {
@@ -1091,6 +1337,7 @@ async function loadTickets() {
   if (!S.user || !window.CP_DB) return;
   try {
     const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
+    
     const fortyEightHoursAgo = Date.now() - (48 * 60 * 60 * 1000);
 
     S.tickets = (data || []).filter(t => {
@@ -1098,7 +1345,9 @@ async function loadTickets() {
         const lastMsg = t.ticket_messages && t.ticket_messages.length > 0 
           ? t.ticket_messages[t.ticket_messages.length - 1].created_at 
           : t.created_at;
-        return new Date(lastMsg).getTime() > fortyEightHoursAgo;
+        
+        const closeTime = new Date(lastMsg).getTime();
+        return closeTime > fortyEightHoursAgo;
       }
       return true;
     }).map(t => {
@@ -1125,13 +1374,14 @@ async function loadTickets() {
     save();
   } catch(e) { console.error("Tickets load failed", e); }
 }
-
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
+  
   if (!S.user.id || S.user.id === "Guest User") {
       toast("Please log in with Google to create a support ticket.", "alert");
       return;
   }
+  
   const openTicket = S.tickets.find(t => t.status !== 'closed');
   if (openTicket) {
       sheet(`<div style="text-align:center;padding:10px 0;">
@@ -1154,7 +1404,9 @@ async function createTicket() {
         .single();
 
     if (insertError) throw insertError;
+    
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
+    
     const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 30 minutes.`;
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
     
@@ -1166,7 +1418,6 @@ async function createTicket() {
     toast("Could not create ticket: " + e.message, "x"); 
   }
 }
-
 /* one-click handlers */
 document.addEventListener("click", async e => {
   const t = e.target.closest("[data-a]");
@@ -1335,6 +1586,7 @@ document.addEventListener("click", async e => {
   }
 });
 
+// Handle Phone Back Button / Swipe
 window.addEventListener('popstate', (e) => {
   if (e.state) {
     S.route = e.state.route || "home";
@@ -1365,16 +1617,17 @@ document.addEventListener("change", e => {
     rd.onload = async () => {
       if (!t) return;
       const base64Data = rd.result;
+      
       t.msgs.push({me:true, text:"[Image]", img:base64Data, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
       t.updated = "Just now"; save(); render();
       setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
+      
       await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: base64Data });
     };
     rd.readAsDataURL(f);
     e.target.value = "";
   }
 });
-
 /* timers */
 setInterval(() => {
   document.querySelectorAll("[data-cd]").forEach(n => {
@@ -1390,6 +1643,7 @@ async function fetchLiveScores() {
     const text = await response.text();
     let data;
     try { data = JSON.parse(text); } catch(e) { return; }
+    
     if (!data || !data.matches) return;
 
     for (const m of MK) {
@@ -1516,6 +1770,9 @@ window.addEventListener("load", async () => {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
+    // ==========================================
+    // CHECK MAINTENANCE MODE ON INITIAL LOAD
+    // ==========================================
     try {
       const { data } = await supabase.from('site_settings').select('*').in('key', ['maintenance', 'maint_msg']);
       if (data && data.length > 0) {
@@ -1546,6 +1803,7 @@ window.addEventListener("load", async () => {
       console.warn("Could not check maintenance mode (make sure site_settings table exists).", e);
     }
 
+    // 2. Setup Auth Listener FIRST to catch initial session safely
     CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
@@ -1559,6 +1817,7 @@ window.addEventListener("load", async () => {
       }
     });
 
+    // 3. Load Matches Data
     try {
       const liveMatches = await CP_DB.getMatches();
       if (liveMatches && liveMatches.length > 0) {
@@ -1580,6 +1839,7 @@ window.addEventListener("load", async () => {
       MK = [];
     }
 
+    // 4. Safe Session Check (Ensures PC screen doesn't stay blank)
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     if (session) { 
       await applySession(session); 
@@ -1587,6 +1847,7 @@ window.addEventListener("load", async () => {
       render(); 
     }
 
+    // 5. Listen for Immediate Maintenance Mode changes
     if (window.CP_DB && CP_DB.ready) {
       supabase.channel('global-settings')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings' }, (payload) => {
@@ -1600,6 +1861,7 @@ window.addEventListener("load", async () => {
         }).subscribe();
     }
     
+    // 5. Payment Return Handler with Polling
     async function checkPaymentReturn() {
       try {
         const params = new URLSearchParams(window.location.search);
