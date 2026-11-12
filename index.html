@@ -16,7 +16,8 @@
   --bg:#f6f7fb;--sf:#fff;--s2:#eff2f8;--ink:#0f1729;--i2:#4a5163;--i3:#7a8296;--ln:#e3e7ee;--ln2:#d0d6e2;
   --ac:#1a5cff;--ac2:#1348d6;--acs:#e8efff;
   --grad: linear-gradient(135deg, #1e5bf0, #1c2a55);
-  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1
+  --ok:#0b8f5e;--oks:#e4f6ee;--no:#d92d4b;--nos:#fdecf0;--am:#a86f0c;--ams:#fdf4e1;
+  --sh:0 1px 2px rgba(13,21,38,.04),0 8px 24px rgba(13,21,38,.05)
 }
 :root[data-theme=dark]{--bg:#090c12;--sf:#10141d;--s2:#171c27;--ink:#e8ecf4;--i2:#a2aab9;--i3:#6f7789;--ln:#1f2634;--ln2:#2b3345;--ac:#5b8cff;--ac2:#7ba3ff;--acs:#151f3d;--ok:#3ddc97;--oks:#10291f;--no:#fb6a82;--nos:#2b1520;--am:#fbbf24;--ams:#2a2211}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{-webkit-text-size-adjust:100%}
@@ -50,6 +51,7 @@ details.card{padding:0}details.card>summary{padding:13px 14px;font-weight:600;li
 .top h1{font-size:17px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .sub{display:none;font-size:13px;color:var(--i3)}.dk{display:none}
 .wc{height:38px;padding:0 11px;border-radius:10px;border:1px solid var(--ln2);background:var(--sf);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;flex:none}
 .pg{padding:12px 14px calc(88px + env(safe-area-inset-bottom));max-width:1100px}
+.pg.contest-pg{padding:0 0 calc(88px + env(safe-area-inset-bottom));max-width:none}
 .bn{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;background:var(--sf);border-top:1px solid var(--ln);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}.bn button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10.5px;font-weight:500;color:var(--i3)}.bn button.on{color:#1e5bf0;font-weight:600}
 .sbar{position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:55;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .pp{position:fixed;right:10px;top:calc(60px + env(safe-area-inset-top));width:min(340px,calc(100vw - 20px));background:var(--sf);border:1px solid var(--ln2);border-radius:14px;box-shadow:0 16px 40px -12px rgba(15,23,41,.3);z-index:70;overflow:hidden}
@@ -119,156 +121,25 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .pay-method-btn .pm-sub{font-size:10.5px;color:var(--i3);font-weight:500;}
 .pay-method-btn.selected .pm-text{color:var(--ac);}
 
-/* ====== EXACT "YOUR CALL" UI FROM YOUR SNIPPET ====== */
-.yc{container-type:inline-size;position:relative;overflow:hidden;color:var(--ink);font-family:inherit;background:var(--sf);border:1px solid var(--ln);border-radius:24px;box-shadow:0 4px 20px rgba(15,23,41,.05)}
-.yc button,.yc input{font:inherit;color:inherit}.yc button{cursor:pointer;-webkit-tap-highlight-color:transparent}
-.yc h3,.yc p,.yc dd,.yc fieldset{margin:0;padding:0}.yc svg{display:block;flex:none}
-.yc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px 16px;background:linear-gradient(180deg,var(--s2),var(--sf));border-bottom:1px solid var(--ln)}
-.yc-title{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.25}
-.yc-sub{margin-top:2px;font-size:12.5px;color:var(--i3);font-weight:500}
-.yc-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.yc-live{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:99px;background:var(--nos);color:var(--no);font-size:10.5px;font-weight:800;letter-spacing:.05em}
-.yc-live::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.yc-timer{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
-.yc-form{display:grid;gap:20px;padding:20px}
-.yc-label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;padding:0;font-size:13px;font-weight:700;color:var(--i2)}
-.yc-label small{font-size:11.5px;font-weight:500;color:var(--i3)}
-.yc-picks{min-width:0;border:0}
-.yc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.yc-opt{position:relative;display:block;min-width:0}
-.yc-opt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
-.yc-card{position:relative;display:flex;flex-direction:column;gap:14px;height:100%;padding:16px;border:2px solid var(--ln2);border-radius:20px;background:var(--sf);transition:all .2s cubic-bezier(.4,0,.2,1)}
-.yc-opt:hover .yc-card{border-color:var(--border-strong)}
-.yc-opt input:active+.yc-card{transform:scale(.985)}
-.yc-opt input:checked+.yc-card{border-color:var(--ac);background:var(--acs);box-shadow:0 4px 15px rgba(29,78,216,.15)}
-.yc-top{display:flex;align-items:center;gap:10px;min-width:0;padding-right:24px}
-.yc-mono{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;font-size:12px;font-weight:800;letter-spacing:.02em;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 2px 4px rgba(0,0,0,.1)}
-.yc-name{min-width:0;font-size:14px;font-weight:800;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.yc-check{margin-left:auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;border:2px solid var(--ln2);color:transparent;background:var(--sf);position:absolute;top:14px;right:14px;transition:all .15s}
-.yc-opt input:checked+.yc-card .yc-check{background:var(--ac);border-color:var(--ac);color:#fff}
-.yc-odds{display:flex;align-items:baseline;gap:6px;margin-top:4px;padding-right:8px}
-.yc-odds b{font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
-.yc-odds span{font-size:12px;font-weight:700;color:var(--i3);line-height:1;margin-bottom:2px}
-.yc-field{display:flex;align-items:center;gap:10px;height:64px;padding:0 16px;border:2px solid var(--ln2);border-radius:18px;background:var(--s2);transition:all .2s ease}
-.yc-field:focus-within{border-color:var(--ac);background:var(--sf);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 15%,transparent)}
-.yc-cur{font-size:26px;font-weight:800;color:var(--i3);line-height:1}
-.yc-amt{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;font-size:30px;font-weight:800;letter-spacing:-.03em;color:var(--ink);font-variant-numeric:tabular-nums}
-.yc-amt::placeholder{color:var(--ln2)}
-
-/* Fixed Chips (Centered & Light background) */
-.yc-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.yc-chip{height:44px;border:1.5px solid var(--ln2);border-radius:12px;background:var(--s2);font-size:13.5px;font-weight:700;color:var(--ink);transition:all .15s ease;display:flex;align-items:center;justify-content:center;padding:0}
-.yc-chip:hover{border-color:var(--ac);background:var(--acs);color:var(--ac)}
-.yc-chip:active{transform:scale(.96)}
-
-/* FORCED PADDING FIX - NOW BULLETPROOF */
-.yc-sum {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 22px 28px !important;
-  border-radius: 18px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 10%, var(--sf)), color-mix(in srgb, var(--ac) 2%, var(--sf)));
-  border: 1.5px solid color-mix(in srgb, var(--ac) 25%, var(--ln));
-  box-sizing: border-box !important;
-  width: 100%;
-  margin: 0;
-}
-.yc-sum > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.yc-sum dt {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--i2);
-  margin: 0;
-  padding: 0;
-}
-.yc-sum dd {
-  font-size: 15px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  margin: 0;
-  padding: 0;
-}
-.yc-sum .yc-return dd {
-  font-size: 20px;
-  letter-spacing: -.02em;
-}
-.yc-sum .yc-profit {
-  padding-top: 14px;
-  border-top: 1px dashed var(--ln2);
-  margin-top: 2px;
-}
-.yc-sum .yc-profit dt {
-  color: var(--ink);
-  font-weight: 700;
-}
-.yc-sum .yc-profit dd {
-  padding: 4px 12px;
-  border-radius: 99px;
-  background: var(--oks);
-  color: var(--ok);
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.yc-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border:0;border-radius:16px;background:var(--grad);color:#fff;font-size:16px;font-weight:800;letter-spacing:.01em;box-shadow:0 10px 24px -8px rgba(30,91,240,.6);transition:all .15s ease}
-.yc-cta:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
-.yc-cta:active:not(:disabled){transform:scale(.98)}
-.yc-cta:disabled{opacity:.65;box-shadow:none;transform:none;cursor:not-allowed;color:#ffffff !important;font-weight:600;}
-.yc-foot{display:grid;justify-items:center;gap:6px;margin-top:-4px;text-align:center}
-.yc-note{font-size:11px;color:var(--i3)}
-@container (max-width:340px){.yc-head{padding:14px}.yc-form{padding:14px;gap:18px}.yc-card{padding:12px;gap:12px}.yc-odds b{font-size:24px}.yc-amt{font-size:28px}.yc-cur{font-size:23px}}
-@container (min-width:460px){.yc-head{padding:18px 20px 16px}.yc-form{padding:20px;gap:22px}.yc-card{padding:16px}.yc-odds b{font-size:32px}}
-@media (prefers-reduced-motion:reduce){.yc *,.yc *::before,.yc *::after{transition:none!important}}
-
 /* Rating Stars */
 .stars { display: flex; justify-content: center; gap: 8px; font-size: 32px; cursor: pointer; color: var(--ln2); }
 .stars .star { transition: color 0.2s; }
 .stars .star.active { color: #facc15; }
 
-/* ================= 1) CSS from Claude ================= */
-.fc-wrap { padding: 0 0 20px; }
-.fc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.fc-back { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--ln2); background: var(--sf); display: grid; place-items: center; color: var(--i2); }
-.fc-card { background: var(--sf); border: 1px solid var(--ln); border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: 0 4px 18px rgba(15, 23, 41, 0.03); }
-.fc-pool { background: var(--grad); color: #fff; position: relative; overflow: hidden; border: 0; }
-.fc-pool:before { content: ""; position: absolute; top: -60px; right: -50px; width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.2), transparent 70%); }
-.fc-pool .amt { font-size: 38px; font-weight: 800; letter-spacing: -.04em; margin: 6px 0; }
-.fc-pool .bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.2); overflow: hidden; margin-top: 12px; }
-.fc-pool .bar i { display: block; height: 100%; width: 75%; background: #fff; }
-.fc-picks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.fc-radio { position: relative; }
-.fc-radio input { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
-.fc-box { border: 2px solid var(--ln2); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; background: var(--sf); transition: all .15s; }
-.fc-radio input:checked + .fc-box { border-color: var(--ac); background: var(--acs); }
-.fc-radio input:checked + .fc-box strong { color: var(--ac2); }
-.fc-table { width: 100%; border-collapse: collapse; }
-.fc-table th { font-size: 11px; color: var(--i3); text-transform: uppercase; padding: 8px 0; border-bottom: 1px solid var(--ln); text-align: left; }
-.fc-table td { padding: 12px 0; border-bottom: 1px solid var(--ln); font-size: 13.5px; }
-.fc-table tr:last-child td { border: 0; }
-.fc-table .amt-col { text-align: right; font-weight: 800; color: var(--ok); }
-.fc-input { width: 100%; border: 2px solid var(--ln2); border-radius: 12px; padding: 12px; background: var(--s2); font-size: 15px; font-weight: 700; outline: 0; margin-top: 8px; }
-.fc-input:focus { border-color: var(--ac); background: var(--sf); }
-/* EXACT CLAUDE CSS */
+/* ====== FIXED CONTEST DETAILS UI ====== */
 .app-c{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
 .ib-c{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
 .ib-c:hover{background:var(--s2);color:var(--ink)}.ib-c:active{transform:scale(.96)}
 .ttl-c{flex:1;min-width:0}.ttl-c h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.ttl-c p{font-size:12px;color:var(--i3);font-weight:500}
 .wal-c{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;flex:none}
 .wal-c svg{color:var(--ac)}
-.main-c{flex:1;padding:16px 16px calc(112px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.main-c{flex:1;padding:16px 16px calc(150px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
 .card-c{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px;box-shadow:var(--sh)}
 .row-c{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .tag-c{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 .timer-c{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;transition:background .3s,color .3s}
+.timer-c.urgent{background:var(--nos);color:var(--no)}.timer-c.closed{background:var(--s2);color:var(--i3)}
 .ev-c{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
 .vs-c{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
 .tm-c{display:flex;align-items:center;gap:10px;min-width:0}.tm-c.b{flex-direction:row-reverse;text-align:right}
@@ -319,7 +190,7 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .rules-c{display:flex;flex-direction:column;gap:12px}.rl-c{display:flex;gap:12px;align-items:flex-start}
 .rn-c{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
 .rl-c b{display:block;font-size:13.5px}.rl-c small{color:var(--i3);font-size:12.5px;line-height:1.4}
-.cta-c{position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+.cta-c{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:45;padding:12px 16px;background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
 .cin-c{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
 .cs-c{min-width:0}.cs-c small{display:block;font-size:11px;color:var(--i3);font-weight:500}.cs-c b{font-size:15px;font-weight:800;letter-spacing:-.02em}
 .go-c{flex:1;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s,box-shadow .15s;text-align:center}
@@ -327,8 +198,10 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .go-c:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.go-c.done{background:var(--oks);color:var(--ok);box-shadow:none}
 .tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
 .tie-input:focus{border-color:var(--ac);background:var(--sf)}
-/* addition: on desktop there is no bottom nav, and the sidebar is 220px wide */
-@media(min-width:900px){.cta-c{left:220px;bottom:0}}
+@media(min-width:900px){
+  .cta-c{left:220px;bottom:0;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  .main-c{padding-bottom:100px}
+}
 </style>
 </head>
 <body>
@@ -340,8 +213,6 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script> 
 <script src="config.js"></script>
 <script>
-// Anti-inspect removed for debugging
-
 const P = {
   home:"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10",
   target:"M22 12A10 10 0 1 1 2 12a10 10 0 0 1 20 0zM18 12A6 6 0 1 1 6 12a6 6 0 0 1 12 0zM14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0z",
@@ -387,8 +258,8 @@ const P = {
 const ic = (n,s=18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]||P.target}"/></svg>`;
 const $ = i => document.getElementById(i);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const inr = n => "🪙" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
-const inr2 = n => "🪙" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+const inr = n => "₹" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
+const inr2 = n => "₹" + Number(n).toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
 const ni = n => Math.round(n).toLocaleString("en-IN");
 
 const CATS = [
@@ -401,9 +272,6 @@ const CATS = [
   ["esports","Esports","gamepad"]
 ];
 
-// ==========================================
-// DEMO DATA FALLBACK (If Supabase is empty)
-// ==========================================
 const DEMO_MK = [
   {
     id: 'demo-1', c: 'cricket', lg: 'ICC T20 World Cup',
@@ -422,9 +290,9 @@ const DEMO_MK = [
   }
 ];
 
-let MK = []; // Start empty to prevent demo glitch
+let MK = [];
 
-const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["🪙50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
+const RW = [["10%","FreshBite 10% off","FB10-X7Q2","Food delivery"],["₹50","Cinema snack voucher","SNACK50-K9","Entertainment"],["20%","LearnHub course discount","LEARN20-M4","Education"],["Free","1-month reading app trial","READ1M-ZT","Subscriptions"],["15%","TravelNest booking offer","TRIP15-B8","Travel"]];
 const FAQ = [
   ["Is it really free?","Yes. Every market is free to enter. There are no payments required to predict."],
   ["How does the wallet work?","A correct pick credits your wallet. You can add funds and withdraw your winnings to your bank."],
@@ -516,7 +384,6 @@ function liveText(m) {
     }
     return m.liveData.statusText;
   }
-  // Fallback based on time if API fails
   if (m.closes_at) {
     const closeTime = new Date(m.closes_at).getTime();
     const now = Date.now();
@@ -534,6 +401,7 @@ function liveBoard(m) {
     </div>`;
 }
 const miniBoard = () => MK[0] ? liveBoard(MK[0]) : '';  
+
 /* ui helpers */
 const toast = (m,g="check") => {
   const n = document.createElement("div"); n.className = "ts";
@@ -571,7 +439,7 @@ function landing() {
       <h1>Call the match. <em>Win real money.</em></h1>
       <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
       <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get Started Free</button><button class="btn grow" data-a="auth" data-v="in">Login</button></div>
-      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>🪙0</b>Entry fee</div></div>
+      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
     </div>
     <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
   </section>
@@ -611,19 +479,14 @@ function legalPage(kind) {
       title:"Terms & Conditions",
       body:`
         <p>Welcome to CricPulse. By accessing or using our platform, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the platform.</p>
-        
         <h2>1. Eligibility & Jurisdiction</h2>
         <p>You must be at least 18 years of age to create an account. By using CricPulse, you represent that you are legally permitted to participate in skill-based online games in your jurisdiction. <strong>Residents of states where online gaming/prediction is restricted (including but not limited to Andhra Pradesh, Assam, Nagaland, Odisha, Sikkim, Tamil Nadu, and Telangana) are strictly prohibited from using this platform.</strong> You are solely responsible for ensuring compliance with your local laws.</p>
-        
         <h2>2. Nature of the Game</h2>
         <p>CricPulse is a "Game of Skill." The outcome of our prediction markets is based on your knowledge, analysis, and judgment of the respective sports or events. It is not a game of chance, lottery, or gambling.</p>
-        
         <h2>3. Account & Wallet</h2>
         <p>Only one account is permitted per user. Multi-accounting or using automated bots will result in immediate account suspension and forfeiture of funds. Your wallet balance can be used to enter prediction markets and can be withdrawn subject to our Refund Policy. We reserve the right to verify your identity (KYC) before processing withdrawals.</p>
-        
         <h2>4. Limitation of Liability</h2>
         <p>CricPulse is not liable for any financial loss, data loss, or emotional distress resulting from your participation. We do not guarantee continuous, uninterrupted access to the platform.</p>
-        
         <h2>5. Governing Law</h2>
         <p>These terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in the state where CricPulse's registered office is located.</p>
       `
@@ -632,16 +495,12 @@ function legalPage(kind) {
       title:"Privacy Policy",
       body:`
         <p>At CricPulse, we take your privacy seriously. This policy outlines how we collect, use, and protect your personal information in compliance with the Indian Information Technology Act, 2000.</p>
-        
         <h2>1. Information We Collect</h2>
         <p>We collect your Google profile information (Name, Email, Profile Picture) during sign-up. We also collect transaction data, wallet history, and device information (IP address, browser type) to ensure platform security and prevent fraud.</p>
-        
         <h2>2. How We Use Your Data</h2>
         <p>Your data is used strictly to operate your account, process deposits/withdrawals via secure payment gateways (such as ZapUPI), provide customer support, and comply with legal obligations.</p>
-        
         <h2>3. Data Sharing</h2>
         <p>We do not sell your personal data. We only share data with trusted third-party service providers (like payment gateways and cloud hosting providers) necessary to run the platform.</p>
-        
         <h2>4. Security & Retention</h2>
         <p>We use industry-standard encryption to protect your data. Your financial records are retained as long as required by Indian tax and financial regulations. You may request account deletion via the Support Center, subject to settlement of pending dues.</p>
       `
@@ -650,16 +509,12 @@ function legalPage(kind) {
       title:"Refund Policy",
       body:`
         <p>This Refund Policy governs the deposit, withdrawal, and refund of funds on the CricPulse platform.</p>
-        
         <h2>1. Market Voidance & Refunds</h2>
         <p>If a prediction market is abandoned, tied, cancelled, or voided due to unforeseen circumstances or incorrect official results, all entries and the associated stake amounts will be automatically refunded to your CricPulse wallet within 24 hours.</p>
-        
         <h2>2. Deposits</h2>
         <p>All deposits made via UPI or other payment methods are final once credited to your wallet. We do not charge any processing fees on deposits. If a deposit fails but money is deducted, it will be automatically reconciled and credited within 3-5 business days as per your bank's policy.</p>
-        
         <h2>3. Withdrawals</h2>
-        <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is 🪙100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
-        
+        <p>Withdrawals are processed manually or automatically within 24 business hours. The minimum withdrawal amount is ₹100. Once a withdrawal request is processed to your bank/UPI, it cannot be reversed. If you cancel a pending withdrawal request before it is processed, the funds will instantly return to your wallet.</p>
         <h2>4. Disputes</h2>
         <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 30 minutes during business hours.</p>
       `
@@ -699,12 +554,12 @@ const slipBody = () => {
     const potential = Math.round(stake * odds);
     totalPotential += potential;
     return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: 🪙</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
-    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: 🪙${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
-  html += `<div class="sl"><span class="t2">Total Stake</span><b>🪙${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
-  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">🪙${totalPotential}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">₹${totalPotential}</b></div>`;
   html += `<button class="btn p w" style="margin-top:8px" data-a="lockslip">${ic("lock",14)} Lock Picks</button>`;
   return html;
 };
@@ -717,8 +572,8 @@ function homeV() {
   
   const row = m => `<button class="ln" data-a="open" data-v="${m.id}"><div class="grow"><div class="nm">${esc(ttl(m))}</div><div class="lvt" style="margin:0;color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div></div>${ic("chevR",16)}</button>`;
 
-const activeMatches = MK.filter(m => left(m) > 0 && !m.isFinished).slice(0, 3);
-const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
+  const activeMatches = MK.filter(m => left(m) > 0 && !m.isFinished).slice(0, 3);
+  const closingSoon = [...MK].filter(m => !m.isFinished && left(m) > 0).sort((a,b) => a.s - b.s).slice(0, 3);
 
   return `<div class="stack">${kpi([["Wallet Balance",inr(S.bal),"Available to play"],["Total Won",inr(S.txs.filter(x=>x.type==="win").reduce((a,b)=>a+b.amount,0)),"Lifetime earnings"],["Total Predictions",t.n,t.d+" settled"],["Win Rate",t.p+"%",t.w+" correct"]])}
 
@@ -747,24 +602,19 @@ function picksV() {
 }
 function walletV() {
   const pend = sumTx("withdraw","pending"), L = S.txs.map((t,i) => ({...t,i})).filter(t => S.txf == "all" || t.type == S.txf).sort((a,b) => b.ts - a.ts);
-  
-  // Show only 5 if showAllTx is false
   const displayList = S.showAllTx ? L : L.slice(0, 5);
   
   return `<div class="stack"><div class="wbal"><small>Wallet Balance</small><h2>${inr2(S.bal)}</h2><div class="s12" style="opacity:.7">${pend?inr2(pend)+" pending withdrawal":"Available for withdrawal"}</div><div class="row" style="margin-top:12px"><button class="btn" data-a="dep">${ic("down",14)} Add funds</button><button class="btn" data-a="wd">${ic("up",14)} Withdraw</button></div></div>
 <div class="stats c3"><div><small>Deposits</small><b>${inr(sumTx("deposit","completed"))}</b></div><div><small>Winnings</small><b class="ok">${inr(sumTx("win"))}</b></div><div><small>Withdrawn</small><b>${inr(sumTx("withdraw","completed"))}</b></div></div>
 <div class="card" style="padding:12px 14px 4px"><h3>Transactions</h3>${chips("txf",S.txf,[["all","All"],["deposit","Deposits"],["withdraw","Withdrawals"],["win","Winnings"]])}
-  
   <div style="${S.showAllTx ? 'max-height: 380px; overflow-y: auto; padding-right: 4px;' : ''}">
     ${L.length ? displayList.map(t => `<div class="ln"><div class="grow"><b class="s12" style="display:block">${{deposit:"Deposit",withdraw:"Withdrawal",win:"Winnings",stake:"Bet Stake"}[t.type]||t.type}</b><span class="mut s12">${esc(t.n)} · ${esc(t.date)}</span></div><div class="col" style="align-items:flex-end;gap:4px"><b class="${t.type=="withdraw"||t.type=="stake"?"no":"ok"}">${t.type=="withdraw"||t.type=="stake"?"-":"+"}${inr2(t.amount)}</b>${t.status=="pending"?`<span class="pill am">Pending</span><button class="mut s11" data-a="wcancel" data-v="${t.i}">Cancel</button>`:t.status=="cancelled"?'<span class="pill">Cancelled</span>':'<span class="pill ok">Completed</span>'}</div></div>`).join("") : '<div class="empty">No transactions yet.</div>'}
   </div>
-
   ${L.length > 5 ? `<button class="btn g w" style="margin-top:10px; margin-bottom:6px;" data-a="toggletx">${S.showAllTx ? 'Show Less' : 'Show More Transactions'}</button>` : ''}
 </div>
-<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>🪙100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>🪙0</b></div></div></details></div>`;
+<details class="card"><summary>Withdrawal policy${ic("chev",15)}</summary><div class="bd"><div class="ln"><span class="t2">Minimum</span><b>₹100</b></div><div class="ln"><span class="t2">Processing</span><b>Up to 24 hours</b></div><div class="ln"><span class="t2">Fees</span><b>₹0</b></div></div></details></div>`;
 }
 function rewardsV() {
-  const un = S.cps.filter(c => !c.cl).length;
   return `<div class="stack"><div class="card" style="padding:12px 14px 2px"><h3>Your coupons</h3>${S.cps.length ? S.cps.map((c,i) => `<div class="ln"><div class="cv">${esc(c.v)}</div><div class="grow"><b class="s12" style="display:block">${esc(c.t)}</b><span class="mut s12">${esc(c.cat)}</span>${c.cl?`<div class="code"><span>${esc(c.code)}</span><button class="btn sm" data-a="copy" data-v="${esc(c.code)}">Copy</button></div>`:""}</div>${c.cl?"":`<button class="btn sm p" data-a="claim" data-v="${i}">Claim</button>`}</div>`).join("") : '<div class="empty">No coupons yet. Win a pick to unlock one.</div>'}</div>
 <details class="card"><summary>Rewards you can win${ic("chev",15)}</summary><div class="bd">${RW.map(r => `<div class="ln"><div class="cv">${r[0]}</div><div class="grow"><b class="s12" style="display:block">${r[1]}</b><span class="mut s12">${r[3]}</span></div></div>`).join("")}</div></details></div>`;
 }
@@ -776,7 +626,7 @@ function ranksV() {
 }
 const alertsV = () => `<div class="bt" style="margin-bottom:8px">${chips("nf",S.nf,[["all","All"],["u","Unread"]]).replace('class="chips"','class="chips" style="margin:0;padding:0"')}<button class="btn sm" data-a="readall">Mark all read</button></div><div class="card" style="padding:0;overflow:hidden">${ntf(S.nts.filter(n => S.nf=="all" || !n.r))}</div>`;
 function profileV() {
-  const u = S.user, t = tally();
+  const u = S.user;
   const tg = [["em","Email updates","Weekly summary."],["re","Result alerts","When a pick settles."],["rw","Reward alerts","When a coupon unlocks."]];
   return `<div class="stack"><div class="card"><div class="row"><span class="av" style="width:46px;height:46px;font-size:18px">${esc(u.n[0].toUpperCase())}</span><div class="grow"><b>${esc(u.n)}</b><div class="mut s12">${esc(u.e)}</div></div></div></div>
 <div class="card"><h3>Display name</h3><div class="row"><input class="inp" id="dn" value="${esc(u.n)}" maxlength="30"><button class="btn p" data-a="saven">Save</button></div></div>
@@ -791,7 +641,6 @@ const helpV = () => `<div class="stack">${faqH()}
 
 /* support center */
 function supportV() {
-  const open = S.tickets.filter(t => t.status != "closed").length;
   const ig = (window.CP_CONFIG && window.CP_CONFIG.INSTAGRAM_HANDLE) || "cricpulse.official";
   return `<div class="stack"><div class="card"><div class="bt"><div><b>Support Center</b><div class="mut s12"><span class="sla">${ic("clock",13)} We reply within ${(window.CP_CONFIG&&window.CP_CONFIG.SUPPORT_REPLY_WINDOW)||"30 minutes"}</span></div></div><span class="pill ok">Online</span></div></div>
 <div class="grid2">
@@ -862,111 +711,9 @@ function ticketV() {
   </div>`;
 }
 
-/* match */
-function form(m,k) { return [0,1,2,3,4].map(i => (m.id*3+i*5+k*2)%7<4?"W":"L"); }
-
-<!-- ================= 1) CSS: paste inside <head> ================= -->
-<style>
-/* Contest Specific CSS */
-.fc-wrap { padding: 0 0 20px; }
-.fc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.fc-back { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--ln2); background: var(--sf); display: grid; place-items: center; color: var(--i2); }
-.fc-card { background: var(--sf); border: 1px solid var(--ln); border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: 0 4px 18px rgba(15, 23, 41, 0.03); }
-.fc-pool { background: var(--grad); color: #fff; position: relative; overflow: hidden; border: 0; }
-.fc-pool:before { content: ""; position: absolute; top: -60px; right: -50px; width: 190px; height: 190px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.2), transparent 70%); }
-.fc-pool .amt { font-size: 38px; font-weight: 800; letter-spacing: -.04em; margin: 6px 0; }
-.fc-pool .bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.2); overflow: hidden; margin-top: 12px; }
-.fc-pool .bar i { display: block; height: 100%; width: 75%; background: #fff; }
-.fc-picks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.fc-radio { position: relative; }
-.fc-radio input { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
-.fc-box { border: 2px solid var(--ln2); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; background: var(--sf); transition: all .15s; }
-.fc-radio input:checked + .fc-box { border-color: var(--ac); background: var(--acs); }
-.fc-radio input:checked + .fc-box strong { color: var(--ac2); }
-.fc-table { width: 100%; border-collapse: collapse; }
-.fc-table th { font-size: 11px; color: var(--i3); text-transform: uppercase; padding: 8px 0; border-bottom: 1px solid var(--ln); text-align: left; }
-.fc-table td { padding: 12px 0; border-bottom: 1px solid var(--ln); font-size: 13.5px; }
-.fc-table tr:last-child td { border: 0; }
-.fc-table .amt-col { text-align: right; font-weight: 800; color: var(--ok); }
-.fc-input { width: 100%; border: 2px solid var(--ln2); border-radius: 12px; padding: 12px; background: var(--s2); font-size: 15px; font-weight: 700; outline: 0; margin-top: 8px; }
-.fc-input:focus { border-color: var(--ac); background: var(--sf); }
-/* EXACT CLAUDE CSS */
-.app-c{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.top-c{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
-.ib-c{width:40px;height:40px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:grid;place-items:center;color:var(--i2);flex:none;transition:background .15s,color .15s}
-.ib-c:hover{background:var(--s2);color:var(--ink)}.ib-c:active{transform:scale(.96)}
-.ttl-c{flex:1;min-width:0}.ttl-c h1{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.25}.ttl-c p{font-size:12px;color:var(--i3);font-weight:500}
-.wal-c{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--ln2);background:var(--sf);display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;flex:none}
-.wal-c svg{color:var(--ac)}
-.main-c{flex:1;padding:16px 16px calc(112px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
-.card-c{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:18px;box-shadow:var(--sh)}
-.row-c{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.tag-c{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;background:var(--acs);color:var(--ac);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.timer-c{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:var(--ams);color:var(--am);font-size:12px;font-weight:700;transition:background .3s,color .3s}
-.ev-c{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:14px 0 16px}
-.vs-c{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:16px}
-.tm-c{display:flex;align-items:center;gap:10px;min-width:0}.tm-c.b{flex-direction:row-reverse;text-align:right}
-.av-c{width:46px;height:46px;border-radius:13px;background:var(--grad);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;letter-spacing:.02em;flex:none;box-shadow:0 6px 14px -4px rgba(30,91,240,.45)}
-.av-c.alt{background:linear-gradient(135deg,#7aa2ff,#2f55c9)}
-.tm-c b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.15}.tm-c small{display:block;font-size:12px;color:var(--i3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vsp-c{font-size:11px;font-weight:800;color:var(--i3);background:var(--sf);border:1px solid var(--ln);padding:3px 9px;border-radius:99px;letter-spacing:.06em}
-.lab-c{display:flex;justify-content:space-between;margin:20px 0 9px;font-size:12px;font-weight:600;color:var(--i2)}.lab-c span:last-child{color:var(--ac)}
-.picks-c{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pk-c{position:relative}.pk-c input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0}.pk-c input:disabled{cursor:not-allowed}
-.pb-c{border:2px solid var(--ln2);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--sf);transition:border-color .15s,background .15s,transform .1s}
-.pk-c input:not(:disabled):hover+.pb-c{border-color:var(--ac)}.pk-c input:active+.pb-c{transform:scale(.985)}
-.pk-c input:checked+.pb-c{border-color:var(--ac);background:var(--acs)}.pk-c input:disabled:not(:checked)+.pb-c{opacity:.5}
-.pb-c strong{font-size:14px;font-weight:700}.pk-c input:checked+.pb-c strong{color:var(--ac2)}
-.rc-c{width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);display:grid;place-items:center;transition:all .15s;color:#fff;flex:none}
-.rc-c svg{opacity:0;transform:scale(.6);transition:all .15s}
-.pk-c input:checked+.pb-c .rc-c{background:var(--ac);border-color:var(--ac)}.pk-c input:checked+.pb-c .rc-c svg{opacity:1;transform:scale(1)}
-.entry-c{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--oks);color:var(--ok);font-weight:600;font-size:13px;align-items:center;gap:10px}
-.entry-c.on{display:flex}.entry-c small{display:block;font-weight:500;opacity:.85}
-.pool-c{background:var(--grad);color:#fff;border:0;position:relative;overflow:hidden;padding:22px 20px;box-shadow:0 14px 30px -10px rgba(30,79,216,.5)}
-.pool-c:before{content:"";position:absolute;top:-60px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%)}
-.pool-c>*{position:relative}
-.pl-c{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
-.fee-c{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:9px;font-size:12px;font-weight:700}
-.amt-c{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin:6px 0 2px}.gtd-c{font-size:12px;opacity:.85;font-weight:500}
-.pgr-c{margin-top:18px}.pgi-c{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:7px}
-.bar-c{height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}.bar-c i{display:block;height:100%;width:0;border-radius:99px;background:#fff;box-shadow:0 0 12px rgba(255,255,255,.55);transition:width .7s cubic-bezier(.2,.8,.2,1)}
-.mini-c{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px;border-top:1px solid rgba(255,255,255,.2);padding-top:14px}
-.mini-c div+div{border-left:1px solid rgba(255,255,255,.2);padding-left:14px}.mini-c small{display:block;font-size:11px;opacity:.8;font-weight:500}.mini-c b{font-size:16px;font-weight:800;letter-spacing:-.02em}
-.seg-c{display:flex;gap:4px;padding:4px;background:var(--s2);border-radius:13px;margin-bottom:16px}
-.seg-c button{flex:1;text-align:center;height:36px;border-radius:10px;font-size:13px;font-weight:600;color:var(--i2);transition:all .15s}
-.seg-c button[aria-selected=true]{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(13,21,38,.1)}
-.panel-c[hidden]{display:none}
-.table-c{width:100%;border-collapse:collapse}
-.table-c th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--i3);padding:8px 8px;border-bottom:1px solid var(--ln);text-align:left}
-.table-c th:last-child,.table-c td:last-child{text-align:right}
-.table-c td{padding:12px 8px;border-bottom:1px solid var(--ln);font-size:13.5px}.table-c tr:last-child td{border:0}
-.rk-c{display:flex;align-items:center;gap:10px;font-weight:700}
-.rb-c{min-width:30px;height:26px;padding:0 7px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:11px;font-weight:800}
-.table-c tr:first-child .rb-c{background:var(--grad);color:#fff}
-.pc-c{color:var(--i2);font-weight:600}.pr-c{font-weight:800;color:var(--ok)}
-.note-c{margin-top:12px;font-size:12px;color:var(--i3);display:flex;gap:7px;align-items:flex-start}
-.ent-c{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln)}.ent-c:last-child{border:0}
-.ea-c{width:36px;height:36px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
-.ent-c.me .ea-c{background:var(--grad);color:#fff}.ent-c div:nth-child(2){flex:1;min-width:0}.ent-c b{display:block;font-size:13.5px}.ent-c small{color:var(--i3);font-size:12px}
-.pill-c{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--i2)}
-.ent-c.me .pill-c{background:var(--acs);color:var(--ac)}
-.rules-c{display:flex;flex-direction:column;gap:12px}.rl-c{display:flex;gap:12px;align-items:flex-start}
-.rn-c{width:26px;height:26px;border-radius:8px;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
-.rl-c b{display:block;font-size:13.5px}.rl-c small{color:var(--i3);font-size:12.5px;line-height:1.4}
-.cta-c{position:fixed;left:0;right:0;bottom:70px;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--sf) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
-.cin-c{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
-.cs-c{min-width:0}.cs-c small{display:block;font-size:11px;color:var(--i3);font-weight:500}.cs-c b{font-size:15px;font-weight:800;letter-spacing:-.02em}
-.go-c{flex:1;height:52px;border-radius:15px;background:var(--grad);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);transition:transform .15s,filter .15s,box-shadow .15s;text-align:center}
-.go-c:hover:not(:disabled){filter:brightness(1.07);transform:translateY(-1px)}.go-c:active:not(:disabled){transform:scale(.985)}
-.go-c:disabled{background:var(--s2);color:var(--i3);box-shadow:none;cursor:not-allowed}.go-c.done{background:var(--oks);color:var(--ok);box-shadow:none}
-.tie-input{width:100%;border:2px solid var(--ln2);border-radius:12px;padding:12px;background:var(--s2);font-size:15px;font-weight:700;outline:0;margin-top:8px}
-.tie-input:focus{border-color:var(--ac);background:var(--sf)}
-/* addition: on desktop there is no bottom nav, and the sidebar is 220px wide */
-@media(min-width:900px){.cta-c{left:220px;bottom:0}}
-</style>
-
-<!-- ================= 2) JS: replace your existing matchV() with this ================= -->
-<script>
+/* =========================================================
+   NEW CONTEST DETAILS PAGE (matchV)
+   ========================================================= */
 window.fcTab = function (btn, id) {
   var root = btn.closest('.card-c');
   root.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b === btn); });
@@ -975,13 +722,13 @@ window.fcTab = function (btn, id) {
 
 function matchV() {
   const m = mkt(S.mid);
-  if (!m) return '<div class="card empty">Market not found or has ended.</div>';
+  if (!m) return '<div class="card empty" style="margin:14px;">Market not found or has ended.</div>';
 
-  const lk = S.preds.find(p => p.m == m.id);
+  const lk = S.preds.find(p => String(p.m) === String(m.id));
   const cls = !left(m) || m.isFinished;
   const sel = lk ? lk.p : (S.slip[m.id] || 'A');
   const dis = lk || cls ? 'disabled' : '';
-  const cn = n => '🪙' + Math.round(n).toLocaleString('en-IN');
+  const cn = n => '₹' + Math.round(n).toLocaleString('en-IN');
 
   const totalSpots = 200, fee = 50, poolAmt = totalSpots * fee;
   const currentFilled = lk ? 151 : 150;
@@ -1024,7 +771,7 @@ function matchV() {
           <input type="number" inputmode="numeric" id="tie-input-${m.id}" class="tie-input" placeholder="e.g. 24" ${dis} value="${lk && lk.tie_breaker ? esc(lk.tie_breaker) : ''}">
           <small class="mut s11" style="display:block;margin-top:6px;">Many players will pick the same winner. The closest prediction ranks higher.</small>
         </div>
-        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(m[lk.p][1])}</span><small>Entry confirmed</small></div></div>` : ''}
+        ${lk ? `<div class="entry-c on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg><div><span>You joined with ${esc(m[lk.p][1])}</span><small>Entry confirmed${lk.tie_breaker ? ' · Tie-breaker: ' + esc(lk.tie_breaker) : ''}</small></div></div>` : ''}
       </section>
 
       <section class="card-c pool-c">
@@ -1075,7 +822,7 @@ function matchV() {
   </div>
   `;
 }
-</script>
+
 const VIEWS = {home:homeV, markets:marketsV, picks:picksV, wallet:walletV, rewards:rewardsV, ranks:ranksV, alerts:alertsV, profile:profileV, help:helpV, support:supportV, ticket:ticketV, match:matchV};
 const MORE = ["rewards","ranks","alerts","profile","support","help"];
 
@@ -1085,14 +832,14 @@ function shell() {
   if (mt && !m) { S.route = "home"; return shell(); }
   const title = mt ? ttl(m) : (META[R] ? META[R][0] : "CricPulse"), sub = mt ? cl(m.c) + " · " + m.lg : (META[R] ? META[R][1] : "");
   const bn = [["home","Home","home"],["markets","Markets","target"],["picks","Picks","list"],["wallet","Wallet","wallet"],["more","More","more"]];
-  const hasBack = ["match","ticket","support"].includes(R) || R=="help";
+  const hasBack = ["ticket","support"].includes(R) || R=="help";
   
   const mobileBrand = `<div class="brand mobo" style="margin-right:8px;"><img src="https://plain-apac-prod-public.komododecks.com/202610/29/m2TmM6SyQ9C7xurAhnjr/image.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>`;
 
-  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>` + g[1].map(i => `<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
-<div><header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>
+  return `<div class="app"><aside class="rail"><div class="brand" style="padding:2px 8px 10px">${brand}</div>${RAIL.map(g => `<div class="rg">${g[0]}</div>`+g[1].map(i=>`<button class="rl${R==i[0]||(mt&&i[0]=="markets")?" on":""}" data-a="nav" data-v="${i[0]}">${ic(i[2],16)}${i[1]}</button>`).join("")).join("")}<div class="mut s11" style="margin-top:auto;padding:12px 8px 0;border-top:1px solid var(--ln)">© CricPulse</div></aside>
+<div>${mt ? '' : `<header class="top">${hasBack ? `<button class="ib" data-a="back" aria-label="Back">${ic("back",18)}</button>` : mobileBrand}<div class="grow"><h1>${esc(title)}</h1><div class="sub">${esc(sub)}</div></div><button class="ib dk" data-a="theme" aria-label="Toggle theme">${ic(isDark()?"sun":"moon",16)}</button><button class="wc" data-a="nav" data-v="wallet">${ic("wallet",15)}${inr(S.bal)}</button><button class="ib" data-a="pop" aria-label="Notifications">${ic("bell",16)}${un?`<span class="dot">${un}</span>`:""}</button><button class="av mnone" data-a="nav" data-v="profile" aria-label="Profile">${esc(S.user.n[0].toUpperCase())}</button></header>`}
 ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="readall">Mark read</button></header>${ntf(S.nts.slice(0,4))}<div style="padding:8px"><button class="btn sm w" data-a="nav" data-v="alerts">View all</button></div></div>` : ""}
-<main class="pg">${VIEWS[R]()}</main></div></div>
+<main class="${mt ? 'pg contest-pg' : 'pg'}">${VIEWS[R]()}</main></div></div>
 <nav class="bn">${bn.map(i => { const on = i[0]=="more" ? MORE.includes(R) : (R==i[0]||(mt&&i[0]=="markets")); return `<button class="${on?"on":""}" data-a="${i[0]=="more"?"more":"nav"}" data-v="${i[0]}">${ic(i[2],20)}${i[1]}</button>`; }).join("")}</nav>`;
 }
 
@@ -1147,7 +894,7 @@ function applySession(session) {
       render();
     } catch (err) {
       console.error("Critical error in applySession:", err);
-      render(); // Force render to prevent white screen
+      render();
     }
   })();
   return AUTH_P;
@@ -1161,7 +908,6 @@ async function doLogout() {
   S.user = null; S.pub = "land"; S.pop = 0; closeSheet(); save(); cleanAuthUrl(); render(); scrollTo(0,0);
 }
 
-// UPDATED LOCK PICKS TO HANDLE REAL MONEY
 function lockPicks(ids) {
   const ok = ids.filter(id => left(mkt(id)) > 0);
   if (ok.length < ids.length) toast("Closed markets were skipped.","clock");
@@ -1177,7 +923,7 @@ function lockPicks(ids) {
   });
 
   if (hasError) {
-    toast("Invalid stake amount. Minimum is 🪙50 and must be a multiple of 10.", "alert");
+    toast("Invalid stake amount. Minimum is ₹50 and must be a multiple of 10.", "alert");
     return;
   }
 
@@ -1186,7 +932,6 @@ function lockPicks(ids) {
     return;
   }
 
-  // Deduct balance
   S.bal -= totalStake;
   addTx("stake", totalStake, "Bets placed", "completed");
 
@@ -1197,7 +942,6 @@ function lockPicks(ids) {
     
     S.preds.push({id:Date.now()+Number(id), m:id, p:S.slip[id], stake: stake, odds: odds, res:null, pay:0}); 
     
-    // Save vote to Database
     if (window.CP_DB && window.CP_DB.ready && S.user) {
       supabase.from('predictions').insert({
         user_id: S.user.id, 
@@ -1231,75 +975,23 @@ window.updateStake = function(id, val) {
   if (isNaN(num) || num < 50) num = 50; 
   S.slipStake[id] = num;
   save();
-
-  const m = mkt(id);
-  if (!m) return;
-  
-  const sel = S.slip[id];
-  const odds = sel == "A" ? m.oa : m.ob;
-  const potential = sel ? Math.round(num * odds) : 0;
-  const profit = potential - num;
-
-  const lblStake = document.getElementById(`yc-stake-${id}`);
-  const lblReturn = document.getElementById(`yc-return-${id}`);
-  const lblProfit = document.getElementById(`yc-profit-${id}`);
-  const btn = document.querySelector(`.yc-cta`);
-
-  if (lblStake) lblStake.textContent = inr(num);
-  if (lblReturn) lblReturn.textContent = inr(potential);
-  if (lblProfit) lblProfit.textContent = '+' + inr(profit);
-
-  if (btn) {
-    // Must be >= 50, <= 10000, and a multiple of 10
-    if (num >= 50 && num <= 10000 && num % 10 === 0 && sel) {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.textContent = 'Confirm Bet';
-    } else {
-      btn.disabled = true;
-      btn.style.opacity = '0.6';
-      if (num < 50) {
-        btn.textContent = 'Minimum stake is 🪙50';
-      } else if (num % 10 !== 0) {
-        btn.textContent = 'Stake must be a multiple of 🪙10';
-      } else {
-        btn.textContent = 'Confirm Bet';
-      }
-    }
-  }
 };
 
 window.incrementStake = function(id, add) {
   const inputEl = document.getElementById(`stake-input-${id}`);
-  let current = parseFloat(inputEl.value);
-  
-  // If user typed an invalid amount (like 53), snap back to the base minimum of 50
-  if (isNaN(current) || current < 50 || current % 10 !== 0) {
-    current = 50;
-  }
-  
-  let next = current + add;
-  if (next > 10000) next = 10000;
-  
+  let current = parseFloat(inputEl ? inputEl.value : 50);
+  if (isNaN(current) || current < 50 || current % 10 !== 0) current = 50;
+  let next = Math.min(10000, current + add);
   S.slipStake[id] = next;
   if (inputEl) inputEl.value = next;
-  
   updateStake(id, next);
 };
+
 window.selectSide = function(id, side) {
   S.slip[id] = side;
   save();
-  render();
 };
 
-// 1. Handle Tab Switching
-window.fcTab = function (btn, id) {
-  var root = btn.closest('.card-c');
-  root.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b === btn); });
-  root.querySelectorAll('.panel-c').forEach(function (p) { p.hidden = p.id !== 'p-' + id; });
-};
-
-// 2. Handle Join Contest
 window.joinContest = async function(matchId) {
   const pick = S.slip[matchId] || 'A';
   const tieInput = document.getElementById(`tie-input-${matchId}`);
@@ -1307,7 +999,7 @@ window.joinContest = async function(matchId) {
   const m = mkt(matchId);
 
   if (!tieBreaker) return toast("Please enter a tie-breaker answer.", "alert");
-  if (S.bal < 50) return toast("Insufficient balance. You need 🪙50.", "alert");
+  if (S.bal < 50) return toast("Insufficient balance. You need ₹50.", "alert");
   if (!S.user || !S.user.id) return toast("Please log in to join.", "alert");
 
   const btn = document.querySelector(`button[onclick="window.joinContest('${matchId}')"]`);
@@ -1334,7 +1026,7 @@ window.joinContest = async function(matchId) {
   } catch (e) {
     console.error(e);
     toast("Error joining contest: " + e.message, "alert");
-    if (btn) { btn.disabled = false; btn.textContent = "Join Contest for 🪙50"; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>Join contest for ₹50</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'; }
   }
 };
 
@@ -1355,7 +1047,7 @@ const mask = s => s.length <= 4 ? "••••" : s.slice(0,2) + "••••"
 const PRESETS = [50, 100, 300, 500, 1000];
 function depSheet() {
   sheet(`<h3 style="font-size:17px">Add funds</h3><p class="mut s12" style="margin:2px 0 12px">Choose an amount and payment method.</p>
-  <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">🪙${v}</button>`).join("")}</div>
+  <div class="chips" style="margin:0 0 10px;padding:0;flex-wrap:wrap">${PRESETS.map(v => `<button class="chip" data-a="damt" data-v="${v}">₹${v}</button>`).join("")}</div>
   <div class="fld"><label for="da">Amount</label><input class="inp" id="da" type="number" inputmode="numeric" min="50" placeholder="Enter amount e.g. 50, 100"></div>
   <div class="fld">
     <label>Payment method</label>
@@ -1388,7 +1080,7 @@ function selectPaymentMethod(btn) {
   btn.classList.add('selected');
   document.getElementById('dm').value = btn.dataset.method;
 }
-const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min 🪙100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
+const wdSheet = () => sheet(`<h3 style="font-size:17px">Withdraw</h3><p class="mut s12" style="margin:2px 0 12px">Available: <b class="ok">${inr2(S.bal)}</b></p><div class="fld"><label for="wa">Amount (min ₹100)</label><div class="row"><input class="inp" id="wa" type="number" inputmode="numeric" placeholder="Enter amount"><button class="btn" data-a="wmax">Max</button></div></div><div class="fld"><label for="wt">Destination (Bank / UPI ID)</label><input class="inp" id="wt" maxlength="30" placeholder="e.g. yourname@upi"></div><div class="err" id="er"></div><button class="btn p w" data-a="wdok">Request withdrawal</button>`);
 const moreSheet = () => {
   const unreadSupportCount = S.tickets.filter(t => t.unread > 0 && t.status !== 'closed').reduce((sum, t) => sum + t.unread, 0);
   return sheet(`<h3 style="font-size:17px;margin-bottom:10px">More</h3><div class="tiles">${[["rewards","Coupons","gift",0],["ranks","Leaderboard","award",0],["alerts","Notifications","bell",0],["profile","Profile","user",0],["support","Support","chat",unreadSupportCount],["help","Help and terms","help",0]].map(([r,l,g,c]) => `<button class="tile" data-a="nav" data-v="${r}" style="position:relative">${ic(g,18)}${l}${c>0 ? `<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--pr);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">${c}</span>` : ''}</button>`).join("")}<button class="tile" data-a="theme">${ic(isDark()?"sun":"moon",18)}${isDark()?"Light mode":"Dark mode"}</button><button class="tile" data-a="logout">${ic("exit",18)}Log out</button></div>`);
@@ -1399,29 +1091,18 @@ async function loadTickets() {
   if (!S.user || !window.CP_DB) return;
   try {
     const { data } = await supabase.from('support_tickets').select('*, ticket_messages(*)').eq('user_id', S.user.id).order('created_at', { ascending: false });
-    
-    // Calculate the time 48 hours ago
     const fortyEightHoursAgo = Date.now() - (48 * 60 * 60 * 1000);
 
     S.tickets = (data || []).filter(t => {
-      // If ticket is closed, check if it's older than 48 hours
       if (t.status === 'closed') {
-        // Find the last message time, or use created_at if no messages
         const lastMsg = t.ticket_messages && t.ticket_messages.length > 0 
           ? t.ticket_messages[t.ticket_messages.length - 1].created_at 
           : t.created_at;
-        
-        const closeTime = new Date(lastMsg).getTime();
-        
-        // Only keep the ticket if it was closed less than 48 hours ago
-        return closeTime > fortyEightHoursAgo;
+        return new Date(lastMsg).getTime() > fortyEightHoursAgo;
       }
-      // Always keep open tickets
       return true;
     }).map(t => {
       const unread = (t.ticket_messages || []).filter(m => m.sender === 'admin' && !m.is_read).length;
-      
-      // Find the most recent date to display (last message or created_at)
       const lastMsgDate = t.ticket_messages && t.ticket_messages.length > 0 
           ? new Date(t.ticket_messages[t.ticket_messages.length - 1].created_at) 
           : new Date(t.created_at);
@@ -1430,7 +1111,7 @@ async function loadTickets() {
         id: t.id, 
         subject: t.subject, 
         status: t.status, 
-        updated: lastMsgDate.toLocaleDateString(), // Shows the actual last update date
+        updated: lastMsgDate.toLocaleDateString(),
         unread: unread,
         rating: t.rating || 0, 
         close_note: t.close_note || '',
@@ -1444,15 +1125,13 @@ async function loadTickets() {
     save();
   } catch(e) { console.error("Tickets load failed", e); }
 }
+
 async function createTicket() {
   if (!S.user || !window.CP_DB) return;
-  
-  // THIS IS CRITICAL: Guests cannot create tickets without logging in
   if (!S.user.id || S.user.id === "Guest User") {
       toast("Please log in with Google to create a support ticket.", "alert");
       return;
   }
-  
   const openTicket = S.tickets.find(t => t.status !== 'closed');
   if (openTicket) {
       sheet(`<div style="text-align:center;padding:10px 0;">
@@ -1475,9 +1154,7 @@ async function createTicket() {
         .single();
 
     if (insertError) throw insertError;
-    
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: "I need help with my account." });
-    
     const autoReply = `Hi ${S.user.n}, thank you for contacting CricPulse! Our support team will connect with you here within 30 minutes.`;
     await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'admin', message: autoReply, is_read: false });
     
@@ -1489,6 +1166,7 @@ async function createTicket() {
     toast("Could not create ticket: " + e.message, "x"); 
   }
 }
+
 /* one-click handlers */
 document.addEventListener("click", async e => {
   const t = e.target.closest("[data-a]");
@@ -1501,7 +1179,7 @@ document.addEventListener("click", async e => {
   if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
 
   switch(a) {
-     case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
+    case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
     case "sgo": closeSheet(); S.route = v; history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
     case "back": 
       S.pop = 0; closeSheet(); 
@@ -1595,13 +1273,12 @@ document.addEventListener("click", async e => {
       if (typeof ZapUPI === 'undefined') { $("er").textContent = "Payment gateway not loaded. Please refresh."; return; }
       
       const selectedApp = $("dm").value; 
-const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
-    const currentUrl = window.location.origin + window.location.pathname;
+      const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
+      const currentUrl = window.location.origin + window.location.pathname;
       
       t.disabled = true; t.textContent = 'Connecting to bank...';
       $("er").textContent = "";
 
-      // 1. Create the order in the database FIRST and WAIT for it
       if (window.CP_DB && CP_DB.ready && S.user && S.user.id) {
         const { error } = await supabase.from('payment_requests').insert({
             user_id: S.user.id, 
@@ -1611,7 +1288,6 @@ const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
             status: 'pending' 
         });
 
-        // If the database fails to save, STOP and show the error. Do not open ZapUPI.
         if (error) {
             console.error("Insert failed:", error);
             $("er").textContent = "Database error: " + error.message;
@@ -1623,7 +1299,6 @@ const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
 
       t.textContent = 'Redirecting to payment...';
 
-      // 2. NOW open the payment gateway
       ZapUPI.createOrder({
         zap_key: 'zapce570e671e2f07f3bc9837566a44ec4c', order_id: orderId, amount: x.toString(),
         preferred_app: selectedApp === 'upi' ? null : selectedApp, 
@@ -1634,11 +1309,11 @@ const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
       });
       break;
     }
-    case "wd": if(S.bal < 100){toast("Minimum withdrawal is 🪙100.","x"); return;} wdSheet(); break;
+    case "wd": if(S.bal < 100){toast("Minimum withdrawal is ₹100.","x"); return;} wdSheet(); break;
     case "wmax": $("wa").value = Math.floor(S.bal); break;
     case "wdok": {
       const x = Number($("wa").value), d = $("wt").value.trim(), er = $("er");
-      if (!x || x < 100) { er.textContent = "Minimum withdrawal is 🪙100."; return; }
+      if (!x || x < 100) { er.textContent = "Minimum withdrawal is ₹100."; return; }
       if (x > S.bal) { er.textContent = "Amount exceeds your balance."; return; }
       if (!d) { er.textContent = "Enter a destination."; return; }
       t.disabled = true; t.textContent = "Processing...";
@@ -1660,7 +1335,6 @@ const orderId = 'CP' + Date.now() + Math.floor(Math.random() * 100);
   }
 });
 
-// Handle Phone Back Button / Swipe
 window.addEventListener('popstate', (e) => {
   if (e.state) {
     S.route = e.state.route || "home";
@@ -1691,19 +1365,16 @@ document.addEventListener("change", e => {
     rd.onload = async () => {
       if (!t) return;
       const base64Data = rd.result;
-      
-      // 1. Update UI locally
       t.msgs.push({me:true, text:"[Image]", img:base64Data, at:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})});
       t.updated = "Just now"; save(); render();
       setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50);
-      
-      // 2. Save to database so admin can see it
       await supabase.from('ticket_messages').insert({ ticket_id: t.id, sender: 'user', message: base64Data });
     };
     rd.readAsDataURL(f);
     e.target.value = "";
   }
 });
+
 /* timers */
 setInterval(() => {
   document.querySelectorAll("[data-cd]").forEach(n => {
@@ -1718,19 +1389,18 @@ async function fetchLiveScores() {
     const response = await fetch('https://hmiyhdekyqpzkxqiukvb.supabase.co/functions/v1/get-live-score');
     const text = await response.text();
     let data;
-    try { data = JSON.parse(text); } catch(e) { return; } // Silently fail if not JSON
-    
-    if (!data || !data.matches) return; // Silently fail
+    try { data = JSON.parse(text); } catch(e) { return; }
+    if (!data || !data.matches) return;
 
     for (const m of MK) {
-      if (m.c !== 'cricket' && m.c !== 'football') continue; // Only fetch live score for sports
+      if (m.c !== 'cricket' && m.c !== 'football') continue;
       const liveMatch = data.matches.find(lm => {
         const homeMatch = lm.home.toLowerCase().includes(m.A[1].toLowerCase()) || m.A[1].toLowerCase().includes(lm.home.toLowerCase());
         const awayMatch = lm.away.toLowerCase().includes(m.B[1].toLowerCase()) || m.B[1].toLowerCase().includes(lm.away.toLowerCase());
         return homeMatch && awayMatch;
       });
 
-       if (liveMatch) {
+      if (liveMatch) {
         const isFinished = liveMatch.status === 'finished';
         m.isFinished = isFinished;
         m.liveData = {
@@ -1806,7 +1476,6 @@ function initRealtimeSync() {
             toast("Support has closed this ticket.", "check");
             loadTickets().then(() => {
                 render();
-                // Optional: Trigger a popup for rating
                 const t = S.tickets.find(x => x.id === payload.new.id);
                 if(t && !t.rating) {
                     sheet(`<div style="text-align:center; padding: 20px;">
@@ -1823,7 +1492,6 @@ function initRealtimeSync() {
 
   supabase.channel('cricpulse-tickets-' + S.user.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ticket_messages' }, (payload) => {
-      
       const msg = payload.new;
       if (msg.sender === 'admin') {
         toast("Support is active: " + msg.message.substring(0, 30) + "...", "chat");
@@ -1831,29 +1499,23 @@ function initRealtimeSync() {
       if (S.route === "ticket" && S.ticketOpen === msg.ticket_id) {
         loadTickets().then(() => { render(); setTimeout(() => { const msgs = $("msgs"); if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 50); });
       } else {
-         loadTickets().then(() => { if (S.route === "support") render(); else render(); }); // Render to update dot
+         loadTickets().then(() => { if (S.route === "support") render(); else render(); });
       }
     }).subscribe();
 }
 
 window.addEventListener("load", async () => {
-  // Restore route from browser history state (fixes refresh)
   if (history.state && history.state.route) {
      S.route = history.state.route;
      if (history.state.mid) S.mid = history.state.mid;
      if (history.state.ticketOpen) S.ticketOpen = history.state.ticketOpen;
      if (history.state.pub) S.pub = history.state.pub;
   }
-  // 1. Wait for data before rendering to prevent empty state flash
-  // render(); <-- Removed to fix flicker
 
   try {
     applyTheme();
     if (!window.CP_DB || !CP_DB.authClient) { render(); return; }
 
-    // ==========================================
-    // CHECK MAINTENANCE MODE ON INITIAL LOAD
-    // ==========================================
     try {
       const { data } = await supabase.from('site_settings').select('*').in('key', ['maintenance', 'maint_msg']);
       if (data && data.length > 0) {
@@ -1870,7 +1532,6 @@ window.addEventListener("load", async () => {
               </div>
             </div>`;
           
-          // Listen for changes so if admin turns it OFF, the page reloads automatically
           supabase.channel('maintenance-live')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings' }, (payload) => {
               if (payload.new.key === 'maintenance' && (payload.new.value === false || payload.new.value === 'false')) {
@@ -1878,21 +1539,19 @@ window.addEventListener("load", async () => {
               }
             }).subscribe();
             
-          return; // STOP loading the rest of the app
+          return;
         }
       }
     } catch (e) {
       console.warn("Could not check maintenance mode (make sure site_settings table exists).", e);
     }
-    // ==========================================
 
-    // 2. Setup Auth Listener FIRST to catch initial session safely
     CP_DB.authClient.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         if (session) {
           await applySession(session);
         } else {
-          if (!S.user) render(); // Render login/landing page if no session
+          if (!S.user) render();
         }
       } else if (event === "SIGNED_OUT") {
         AUTHED_ID = null; AUTH_P = null; 
@@ -1900,7 +1559,6 @@ window.addEventListener("load", async () => {
       }
     });
 
-    // 3. Load Matches Data
     try {
       const liveMatches = await CP_DB.getMatches();
       if (liveMatches && liveMatches.length > 0) {
@@ -1921,7 +1579,7 @@ window.addEventListener("load", async () => {
     } catch(e) { 
       MK = [];
     }
-    // 4. Safe Session Check (Ensures PC screen doesn't stay blank)
+
     const { data: { session } } = await CP_DB.authClient.auth.getSession();
     if (session) { 
       await applySession(session); 
@@ -1929,7 +1587,6 @@ window.addEventListener("load", async () => {
       render(); 
     }
 
-    // 5. Listen for Immediate Maintenance Mode changes
     if (window.CP_DB && CP_DB.ready) {
       supabase.channel('global-settings')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_settings' }, (payload) => {
@@ -1937,13 +1594,12 @@ window.addEventListener("load", async () => {
             if (payload.new.value === true) {
                document.body.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f6f7fb;color:#0f1729;text-align:center;padding:20px;font-family:Inter,sans-serif;"><div><h1 style="font-size:24px;margin-bottom:10px;">Under Maintenance</h1><p style="color:#7a8296;">CricPulse is getting an upgrade. We will be back shortly.</p></div></div>`;
             } else {
-               location.reload(); // Reload to bring the app back if turned off
+               location.reload();
             }
           }
         }).subscribe();
     }
     
-    // 5. Payment Return Handler with Polling
     async function checkPaymentReturn() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -1951,25 +1607,17 @@ window.addEventListener("load", async () => {
         const orderId = params.get('order_id');
         if (!orderId) return;
         if (status === 'success' && S.user && S.user.id) {
-          
-          // Call our new secure database function
           const { data, error } = await supabase.rpc('verify_payment', { p_txn_id: orderId });
-          
           if (!error && data && data.ok) { 
             toast('Payment successful. Wallet updated!', 'check'); 
-            
-            // Immediately fetch the new balance from the database
             const p = await CP_DB.getProfile(S.user.id); 
             if (p && p.balance !== undefined) { 
                 S.bal = p.balance; 
-                
-                // NEW FIX: Instantly add the notification to the user's local state
-                note("Top-up Successful", "Payment of 🪙" + (new URLSearchParams(window.location.search).get('amount') || '') + " verified.", "wallet");
-                
+                note("Top-up Successful", "Payment of ₹" + (new URLSearchParams(window.location.search).get('amount') || '') + " verified.", "wallet");
                 save(); 
                 render(); 
             }
-             } else {
+          } else {
             const errorMsg = error ? error.message : (data ? data.message : 'Unknown error');
             toast('Payment verification failed: ' + errorMsg, 'alert');
             console.error('Payment verification error:', error, data);
@@ -1985,7 +1633,7 @@ window.addEventListener("load", async () => {
 
   } catch (err) { 
     console.error("Init error:", err); 
-    render(); // Forces the screen to render even if there's an error
+    render();
   }
 });
 </script>
