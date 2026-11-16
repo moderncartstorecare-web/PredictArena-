@@ -360,7 +360,30 @@ const stChip=s=>`<span class="chip ${{open:"wa",pending:"",closed:"ok"}[s]}">${s
 function tkTabs(){const c=f=>f==="all"?S.tickets.length:S.tickets.filter(t=>t.st===f).length;return `<div class="tabs">${["open","pending","closed","all"].map(f=>`<button class="${TKF===f?"on":""}" data-act="kf" data-v="${f}">${f[0].toUpperCase()+f.slice(1)} ${c(f)}</button>`).join("")}</div>`}
 function tkList(){
   const q=TQ.toLowerCase(),l=S.tickets.filter(t=>(TKF==="all"||t.st===TKF)&&(!q||(tkUser(t)+t.sub+t.id).toLowerCase().includes(q))).sort((a,b)=>b.lastTs-a.lastTs);
-  return l.length?l.map(t=>{const n=tkUser(t);return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}"><span class="avt" style="background:${col(n)}">${ini(n)}</span><span class="tb"><span class="tl"><b>${esc(n)}</b>${t.st==="closed" ? `<em>${rel(t.lastTs)}</em>` : `<em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em>`}</span><span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc((t.lastMsgText||t.sub).substring(0,30))}${(t.lastMsgText||t.sub).length>30?'...':''}</span><span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span></span></button>`}).join(""):'<div class="emp">No tickets here.</div>';
+  return l.length?l.map(t=>{
+    const n=tkUser(t);
+    
+    // Determine if the timer should run (only if the USER sent the last message)
+    let timerHtml = '';
+    if (t.st === "closed") {
+        timerHtml = `<em style="color:var(--mu)">${rel(t.lastTs)}</em>`;
+    } else if (t.lastSender === "user") {
+        // User replied last -> Timer runs
+        timerHtml = `<em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em>`;
+    } else {
+        // Admin replied last -> Timer stops, show static time
+        timerHtml = `<em style="color:var(--mu)">${ftm(t.lastTs)}</em>`;
+    }
+
+    return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}">
+      <span class="avt" style="background:${col(n)}">${ini(n)}</span>
+      <span class="tb">
+        <span class="tl"><b>${esc(n)}</b>${timerHtml}</span>
+        <span class="ts2">${t.lastSender==="admin"?"You replied · ":""}${esc((t.lastMsgText||t.sub).substring(0,30))}${(t.lastMsgText||t.sub).length>30?'...':''}</span>
+        <span class="tm2">${stChip(t.st)}${priChip(t.pr)}${t.unread?`<i class="bd2">${t.unread}</i>`:""}</span>
+      </span>
+    </button>`
+  }).join(""):'<div class="emp">No tickets here.</div>';
 }
 function chatMsgs(t){
   if(!t.msgs)return '<div class="emp">Loading conversation...</div>';
