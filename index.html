@@ -1517,6 +1517,14 @@ document.addEventListener("click", async e => {
     case "dep": depSheet(); break;
     case "damt": $("da").value = v; break;
     case "depok": {
+      // Rate Limiting Check
+      const now = Date.now();
+      if (window.lastDepositClick && now - window.lastDepositClick < 10000) {
+          $("er").textContent = "Please wait 10 seconds before trying again.";
+          return;
+      }
+      window.lastDepositClick = now;
+
       const x = Number($("da").value);
       const allowedAmounts = [50, 100, 300, 500, 1000];
       if (!allowedAmounts.includes(x)) { 
