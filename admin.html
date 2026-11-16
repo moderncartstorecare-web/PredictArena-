@@ -302,6 +302,50 @@ const chipM=s=>`<span class="chip ${{closed:"wa",settled:"ok",upcoming:""}[s]||"
 
 function feed(){const f=[];S.users.slice(0,40).forEach(u=>u.ts&&f.push({ts:u.ts,i:"user-plus",t:`${u.name} joined`}));S.wd.slice(0,40).forEach(w=>f.push({ts:w.ts,i:"landmark",t:`Withdrawal ${fm(w.amt)} ${w.st} · ${userName(w.uid)}`}));S.pay.slice(0,40).forEach(p=>f.push({ts:p.ts,i:"banknote",t:`Deposit ${fm(p.amt)} ${p.st} · ${userName(p.uid)}`}));S.tickets.slice(0,40).forEach(t=>f.push({ts:t.ts,i:"life-buoy",t:`Ticket "${t.sub}" · ${tkUser(t)}`}));S.act.forEach(a=>f.push({ts:a[2]||0,i:"activity",t:a[0]}));return f.filter(x=>x.ts).sort((a,b)=>b.ts-a.ts).slice(0,9)}
 
+ let LIVE_FILTER = "live";
+let HISTORICAL_LIVE = [];
+
+function liveV() {
+  return `
+  <div class="hd">
+    <div>
+      <h1>Live Users</h1>
+      <small>Who is on the app right now and what they are doing.</small>
+    </div>
+    <div class="sp"></div>
+    <select class="in sm" data-sel="live_filter" style="width:140px">
+      <option value="live" ${LIVE_FILTER==="live"?"selected":""}>Live</option>
+      <option value="today" ${LIVE_FILTER==="today"?"selected":""}>Today</option>
+      <option value="yesterday" ${LIVE_FILTER==="yesterday"?"selected":""}>Yesterday</option>
+      <option value="week" ${LIVE_FILTER==="week"?"selected":""}>This Week</option>
+      <option value="month" ${LIVE_FILTER==="month"?"selected":""}>This Month</option>
+    </select>
+    <button class="btn g" data-act="refresh">${ic("refresh-cw")}Refresh</button>
+  </div>
+  
+  <div class="lv-grid" id="lv-stats">
+    <div class="lv-card"><div class="k">Users Online</div><div class="v" id="lv-online">0</div></div>
+    <div class="lv-card"><div class="k">On Predictions</div><div class="v" id="lv-predicting">0</div></div>
+    <div class="lv-card"><div class="k">On Wallet/Deposit</div><div class="v" id="lv-wallet">0</div></div>
+    <div class="lv-card"><div class="k">In Support</div><div class="v" id="lv-support">0</div></div>
+  </div>
+  
+  <div class="lv-main">
+    <div class="card" style="margin-bottom:0">
+      <h3 style="padding:14px 16px 0;margin:0">Active Sessions</h3>
+      <div class="lv-table-wrap">
+        <table class="lv-table">
+          <thead><tr><th>User</th><th>Current Screen</th><th>Status</th><th>Last Ping</th></tr></thead>
+          <tbody id="lv-tbody"><tr><td colspan="4" class="emp">Loading data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <h3 style="padding:14px 16px 0;margin:0">Event Stream</h3>
+      <ul class="lv-log" id="lv-stream"><li><div></div><div class="emp" style="padding:0">Waiting for events...</div></li></ul>
+    </div>
+  </div>`;
+}
 function dashV(){
   const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
   const aw=S.matches.filter(m=>m.st!=="settled"&&m.st==="closed"),liab=S.users.reduce((a,u)=>a+u.wal,0),pamt=pw.reduce((a,w)=>a+w.amt,0);
@@ -336,38 +380,7 @@ function dashV(){
       <button class="btn g" data-act="addm">${ic("plus")}Add match</button><button class="btn g" data-p="not">${ic("send")}Notify users</button>
       <button class="btn g" data-p="sup">${ic("life-buoy")}Open inbox</button><button class="btn ${ST.maintenance?"r":"g"}" data-p="set">${ic("wrench")}${ST.maintenance?"Maintenance ON":"Maintenance"}</button></div></div>
     <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}</div>
-  </div></div>
-  
-  <!-- LIVE USERS SECTION -->
-  <div style="margin-top:30px;margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div><h1 style="font-size:18px;margin:0">Live Users Tracking</h1><small style="color:var(--mu)">Real-time activity across the platform</small></div>
-      <span class="chip ok" style="display:flex;align-items:center;gap:6px"><i style="display:block;width:6px;height:6px;border-radius:50%;background:currentColor;animation:pu 2s infinite"></i>Live</span>
-    </div>
-    
-    <div class="lv-grid" id="lv-stats">
-      <div class="lv-card"><div class="k">Users Online</div><div class="v" id="lv-online">0</div></div>
-      <div class="lv-card"><div class="k">On Predictions</div><div class="v" id="lv-predicting">0</div></div>
-      <div class="lv-card"><div class="k">On Wallet/Deposit</div><div class="v" id="lv-wallet">0</div></div>
-      <div class="lv-card"><div class="k">In Support</div><div class="v" id="lv-support">0</div></div>
-    </div>
-    
-    <div class="lv-main">
-      <div class="card" style="margin-bottom:0">
-        <h3 style="padding:14px 16px 0;margin:0">Active Sessions (Live)</h3>
-        <div class="lv-table-wrap">
-          <table class="lv-table">
-            <thead><tr><th>User</th><th>Current Screen</th><th>Status</th><th>Last Ping</th></tr></thead>
-            <tbody id="lv-tbody"><tr><td colspan="4" class="emp">Waiting for live data...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:0">
-        <h3 style="padding:14px 16px 0;margin:0">Live Event Stream</h3>
-        <ul class="lv-log" id="lv-stream"><li><div></div><div class="emp" style="padding:0">Waiting for events...</div></li></ul>
-      </div>
-    </div>
-  </div>`;
+  </div></div>`;
 }
 function matchesV(){
   return `<div class="hd"><div><h1>Matches</h1><small>Create markets, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-act="addm">${ic("plus")}Add match</button></div>
@@ -511,8 +524,8 @@ function setV(){
   </div></div>`;
 }
 
-const NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["deposits","banknote","Deposits"],["wd","landmark","Withdrawals"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
-const VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],deposits:["Deposits",depV],wd:["Withdrawals",wdV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
+const NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["deposits","banknote","Deposits"],["wd","landmark","Withdrawals"],["live","activity","Live Users"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
+const VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],deposits:["Deposits",depV],wd:["Withdrawals",wdV],live:["Live Users",liveV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
 function badge(k){const n=k==="wd"?pendW().length:k==="deposits"?pendP().length:k==="sup"?unreadT().length:0;return n?`<span class="cn">${n}</span>`:""}
 const nav=()=>NV.map(n=>n[0]==="H"?`<h6>${n[1]}</h6>`:`<button class="nv${S.page===n[0]?" on":""}" data-p="${n[0]}">${ic(n[1])}${n[2]}${badge(n[0])}</button>`).join("")+`<button class="nv" data-act="logout">${ic("log-out")}Logout</button>`;
 
@@ -643,6 +656,14 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",async e=>{
   const t=e.target;
   if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}
+  else if(t.dataset.sel==="live_filter"){
+    LIVE_FILTER = t.value;
+    if(LIVE_FILTER === "live") {
+      updateLiveUI(null, "FILTER");
+    } else {
+      fetchHistoricalLive(LIVE_FILTER);
+    }
+  }
   else if(t.dataset.sel==="tf"){TF=t.value;render()}
   else if(t.dataset.sel==="uf"){UF=t.value;render()}
   else if(t.dataset.leagues!==undefined){const l=$("lgl");if(l)l.innerHTML=(LEAGUES[t.value]||[]).map(x=>`<option value="${x}">`).join("")}
@@ -765,7 +786,6 @@ function initRealtime(){
     }
   });
 }
-
 function updateLiveUI(payload, type) {
   const now = Date.now();
   const validUsers = Object.values(LIVE_USERS).filter(u => {
@@ -773,7 +793,7 @@ function updateLiveUI(payload, type) {
     return (now - lastActive < 120000); // Ignore users inactive for 2+ mins
   });
 
-  // Update Stats
+  // Update Stats (Always run this so stats are accurate even if looking at history)
   const online = validUsers.filter(u => u.is_active && u.current_page !== "Left App").length;
   const predicting = validUsers.filter(u => u.current_page === "markets" || u.current_page === "picks" || u.current_page === "match").length;
   const wallet = validUsers.filter(u => u.current_page === "wallet" || u.current_page === "rewards").length;
@@ -783,6 +803,9 @@ function updateLiveUI(payload, type) {
   if(document.getElementById("lv-predicting")) document.getElementById("lv-predicting").textContent = predicting;
   if(document.getElementById("lv-wallet")) document.getElementById("lv-wallet").textContent = wallet;
   if(document.getElementById("lv-support")) document.getElementById("lv-support").textContent = support;
+
+  // Only update tables if we are on the "Live" filter
+  if (LIVE_FILTER !== "live") return;
 
   // Update Table
   const tbody = document.getElementById("lv-tbody");
@@ -822,9 +845,49 @@ function updateLiveUI(payload, type) {
   }
 }
 
+// Fetch Historical Data for the dropdown menu
+async function fetchHistoricalLive(filter) {
+  let start = new Date(), end = new Date();
+  if (filter === "today") { start.setHours(0,0,0,0); }
+  else if (filter === "yesterday") { start.setDate(start.getDate()-1); start.setHours(0,0,0,0); end.setDate(end.getDate()-1); end.setHours(23,59,59,999); }
+  else if (filter === "week") { start.setDate(start.getDate()-7); }
+  else if (filter === "month") { start.setMonth(start.getMonth()-1); }
+
+  const tbody = document.getElementById("lv-tbody");
+  if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="emp">Loading history...</td></tr>';
+  const stream = document.getElementById("lv-stream");
+  if(stream) stream.innerHTML = '<li><div></div><div class="emp" style="padding:0">Event stream is only available in Live mode.</div></li>';
+
+  const { data, error } = await db.from("live_sessions")
+    .select("*")
+    .gte("last_active", start.toISOString())
+    .lte("last_active", end.toISOString())
+    .order("last_active", { ascending: false })
+    .limit(100);
+
+  if (tbody) {
+    if (!error && data && data.length > 0) {
+      tbody.innerHTML = data.map(u => {
+        const isOnline = u.is_active && u.current_page !== "Left App";
+        const statusColor = isOnline ? "#10b981" : "#ef4444";
+        const statusText = isOnline ? "Active" : "Left/Browsing Away";
+        const timeStr = new Date(u.last_active).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"});
+        return `<tr>
+          <td><b>${esc(u.user_name)}</b><br><small>${esc(u.user_id.slice(0,8))}</small></td>
+          <td><span class="chip">${esc(u.current_page)}</span></td>
+          <td><span class="lv-dot" style="background:${statusColor}"></span>${statusText}</td>
+          <td><small>${timeStr}</small></td>
+        </tr>`;
+      }).join("");
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" class="emp">No sessions found for this time period.</td></tr>';
+    }
+  }
+}
+
 // Refresh times in UI every 5 seconds
 setInterval(() => {
-  if (S.page === "dash" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
+  if (S.page === "live" && LIVE_FILTER === "live" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
 }, 5000);
 setInterval(()=>{
   document.querySelectorAll('[data-timer]').forEach(el=>{
