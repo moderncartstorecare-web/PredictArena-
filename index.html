@@ -1091,20 +1091,26 @@ ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="r
 let LIVE_SESSION_ID = sessionStorage.getItem("cp_sess_id") || "sess_" + Math.random().toString(36).substring(2, 10);
 sessionStorage.setItem("cp_sess_id", LIVE_SESSION_ID);
 
+// Generate a guest name if they aren't logged in
+let GUEST_NAME = sessionStorage.getItem("cp_guest_name");
+if (!GUEST_NAME) {
+    GUEST_NAME = "Guest #" + Math.floor(1000 + Math.random() * 9000);
+    sessionStorage.setItem("cp_guest_name", GUEST_NAME);
+}
+
 async function pingLive(isLeaving = false) {
-  if (!S.user || !S.user.id || !window.CP_DB || !CP_DB.ready) return;
+  if (!window.CP_DB || !CP_DB.ready) return; // Removed the user check!
   try {
     await supabase.from('live_sessions').upsert({
       session_id: LIVE_SESSION_ID,
-      user_id: S.user.id,
-      user_name: S.user.n,
+      user_id: (S.user && S.user.id) ? S.user.id : null, // NULL for guests
+      user_name: (S.user && S.user.n) ? S.user.n : GUEST_NAME,
       current_page: isLeaving ? "Left App" : (S.route || "home"),
       last_active: new Date().toISOString(),
       is_active: !isLeaving
     }, { onConflict: 'session_id' });
-  } catch(e) {}
+  } catch(e) { console.error("Live ping error:", e); }
 }
-
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") pingLive(true);
   else pingLive(false);
