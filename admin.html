@@ -104,6 +104,23 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
  body.navopen .sb{left:0}.scrim{display:none}body.navopen .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35}
  #app{flex-direction:column}.pg{padding:14px}.tp{padding:10px 14px}.fg{grid-template-columns:1fr}.tsr{display:none}.kv{grid-template-columns:100px 1fr}
 }
+/* --- LIVE USERS DASHBOARD --- */
+.lv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.lv-card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.lv-card .k{font-size:12px;color:var(--mu);font-weight:500}
+.lv-card .v{font-size:24px;font-weight:700;margin-top:4px;color:var(--tx)}
+.lv-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;margin-bottom:16px}
+.lv-log{list-style:none;padding:0 16px;margin:0;max-height:260px;overflow-y:auto}
+.lv-log li{display:grid;grid-template-columns:60px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12.5px;animation:fi .3s ease}
+.lv-log li:last-child{border:0}
+.lv-log time{color:var(--mu);font-size:11px}
+.lv-tag{display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;margin-right:6px;background:var(--prs);color:var(--pr)}
+.lv-table-wrap{overflow-x:auto}
+.lv-table{width:100%;border-collapse:collapse}
+.lv-table th{text-align:left;font-size:11px;color:var(--mu);padding:8px 16px;border-bottom:1px solid var(--bd);background:color-mix(in srgb,var(--pr) 3%,var(--card))}
+.lv-table td{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:13px}
+.lv-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}
+@media(max-width:1000px){.lv-grid{grid-template-columns:repeat(2,1fr)}.lv-main{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -150,6 +167,7 @@ let S={mi:0,page:"dash",users:[],matches:[],wd:[],pay:[],tx:[],txReal:null,txl:[
 try{const o=JSON.parse(localStorage.getItem("pxa3")||"{}");["mi","page","cp","act","txl"].forEach(k=>{if(o[k]!==undefined)S[k]=o[k]})}catch(e){}
 const save=()=>{try{const o={};["mi","page","cp","act","txl"].forEach(k=>o[k]=S[k]);localStorage.setItem("pxa3",JSON.stringify(o))}catch(e){}};
 let EYE=0,EYET=0,LOGIN=0,UQ="",UF="all",WF="pending",TF="All",TKF="open",TQ="",TKM=null,MOD=null,DENY="",SESS=null,BOOTED=0,LT=0;
+let LIVE_USERS = {};
 let CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""};
 let UNLOCK=false;try{UNLOCK=sessionStorage.getItem("cp_adm_ok")==="1"}catch(e){}
 try{TKM=localStorage.getItem("admin_tkm")||null;if(TKM)S.page="sup"}catch(e){}
@@ -318,9 +336,39 @@ function dashV(){
       <button class="btn g" data-act="addm">${ic("plus")}Add match</button><button class="btn g" data-p="not">${ic("send")}Notify users</button>
       <button class="btn g" data-p="sup">${ic("life-buoy")}Open inbox</button><button class="btn ${ST.maintenance?"r":"g"}" data-p="set">${ic("wrench")}${ST.maintenance?"Maintenance ON":"Maintenance"}</button></div></div>
     <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}</div>
-  </div></div>`;
+  </div></div>
+  
+  <!-- LIVE USERS SECTION -->
+  <div style="margin-top:30px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><h1 style="font-size:18px;margin:0">Live Users Tracking</h1><small style="color:var(--mu)">Real-time activity across the platform</small></div>
+      <span class="chip ok" style="display:flex;align-items:center;gap:6px"><i style="display:block;width:6px;height:6px;border-radius:50%;background:currentColor;animation:pu 2s infinite"></i>Live</span>
+    </div>
+    
+    <div class="lv-grid" id="lv-stats">
+      <div class="lv-card"><div class="k">Users Online</div><div class="v" id="lv-online">0</div></div>
+      <div class="lv-card"><div class="k">On Predictions</div><div class="v" id="lv-predicting">0</div></div>
+      <div class="lv-card"><div class="k">On Wallet/Deposit</div><div class="v" id="lv-wallet">0</div></div>
+      <div class="lv-card"><div class="k">In Support</div><div class="v" id="lv-support">0</div></div>
+    </div>
+    
+    <div class="lv-main">
+      <div class="card" style="margin-bottom:0">
+        <h3 style="padding:14px 16px 0;margin:0">Active Sessions (Live)</h3>
+        <div class="lv-table-wrap">
+          <table class="lv-table">
+            <thead><tr><th>User</th><th>Current Screen</th><th>Status</th><th>Last Ping</th></tr></thead>
+            <tbody id="lv-tbody"><tr><td colspan="4" class="emp">Waiting for live data...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <h3 style="padding:14px 16px 0;margin:0">Live Event Stream</h3>
+        <ul class="lv-log" id="lv-stream"><li><div></div><div class="emp" style="padding:0">Waiting for events...</div></li></ul>
+      </div>
+    </div>
+  </div>`;
 }
-
 function matchesV(){
   return `<div class="hd"><div><h1>Matches</h1><small>Create markets, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-act="addm">${ic("plus")}Add match</button></div>
   <div class="card tw"><table><tr><th>Match</th><th>Closes</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>${S.matches.map(m=>{
@@ -697,7 +745,87 @@ function initRealtime(){
   db.channel("adm-tickets").on("postgres_changes",{event:"INSERT",schema:"public",table:"support_tickets"},()=>{toast("New support ticket","life-buoy");reload()}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"support_tickets"},()=>reload()).subscribe();
   db.channel("adm-money").on("postgres_changes",{event:"INSERT",schema:"public",table:"withdrawal_requests"},()=>{toast("New withdrawal request","landmark");reload()}).on("postgres_changes",{event:"INSERT",schema:"public",table:"payment_requests"},()=>{toast("New deposit request","banknote");reload()}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"wallet"},p=>{const u=S.users.find(x=>x.id===p.new.user_id);if(u&&u.wal!==Number(p.new.balance)){u.wal=Number(p.new.balance);if(["users","dash","wallets"].includes(S.page))render()}}).subscribe();
   db.channel("adm-users").on("postgres_changes",{event:"INSERT",schema:"public",table:"users"},()=>reload()).on("postgres_changes",{event:"INSERT",schema:"public",table:"predictions"},()=>reload()).subscribe();
+
+  // REAL-TIME LIVE USER TRACKING
+  db.channel("admin-live-users")
+    .on("postgres_changes", { event: "*", schema: "public", table: "live_sessions" }, (payload) => {
+      if (payload.eventType === "DELETE") {
+        delete LIVE_USERS[payload.old.session_id];
+      } else {
+        LIVE_USERS[payload.new.session_id] = payload.new;
+      }
+      updateLiveUI(payload.new, payload.eventType);
+    }).subscribe();
+
+  // Initial fetch of live users
+  db.from("live_sessions").select("*").then(r => {
+    if (r.data) {
+      r.data.forEach(u => LIVE_USERS[u.session_id] = u);
+      updateLiveUI(null, "INIT");
+    }
+  });
 }
+
+function updateLiveUI(payload, type) {
+  const now = Date.now();
+  const validUsers = Object.values(LIVE_USERS).filter(u => {
+    const lastActive = new Date(u.last_active).getTime();
+    return (now - lastActive < 120000); // Ignore users inactive for 2+ mins
+  });
+
+  // Update Stats
+  const online = validUsers.filter(u => u.is_active && u.current_page !== "Left App").length;
+  const predicting = validUsers.filter(u => u.current_page === "markets" || u.current_page === "picks" || u.current_page === "match").length;
+  const wallet = validUsers.filter(u => u.current_page === "wallet" || u.current_page === "rewards").length;
+  const support = validUsers.filter(u => u.current_page === "support" || u.current_page === "ticket").length;
+
+  if(document.getElementById("lv-online")) document.getElementById("lv-online").textContent = online;
+  if(document.getElementById("lv-predicting")) document.getElementById("lv-predicting").textContent = predicting;
+  if(document.getElementById("lv-wallet")) document.getElementById("lv-wallet").textContent = wallet;
+  if(document.getElementById("lv-support")) document.getElementById("lv-support").textContent = support;
+
+  // Update Table
+  const tbody = document.getElementById("lv-tbody");
+  if (tbody) {
+    const sorted = validUsers.sort((a,b) => new Date(b.last_active) - new Date(a.last_active));
+    if (sorted.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="emp">No active users right now.</td></tr>';
+    } else {
+      tbody.innerHTML = sorted.map(u => {
+        const isOnline = u.is_active && u.current_page !== "Left App";
+        const statusColor = isOnline ? "#10b981" : "#ef4444";
+        const statusText = isOnline ? "Active" : "Left/Browsing Away";
+        const timeAgo = Math.floor((now - new Date(u.last_active).getTime()) / 1000) + "s ago";
+        
+        return `<tr>
+          <td><b>${esc(u.user_name)}</b><br><small>${esc(u.user_id.slice(0,8))}</small></td>
+          <td><span class="chip">${esc(u.current_page)}</span></td>
+          <td><span class="lv-dot" style="background:${statusColor}"></span>${statusText}</td>
+          <td><small>${timeAgo}</small></td>
+        </tr>`;
+      }).join("");
+    }
+  }
+
+  // Update Event Stream
+  if ((type === "INSERT" || type === "UPDATE") && payload) {
+    const stream = document.getElementById("lv-stream");
+    if (stream) {
+      if (stream.querySelector(".emp")) stream.innerHTML = "";
+      const li = document.createElement("li");
+      const timeStr = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+      const action = payload.is_active ? `went to <b>${esc(payload.current_page)}</b>` : `left the app`;
+      li.innerHTML = `<time>${timeStr}</time><div><span class="lv-tag">LIVE</span> ${esc(payload.user_name)} ${action}</div>`;
+      stream.prepend(li);
+      if (stream.children.length > 15) stream.lastChild.remove();
+    }
+  }
+}
+
+// Refresh times in UI every 5 seconds
+setInterval(() => {
+  if (S.page === "dash" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
+}, 5000);
 setInterval(()=>{
   document.querySelectorAll('[data-timer]').forEach(el=>{
     const ts=Number(el.dataset.timer);
