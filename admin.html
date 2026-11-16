@@ -821,7 +821,7 @@ function updateLiveUI(payload, type) {
         const timeAgo = Math.floor((now - new Date(u.last_active).getTime()) / 1000) + "s ago";
         
         return `<tr>
-          <td><b>${esc(u.user_name)}</b><br><small>${esc(u.user_id.slice(0,8))}</small></td>
+          <td><b>${esc(u.user_name)}</b><br><small>${u.user_id ? esc(u.user_id.slice(0,8)) : 'guest'}</small></td>
           <td><span class="chip">${esc(u.current_page)}</span></td>
           <td><span class="lv-dot" style="background:${statusColor}"></span>${statusText}</td>
           <td><small>${timeAgo}</small></td>
@@ -873,7 +873,7 @@ async function fetchHistoricalLive(filter) {
         const statusText = isOnline ? "Active" : "Left/Browsing Away";
         const timeStr = new Date(u.last_active).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"});
         return `<tr>
-          <td><b>${esc(u.user_name)}</b><br><small>${esc(u.user_id.slice(0,8))}</small></td>
+          <td><b>${esc(u.user_name)}</b><br><small>${u.user_id ? esc(u.user_id.slice(0,8)) : 'guest'}</small></td>
           <td><span class="chip">${esc(u.current_page)}</span></td>
           <td><span class="lv-dot" style="background:${statusColor}"></span>${statusText}</td>
           <td><small>${timeStr}</small></td>
