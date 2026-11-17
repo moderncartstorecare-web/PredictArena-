@@ -780,9 +780,9 @@ window.cOpenConfirmSheet = function(matchId) {
   const pick = S.slip[m.id] || 'A';
   if (lk || cls) return;
 
-  const fee = 50;
-  const spotsTotal = 200;
-  const spotsFilled = 150;
+  const fee = m.entry_fee || 50;
+  const spotsTotal = m.max_spots || 200;
+  const spotsFilled = S.real_filled || 0;
   if (spotsFilled >= spotsTotal) return toast("This contest is now full", "x");
 
   const bal = Number(S.bal || 0);
@@ -816,7 +816,7 @@ window.cConfirmJoin = async function(matchId) {
   const m = mkt(matchId);
   if (!m) return;
   const pick = S.slip[matchId] || 'A';
-  const fee = 50;
+  const fee = m.entry_fee || 50;
 
   if (S.bal < fee) {
     closeSheet();
@@ -882,9 +882,10 @@ function matchV() {
     save();
   }
 
-  const fee = 50;
-  const spots = 200;
-  const filled = Math.min(spots, 150 + (lk ? 1 : 0));
+  const fee = m.entry_fee || 50;     // Reads your dynamic fee
+  const spots = m.max_spots || 200;  // Reads your dynamic spots
+  // Use real filled count fetched from database (fallback to 0)
+  const filled = S.real_filled !== undefined ? S.real_filled : 0;
   const spotsLeft = spots - filled;
   const pct = Math.round(filled / spots * 100);
   const pool = fee * spots;
@@ -1892,8 +1893,9 @@ window.addEventListener("load", async () => {
           A: [String(m.team_a || 'Option A').split(' ')[0], m.team_a || 'Option A'], 
           B: [String(m.team_b || 'Option B').split(' ')[0], m.team_b || 'Option B'],
           q: m.question, s: m.closes_at ? Math.max(0, Math.floor((new Date(m.closes_at).getTime() - Date.now()) / 1000)) : 0, 
-          w: m.crowd_a, oa: m.odds_a, ob: m.odds_b
-          }));
+          w: m.crowd_a, oa: m.odds_a, ob: m.odds_b,
+          entry_fee: m.entry_fee || 50, max_spots: m.max_spots || 200
+        }));
       } else {
         MK = [];
       }
