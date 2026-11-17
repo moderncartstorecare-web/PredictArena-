@@ -14,6 +14,10 @@
     --ink: #0f172a;
     --i2: #64748b;
     --ln: #e2e8f0;
+    
+    /* EXACT TOAST VARIABLES FROM INDEX.HTML */
+    --toast-bg: #0d1526;
+    --toast-tx: #f5f7fc;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,32 +29,135 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
+    /* Subtle dot pattern for a premium feel */
     background-image: radial-gradient(var(--ln) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
-  /* HEADER */
-  header { padding: 24px 32px; display: flex; align-items: center; }
-  .logo { display: inline-flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--ink); text-decoration: none; letter-spacing: -0.02em; }
-  .logo img { width: 28px; height: 28px; border-radius: 6px; }
+  /* HEADER (Just Logo, no back button based on screenshot) */
+  header {
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .logo img {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
 
   /* MAIN CONTENT */
-  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-  .error-code { font-size: clamp(100px, 18vw, 220px); font-weight: 800; line-height: 0.9; color: #f1f5f9; letter-spacing: -0.05em; margin-bottom: -10px; user-select: none; }
-  h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 16px; color: var(--ink); position: relative; z-index: 1; }
-  p { font-size: 16px; color: var(--i2); line-height: 1.6; max-width: 440px; margin-bottom: 40px; position: relative; z-index: 1; }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
 
-  .actions { display: flex; gap: 12px; align-items: center; position: relative; z-index: 1; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 24px; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; cursor: pointer; border: none; }
-  .btn-primary { background: #0f172a; color: #ffffff; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
-  .btn-primary:hover { background: #1e293b; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2); }
-  .btn-secondary { background: transparent; color: #0f172a; border: 1px solid var(--ln); }
-  .btn-secondary:hover { background: #f8fafc; }
+  .error-code {
+    font-size: clamp(100px, 18vw, 220px);
+    font-weight: 800;
+    line-height: 0.9;
+    color: #f1f5f9; /* Very light slate background text */
+    letter-spacing: -0.05em;
+    margin-bottom: -10px;
+    user-select: none;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    color: var(--ink);
+    position: relative;
+    z-index: 1;
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--i2);
+    line-height: 1.6;
+    max-width: 440px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  }
+  .btn-primary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+  }
+
+  .btn-secondary {
+    background: #ffffff;
+    color: var(--ink);
+    border: 1px solid var(--ln);
+  }
+  .btn-secondary:hover {
+    background: #f8fafc;
+  }
 
   /* FOOTER */
-  footer { padding: 24px; text-align: center; font-size: 13px; color: var(--i2); border-top: 1px solid var(--ln); background: var(--bg); }
-  footer a { color: var(--i2); text-decoration: none; transition: color 0.2s; margin: 0 8px; }
-  footer a:hover { color: var(--ink); }
+  footer {
+    padding: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--i2);
+    border-top: 1px solid var(--ln);
+    background: var(--bg);
+  }
+  footer a {
+    color: var(--i2);
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-left: 12px;
+  }
+  footer a:hover {
+    color: var(--ink);
+  }
 
   /* =========================================
      EXACT TOAST CSS FROM INDEX.HTML
@@ -59,7 +166,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    top: calc(24px + env(safe-area-inset-top)); /* Adjusted slightly for 404 layout */
+    top: calc(24px + env(safe-area-inset-top));
     z-index: 120;
     display: flex;
     flex-direction: column;
@@ -69,8 +176,8 @@
   }
   
   .ts {
-    background: #0d1526; /* --ink from index.html */
-    color: #f5f7fc;      /* --bg from index.html */
+    background: var(--toast-bg);
+    color: var(--toast-tx);
     padding: 10px 14px;
     border-radius: 10px;
     font-size: 13px;
@@ -79,8 +186,6 @@
     align-items: center;
     max-width: 92vw;
     box-shadow: 0 10px 30px rgba(0,0,0,.3);
-    
-    /* Added animation for smooth entrance from top */
     animation: dropIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
     transform: translateY(-20px);
@@ -90,6 +195,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* Mobile Adjustments */
   @media (max-width: 600px) {
     header { padding: 20px; justify-content: center; }
     .error-code { margin-bottom: 0px; }
@@ -114,27 +220,26 @@
     
     <div class="actions">
       <a href="/" class="btn btn-primary">Return to Homepage</a>
-      <!-- Updated onclick to trigger the new toast -->
       <button onclick="showLoginToast()" class="btn btn-secondary">Contact Support</button>
     </div>
   </main>
 
   <footer>
     &copy; <script>document.write(new Date().getFullYear())</script> CricPulse. All rights reserved. 
-    <a href="/terms.html">Terms</a> &middot; <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/privacy.html">Privacy</a>
   </footer>
 
-  <!-- Toast Container at the top -->
+  <!-- Toast Container -->
   <div class="tw" id="tw"></div>
 
   <script>
-    // Exact Toast Logic matching index.html
+    // EXACT TOAST FUNCTION FROM INDEX.HTML
     function showLoginToast() {
       const container = document.getElementById('tw');
       const toast = document.createElement('div');
       toast.className = 'ts';
       
-      // Info/Alert icon matching your app's style
       toast.innerHTML = `
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
@@ -145,7 +250,6 @@
       
       container.appendChild(toast);
       
-      // Remove after 2.8 seconds (matching index.html)
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(-20px)';
