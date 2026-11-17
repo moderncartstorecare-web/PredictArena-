@@ -560,7 +560,7 @@ function legalPage(kind) {
 /* ============== APP VIEWS ============== */
 const mrow = m => {
   const lk = S.preds.find(p => p.m == m.id), cls = !left(m) || m.isFinished, sel = S.slip[m.id];
-  return `<div class="mk" data-a="open" data-v="${m.id}"><div class="bt" style="align-items:flex-start"><div class="nm">${esc(ttl(m))}</div><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}</div><div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):(k=="A"?m.oa:m.ob).toFixed(2)+"x"}</b></button>`; }).join("")}</div></div>`;
+  return `<div class="mk" data-a="open" data-v="${m.id}"><div class="bt" style="align-items:flex-start"><div class="nm">${esc(ttl(m))}</div><span class="cd">${ic("clock",12)}<span data-cd="${m.id}">${cdt(m)}</span></span></div><div class="mut s12">${cl(m.c)} · ${esc(m.lg)}</div><div class="lvt" style="color:var(--i3)" data-lt="${m.id}">${liveText(m)}        <div class="pks">${["A","B"].map(k => { const on = lk ? lk.p == k : sel == k; return `<button class="pk${on?" on":""}" data-a="pick" data-v="${m.id}:${k}" ${lk||cls?"disabled":""} aria-label="${esc(full(m,k))}"><span>${esc(lbl(m,k))}</span><b>${lk&&on?ic("lock",11):"₹"+(m.entry_fee||50)}</b></button>`; }).join("")}</div></div>`;
 };
 const mlist = () => {
   const q = S.q.toLowerCase(), L = MK.filter(m => (S.cat == "all" || m.c == S.cat) && ttl(m).toLowerCase().includes(q));
@@ -570,20 +570,18 @@ const slipBody = () => {
   const ids = Object.keys(S.slip);
   if (!ids.length) return '<div class="empty">Tap an outcome to add it here.</div>';
   
-  let totalPotential = 0;
+  let totalStake = 0;
   let html = ids.map(id => { 
     const m = mkt(id); 
-    const odds = S.slip[id] == "A" ? m.oa : m.ob;
-    const stake = S.slipStake[id] || 0;
-    const potential = Math.round(stake * odds);
-    totalPotential += potential;
-    return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))} @ ${odds.toFixed(2)}x</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" data-stake="${id}" value="${stake}" min="10" style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;" oninput="updateStake('${id}', this.value)"></div>
-    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok">Win: ₹${potential}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+    const fee = m.entry_fee || 50;
+    S.slipStake[id] = fee; // Force stake to match the entry fee
+    totalStake += fee;
+    return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))}</span>
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Entry Fee:</span><b class="s12">₹${fee}</b></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
-  html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${Object.values(S.slipStake).reduce((a,b)=>a+b,0)}</b></div>`;
-  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok">₹${totalPotential}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Entry Fee</span><b>₹${totalStake}</b></div>`;
   html += `<button class="btn p w" style="margin-top:8px" data-a="lockslip">${ic("lock",14)} Lock Picks</button>`;
   return html;
 };
@@ -621,7 +619,7 @@ function picksV() {
     const team = m ? full(m, p.p) : (p.p === 'A' ? 'Team A' : 'Team B');
     const btnAttr = m ? `data-a="open" data-v="${m.id}"` : `style="cursor:default"`;
     
-    return `<div class="ln"><div class="grow"><button class="nm" ${btnAttr}>${esc(title)}</button><div class="mut s12">Pick: ${esc(team)} · Stake: ${inr(p.stake)} · Odds: ${p.odds}x</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
+        return `<div class="ln"><div class="grow"><button class="nm" ${btnAttr}>${esc(title)}</button><div class="mut s12">Pick: ${esc(team)} · Entry Fee: ${inr(p.stake)}</div></div><div class="col" style="align-items:flex-end;gap:6px">${stp(p)}${p.res=="w"?`<b class="ok">+${inr(p.pay)}</b>`:''}</div></div>`; 
   }).join("") : '<div class="empty">No picks here yet.</div>'}</div>`;
 }
 function walletV() {
@@ -887,8 +885,9 @@ function matchV() {
   // Use real filled count fetched from database (fallback to 0)
   const filled = S.real_filled !== undefined ? S.real_filled : 0;
   const spotsLeft = spots - filled;
-  const pct = Math.round(filled / spots * 100);
-  const pool = fee * spots;
+  const pct = Math.round((filled / spots) * 100);
+  // Dynamic Pool: Total collected * 80% (20% platform fee)
+  const pool = Math.round((filled * fee) * 0.8);
   const isFull = filled >= spots;
   const locked = !!lk || cls || isFull;
 
@@ -1236,10 +1235,9 @@ function lockPicks(ids) {
 
   ok.forEach(id => { 
     const m = mkt(id);
-    const stake = S.slipStake[id] || 0;
-    const odds = S.slip[id] == "A" ? m.oa : m.ob;
+    const stake = m.entry_fee || 50; // Fixed entry fee
     
-    S.preds.push({id:Date.now()+Number(id), m:id, p:S.slip[id], stake: stake, odds: odds, res:null, pay:0}); 
+    S.preds.push({id:Date.now()+Number(id), m:id, p:S.slip[id], stake: stake, odds: 0, res:null, pay:0}); 
     
     if (window.CP_DB && window.CP_DB.ready && S.user) {
       supabase.from('predictions').insert({
