@@ -120,7 +120,15 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 .lv-table th{text-align:left;font-size:11px;color:var(--mu);padding:8px 16px;border-bottom:1px solid var(--bd);background:color-mix(in srgb,var(--pr) 3%,var(--card))}
 .lv-table td{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:13px}
 .lv-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}
-@media(max-width:1000px){.lv-grid{grid-template-columns:repeat(2,1fr)}.lv-main{grid-template-columns:1fr}}
+@media(max-width:1000px){
+  .lv-grid{grid-template-columns:repeat(2,1fr)}
+  .lv-main{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .lv-grid{grid-template-columns:1fr}
+  .lv-table-wrap{width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;}
+  .lv-table th, .lv-table td { padding: 10px 8px; white-space: nowrap; }
+}
 </style>
 </head>
 <body>
@@ -889,6 +897,22 @@ async function fetchHistoricalLive(filter) {
 setInterval(() => {
   if (S.page === "live" && LIVE_FILTER === "live" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
 }, 5000);
+
+// Mobile fix: When you switch back to the Admin panel tab, re-fetch the live users
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live") {
+    // Force reconnect/re-fetch
+    if (db) {
+      db.from("live_sessions").select("*").then(r => {
+        if (r.data) {
+          LIVE_USERS = {}; // Clear old cache
+          r.data.forEach(u => LIVE_USERS[u.session_id] = u);
+          updateLiveUI(null, "INIT");
+        }
+      });
+    }
+  }
+});
 setInterval(()=>{
   document.querySelectorAll('[data-timer]').forEach(el=>{
     const ts=Number(el.dataset.timer);
