@@ -571,17 +571,26 @@ const slipBody = () => {
   if (!ids.length) return '<div class="empty">Tap an outcome to add it here.</div>';
   
   let totalStake = 0;
+  let totalMaxWin = 0;
   let html = ids.map(id => { 
     const m = mkt(id); 
     const fee = m.entry_fee || 50;
-    S.slipStake[id] = fee; // Force stake to match the entry fee
+    S.slipStake[id] = fee; // Lock the stake to entry fee
     totalStake += fee;
+    
+    // Calculate Max Rank 1 Prize (30% of max pool)
+    const maxSpots = m.max_spots || 200;
+    const maxPool = maxSpots * fee * 0.8; 
+    const maxWin = Math.round(maxPool * 0.30);
+    totalMaxWin += maxWin;
+
     return `<div class="se"><div class="grow"><b class="s12" style="display:block">${esc(ttl(m))}</b><span class="mut s12">Pick: ${esc(full(m,S.slip[id]))}</span>
-    <div class="row" style="margin-top:6px;"><span class="s12 mut">Entry Fee:</span><b class="s12">₹${fee}</b></div>
-    </div><div class="col" style="align-items:flex-end;gap:6px"><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
+    <div class="row" style="margin-top:6px;"><span class="s12 mut">Stake: ₹</span><input type="number" value="${fee}" readonly style="width:80px;padding:4px 8px;border:1px solid var(--ln2);border-radius:6px;outline:none;pointer-events:none;background:var(--bg);"></div>
+    </div><div class="col" style="align-items:flex-end;gap:6px"><b class="s12 ok" style="color:var(--ok)">Win up to ₹${maxWin}</b><button class="mut" data-a="rm" data-v="${id}" aria-label="Remove">${ic("x",15)}</button></div></div>`; 
   }).join("");
   
-  html += `<div class="sl"><span class="t2">Total Entry Fee</span><b>₹${totalStake}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Stake</span><b>₹${totalStake}</b></div>`;
+  html += `<div class="sl"><span class="t2">Total Potential Win</span><b class="ok" style="color:var(--ok); font-size:14px;">₹${totalMaxWin}</b></div>`;
   html += `<button class="btn p w" style="margin-top:8px" data-a="lockslip">${ic("lock",14)} Lock Picks</button>`;
   return html;
 };
