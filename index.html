@@ -1101,9 +1101,9 @@ if (!GUEST_NAME) {
 let pingTimeout;
 async function pingLive(isLeaving = false) {
   if (!window.CP_DB || !CP_DB.ready) return;
-  clearTimeout(pingTimeout);
+  console.log("📡 Sending ping to Supabase:", S.route || "home", isLeaving ? "(Leaving)" : "");
   try {
-    await supabase.from('live_sessions').upsert({
+    const { data, error } = await supabase.from('live_sessions').upsert({
       session_id: LIVE_SESSION_ID,
       user_id: (S.user && S.user.id) ? S.user.id : null,
       user_name: (S.user && S.user.n) ? S.user.n : GUEST_NAME,
@@ -1111,6 +1111,10 @@ async function pingLive(isLeaving = false) {
       last_active: new Date().toISOString(),
       is_active: !isLeaving
     }, { onConflict: 'session_id' });
+    
+    if (error) console.error("❌ Supabase Ping Error:", error);
+    else console.log("✅ Ping successful!");
+    
   } catch(e) { console.error("Live ping error:", e); }
 }
 
