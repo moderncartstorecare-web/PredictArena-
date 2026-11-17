@@ -1040,7 +1040,7 @@ function matchV() {
           <div class="c-bar" role="progressbar" aria-label="Spots filled" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
           <div class="c-fast ${spotsLeft > 0 && spotsLeft <= 25 ? 'on' : ''}">Filling fast. Only a few spots left.</div>
           <div class="c-mini">
-            <div><small>Winners</small><b>${prizes[prizes.length - 1][1]}</b></div>
+            <div><small>Top Winners</small><b>Top ${prizes[prizes.length - 1][1]}</b></div>
             <div><small>First prize</small><b>${inr(prizeRows[0].amt)}</b></div>
             <div><small>Entry</small><b>${inr(fee)}</b></div>
           </div>
