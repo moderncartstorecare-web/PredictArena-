@@ -945,6 +945,7 @@ setInterval(async () => {
         .gte("last_active", new Date(Date.now() - 120000).toISOString()); // Only last 2 mins
         
       if (data) {
+        console.log("📥 Polled Live Users from DB:", data); // DEBUG LOG
         LIVE_USERS = {}; // Clear local cache
         data.forEach(u => LIVE_USERS[u.session_id] = u);
         updateLiveUI(null, "POLL");
