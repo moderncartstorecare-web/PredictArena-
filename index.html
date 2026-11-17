@@ -1116,8 +1116,13 @@ async function pingLive(isLeaving = false) {
 
 // Mobile browsers pause timers when switching apps. This fires when they return.
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") pingLive(true);
-  else pingLive(false);
+  if (document.visibilityState === "hidden") {
+    pingLive(true);
+  } else {
+    pingLive(false);
+    // Force a second ping 2 seconds later just in case mobile Safari woke up slowly
+    setTimeout(() => pingLive(false), 2000); 
+  }
 });
 window.addEventListener("beforeunload", () => pingLive(true));
 
