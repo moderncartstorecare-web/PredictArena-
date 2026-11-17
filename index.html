@@ -1088,22 +1088,24 @@ ${S.pop ? `<div class="pp"><header>Notifications<button class="btn sm" data-a="r
 }
 
 // --- LIVE TRACKING SYSTEM ---
-let LIVE_SESSION_ID = sessionStorage.getItem("cp_sess_id") || "sess_" + Math.random().toString(36).substring(2, 10);
-sessionStorage.setItem("cp_sess_id", LIVE_SESSION_ID);
+let LIVE_SESSION_ID = localStorage.getItem("cp_sess_id") || "sess_" + Math.random().toString(36).substring(2, 10);
+localStorage.setItem("cp_sess_id", LIVE_SESSION_ID);
 
 // Generate a guest name if they aren't logged in
-let GUEST_NAME = sessionStorage.getItem("cp_guest_name");
+let GUEST_NAME = localStorage.getItem("cp_guest_name");
 if (!GUEST_NAME) {
     GUEST_NAME = "Guest #" + Math.floor(1000 + Math.random() * 9000);
-    sessionStorage.setItem("cp_guest_name", GUEST_NAME);
+    localStorage.setItem("cp_guest_name", GUEST_NAME);
 }
 
+let pingTimeout;
 async function pingLive(isLeaving = false) {
-  if (!window.CP_DB || !CP_DB.ready) return; // Removed the user check!
+  if (!window.CP_DB || !CP_DB.ready) return;
+  clearTimeout(pingTimeout);
   try {
     await supabase.from('live_sessions').upsert({
       session_id: LIVE_SESSION_ID,
-      user_id: (S.user && S.user.id) ? S.user.id : null, // NULL for guests
+      user_id: (S.user && S.user.id) ? S.user.id : null,
       user_name: (S.user && S.user.n) ? S.user.n : GUEST_NAME,
       current_page: isLeaving ? "Left App" : (S.route || "home"),
       last_active: new Date().toISOString(),
@@ -1111,12 +1113,19 @@ async function pingLive(isLeaving = false) {
     }, { onConflict: 'session_id' });
   } catch(e) { console.error("Live ping error:", e); }
 }
+
+// Mobile browsers pause timers when switching apps. This fires when they return.
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") pingLive(true);
   else pingLive(false);
 });
 window.addEventListener("beforeunload", () => pingLive(true));
-setInterval(() => { if (document.visibilityState === "visible") pingLive(false); }, 15000); // Heartbeat every 15s
+
+// 15s heartbeat for active users
+setInterval(() => { if (document.visibilityState === "visible") pingLive(false); }, 15000);
+
+// Mobile fix: force a ping if they tap the screen, just in case the timer paused
+document.addEventListener("touchstart", () => { if (document.visibilityState === "visible") pingLive(false); }, { passive: true });
 
 function render() {
   const r = $("app");
