@@ -1476,7 +1476,7 @@ document.addEventListener("click", async e => {
   if (S.pop && a != "pop" && !e.target.closest(".pp")) S.pop = 0;
 
   switch(a) {
-    case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
+    case "nav": S.route = v; S.pop = 0; closeSheet(); history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); pingLive(false); break;
     case "sgo": closeSheet(); S.route = v; history.pushState({route: v}, "", ""); save(); render(); scrollTo(0,0); break;
     case "back": 
       S.pop = 0; closeSheet(); 
@@ -1526,7 +1526,7 @@ document.addEventListener("click", async e => {
     case "slipsheet": slipSheet(); break;
     case "lockslip": lockPicks(Object.keys(S.slip)); break;
     case "lockm": lockPicks([v]); break;
-    case "open": S.route = "match"; S.mid = v; S.pop = 0; history.pushState({route: "match", mid: v}, "", ""); save(); render(); scrollTo(0,0); break;
+    case "open": S.route = "match"; S.mid = v; S.pop = 0; history.pushState({route: "match", mid: v}, "", ""); save(); render(); scrollTo(0,0); pingLive(false); break;
     case "pff": S.pff = v; render(); break;
     case "nf": S.nf = v; render(); break;
     case "rk": S.rk = v; render(); break;
