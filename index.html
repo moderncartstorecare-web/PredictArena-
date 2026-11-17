@@ -1035,7 +1035,7 @@ function matchV() {
         <section class="c-card c-pool" id="c-pool" aria-label="Prize pool">
           <div class="c-row"><span class="c-pl">Guaranteed prize pool</span><span class="c-fee">Entry ${inr(fee)}</span></div>
           <div class="c-amt">${inr(pool)}</div>
-          <div class="c-gtd">Paid out whether or not all spots fill</div>
+          <div class="c-gtd">Grows as more players join the contest</div>
           <div class="c-pgi"><span>Spots filled</span><span>${filled} / ${spots} (${spotsLeft} left)</span></div>
           <div class="c-bar" role="progressbar" aria-label="Spots filled" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
           <div class="c-fast ${spotsLeft > 0 && spotsLeft <= 25 ? 'on' : ''}">Filling fast. Only a few spots left.</div>
