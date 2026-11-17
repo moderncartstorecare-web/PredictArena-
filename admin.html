@@ -172,13 +172,13 @@ const ST_DEF={maintenance:false,maint_msg:"CricPulse is getting an upgrade. We w
 let ST=Object.assign({},ST_DEF);
 try{ST=Object.assign(ST,JSON.parse(localStorage.getItem("cp_settings")||"{}"))}catch(e){}
 let S={mi:0,page:"dash",users:[],matches:[],wd:[],pay:[],tx:[],txReal:null,txl:[],tickets:[],preds:[],sent:[],cp:[],act:[],ucount:0,totalPreds:0,has:{},adm:""};
-try{const o=JSON.parse(localStorage.getItem("pxa3")||"{}");["mi","page","cp","act","txl"].forEach(k=>{if(o[k]!==undefined)S[k]=o[k]})}catch(e){}
+try{const o=JSON.parse(localStorage.getItem("pxa3")||"{}");["mi","cp","act","txl"].forEach(k=>{if(o[k]!==undefined)S[k]=o[k]})}catch(e){}
 const save=()=>{try{const o={};["mi","page","cp","act","txl"].forEach(k=>o[k]=S[k]);localStorage.setItem("pxa3",JSON.stringify(o))}catch(e){}};
 let EYE=0,EYET=0,LOGIN=0,UQ="",UF="all",WF="pending",TF="All",TKF="open",TQ="",TKM=null,MOD=null,DENY="",SESS=null,BOOTED=0,LT=0;
 let LIVE_USERS = {};
 let CPS={aud:"all",uid:"",ty:"Promo",t:"",m:""};
 let UNLOCK=false;try{UNLOCK=sessionStorage.getItem("cp_adm_ok")==="1"}catch(e){}
-try{TKM=localStorage.getItem("admin_tkm")||null;if(TKM)S.page="sup"}catch(e){}
+try{TKM=localStorage.getItem("admin_tkm")||null;}catch(e){}
 const saveTkm=id=>{TKM=id;try{id?localStorage.setItem("admin_tkm",id):localStorage.removeItem("admin_tkm")}catch(e){}};
 
 const $=i=>document.getElementById(i);
