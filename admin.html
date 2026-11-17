@@ -936,14 +936,30 @@ setInterval(() => {
   if (S.page === "live" && LIVE_FILTER === "live" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
 }, 5000);
 
-// Mobile fix: When you switch back to the Admin panel tab, re-fetch the live users
+// BULLETPROOF FALLBACK: Poll the database every 5 seconds if looking at Live Users
+setInterval(async () => {
+  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live" && db) {
+    try {
+      const { data } = await db.from("live_sessions")
+        .select("*")
+        .gte("last_active", new Date(Date.now() - 120000).toISOString()); // Only last 2 mins
+        
+      if (data) {
+        LIVE_USERS = {}; // Clear local cache
+        data.forEach(u => LIVE_USERS[u.session_id] = u);
+        updateLiveUI(null, "POLL");
+      }
+    } catch(e) { console.error("Poll failed", e); }
+  }
+}, 5000);
+
+// Mobile fix: When you switch back to the Admin panel tab, re-fetch instantly
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live") {
-    // Force reconnect/re-fetch
     if (db) {
       db.from("live_sessions").select("*").then(r => {
         if (r.data) {
-          LIVE_USERS = {}; // Clear old cache
+          LIVE_USERS = {};
           r.data.forEach(u => LIVE_USERS[u.session_id] = u);
           updateLiveUI(null, "INIT");
         }
