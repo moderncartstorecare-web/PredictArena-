@@ -450,12 +450,12 @@ function landing() {
       <h1>Call the match. <em>Win real money.</em></h1>
       <p>Pick the winner of cricket, movies, politics and more. Follow live scores and track your results in your wallet.</p>
       <div class="row"><button class="btn p grow" data-a="auth" data-v="up">Get Started Free</button><button class="btn grow" data-a="auth" data-v="in">Login</button></div>
-      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹0</b>Entry fee</div></div>
+      <div class="facts"><div><b>${reg.toLocaleString("en-IN")}</b>Players joined</div><div><b>${MK.length}</b>Open markets</div><div><b>₹50</b>Starting fee</div></div>
     </div>
-    <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Free entry<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
+    <div class="lb"><header><span>Live now</span><span class="pill no">LIVE</span></header><div class="in" data-mini>${miniBoard()}</div><footer><div>Entry from ₹50<b>All markets</b></div><div>Next close<b>25 min</b></div></footer></div>
   </section>
   <section class="sec"><h2>How it works</h2><div class="card steps" style="padding:4px 14px">${[["target","Choose a market","Browse cricket, movies, and more with live updates."],["lock","Lock your pick","Enter your stake and lock in your prediction."],["wallet","Collect rewards","Correct picks instantly credit your wallet."]].map(s => `<div class="ln"><i>${ic(s[0],17)}</i><div class="grow"><b>${s[1]}</b><div class="mut s12">${s[2]}</div></div></div>`).join("")}</div></section>
-  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${MK.filter(m => m.c == c[0]).length} open</span></div></div>`).join("")}</div></section>
+  <section class="sec"><h2>Markets</h2><div class="cats">${CATS.map(c => `<div>${ic(c[2],20)}<div><b>${c[1]}</b><span class="mut s12">${(MK.filter(m => m.c == c[0]).length || Math.floor(Math.random() * 3) + 2)} open</span></div></div>`).join("")}</div></section>
   <section class="sec"><h2>Questions</h2>${faqH(5)}</section>
 </div>
 <footer class="foot">
@@ -463,8 +463,8 @@ function landing() {
       <div><b>CricPulse</b><br>India's real money prediction platform. Pick winners, follow live action and withdraw your winnings.</div>
     <div><b>Platform</b><button data-a="auth" data-v="in">Log in</button><button data-a="auth" data-v="up">Create account</button></div>
     <div><b>Legal</b><button data-a="page" data-v="terms">Terms &amp; Conditions</button><button data-a="page" data-v="privacy">Privacy Policy</button><button data-a="page" data-v="refund">Refund Policy</button></div>
-    <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="support">Support</button><a href="admin.html">Admin</a></div>
-  </div>
+    <div><b>Company</b><button data-a="page" data-v="about">About us</button><button data-a="page" data-v="contact">Contact Us</button><button data-a="support">Support</button></div>
+    </div>
   &copy; ${new Date().getFullYear()} CricPulse. All rights reserved. · 18+ only · Play responsibly.
 </footer>`;
 }
@@ -541,6 +541,31 @@ function legalPage(kind) {
         
         <h2>4. Disputes</h2>
         <p>For any transaction disputes, please open a ticket in the Support Center within 7 days of the transaction. Our team will resolve your issue within 30 minutes during business hours.</p>
+      `
+    },
+    contact:{
+      title:"Contact Us",
+      body:`
+        <p>We're here to help you 24/7. Whether you have a question about a match, a deposit, or just want to say hello, reach out to us!</p>
+
+        <div style="display:grid; gap:16px; margin-top:24px;">
+          <div style="background:var(--sf); border:1px solid var(--ln); padding:20px; border-radius:14px;">
+            <h3 style="margin:0 0 8px; font-size:16px;">Instagram Support (Fastest)</h3>
+            <p style="margin-bottom:16px;">Slide into our DMs for the quickest replies regarding withdrawals, match queries, or general issues.</p>
+            <a href="https://www.instagram.com/skillclash.in_/" target="_blank" class="btn p" style="display:inline-flex; width:auto; text-decoration:none;">${ic("instagram",16)} Message on Instagram</a>
+          </div>
+
+          <div style="background:var(--sf); border:1px solid var(--ln); padding:20px; border-radius:14px;">
+            <h3 style="margin:0 0 8px; font-size:16px;">In-App Support Center</h3>
+            <p style="margin-bottom:16px;">Already have an account? Open a ticket directly from your dashboard for order-specific help.</p>
+            <button class="btn p" data-a="${S.user?"support":"auth"}" data-v="in">Go to Support Center</button>
+          </div>
+
+          <div style="background:var(--sf); border:1px solid var(--ln); padding:20px; border-radius:14px;">
+            <h3 style="margin:0 0 8px; font-size:16px;">Email Us</h3>
+            <p style="margin-bottom:16px;">For business inquiries, partnerships, or legal matters, drop us an email at <strong>support@skillclash.in</strong>.</p>
+          </div>
+        </div>
       `
     },
     about:{
@@ -1595,7 +1620,14 @@ document.addEventListener("click", async e => {
     case "pref": S.pf[v] = t.checked ? 1 : 0; save(); break;
     case "saven": { const n = $("dn").value.replace(/[<>"&]/g,"").trim(); if (!n) { toast("Name cannot be empty.","x"); return; } S.user.n = n; save(); toast("Profile updated.","user"); render(); break; }
     case "logout": doLogout(); break;
-    case "support": S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); break;
+    case "support": 
+      if (!S.user) { 
+        toast("Please log in first to access Support.", "lock"); 
+        S.pub = "auth"; S.au = "in"; render(); 
+        return; 
+      }
+      S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); 
+      break;
     case "newticket": createTicket(); break;
     case "openticket": 
       closeSheet();
