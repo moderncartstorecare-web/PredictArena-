@@ -337,7 +337,21 @@ async function saveSetting(k,v){ST[k]=v;try{localStorage.setItem("cp_settings",J
 /* ---------- support ---------- */
 async function fetchMsgs(id){let x=await db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id).order(COLS.msg.created,{ascending:true});if(x.error)x=await db.from("ticket_messages").select("*").eq(COLS.msg.ticket,id);return x}
 async function loadMsgs(t){const r=await fetchMsgs(t.id);if(r.error){toast("Could not load messages","circle-alert");return}t.msgs=(r.data||[]).map(mapMsg);if(t.unread){t.unread=0;db.from("ticket_messages").update({is_read:true}).eq("ticket_id",t.id).eq("sender","user").then(()=>{})}if(S.page==="sup"){updateChat(true);updateList()}else render()}
-async function tkSend(text,img){const t=TK(TKM);if(!t||t.st==="closed")return;const body=img||text;if(!body)return;const r=await db.from("ticket_messages").insert({ticket_id:t.id,sender:"admin",message:body,is_read:false}).select();if(r.error){toast("Failed to send: "+r.error.message,"circle-alert");return}const m=mapMsg(r.data&&r.data[0]?r.data[0]:{message:body,sender:"admin",created_at:new Date().toISOString()});if(!t.msgs)t.msgs=[];if(!t.msgs.some(x=>x.id&&x.id===m.id))t.msgs.push(m);t.lastTs=Date.now();t.lastSender="admin";updateChat(true);updateList()}
+async function tkSend(text,img){
+  const t=TK(TKM);if(!t||t.st==="closed")return;
+  const body=img||text;if(!body)return;
+  const r=await db.from("ticket_messages").insert({ticket_id:t.id,sender:"admin",message:body,is_read:false}).select();
+  if(r.error){toast("Failed to send: "+r.error.message,"circle-alert");return}
+  
+  // Update database status so it refreshes correctly
+  await db.from("support_tickets").update({status:"pending"}).eq("id",t.id);
+  t.st = "pending";
+
+  const m=mapMsg(r.data&&r.data[0]?r.data[0]:{message:body,sender:"admin",created_at:new Date().toISOString()});
+  if(!t.msgs)t.msgs=[];if(!t.msgs.some(x=>x.id&&x.id===m.id))t.msgs.push(m);
+  t.lastTs=Date.now();t.lastSender="admin";
+  updateChat(true);updateList();
+}
 const tkNote=id=>{try{return localStorage.getItem("cp_note_"+id)||""}catch(e){return""}};
 
 /* =====================================================================
@@ -426,29 +440,29 @@ function dashV(){
       <button class="btn g" data-act="addm">${ic("plus")}Add match</button><button class="btn g" data-p="not">${ic("send")}Notify users</button>
       <button class="btn g" data-p="sup">${ic("life-buoy")}Open inbox</button><button class="btn ${ST.maintenance?"r":"g"}" data-p="set">${ic("wrench")}${ST.maintenance?"Maintenance ON":"Maintenance"}</button></div></div>
     <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}
-        </div>
     </div>
+  </div></div>
 
-    <!-- PASSWORD RESET GENERATOR -->
-    <div style="margin-top:30px;margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div><h1 style="font-size:18px;margin:0">Password Reset Generator</h1><small style="color:var(--mu)">Generate secure 10-minute links for users who forgot their passwords</small></div>
+  <!-- PASSWORD RESET GENERATOR -->
+  <div style="margin-top:30px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><h1 style="font-size:18px;margin:0">Password Reset Generator</h1><small style="color:var(--mu)">Generate secure 10-minute links for users who forgot their passwords</small></div>
+    </div>
+    <div class="card" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
+      <div style="flex:1;min-width:250px">
+        <label class="f">Customer Email Address</label>
+        <input class="in" id="reset-email" placeholder="e.g. customer@gmail.com">
       </div>
-      <div class="card" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
-        <div style="flex:1;min-width:250px">
-          <label class="f">Customer Email Address</label>
-          <input class="in" id="reset-email" placeholder="e.g. customer@gmail.com">
-        </div>
-        <button class="btn" onclick="genResetLink()">${ic("link")}Generate Link</button>
-      </div>
-      <div id="reset-result" style="display:none;margin-top:12px" class="card">
-        <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Send this link to the customer (Valid for 10 mins):</div>
-        <div style="display:flex;gap:8px">
-          <input class="in" id="reset-link-val" readonly style="font-family:monospace;font-size:14px">
-          <button class="btn k" onclick="copyResetLink()">${ic("copy")}Copy</button>
-        </div>
+      <button class="btn" onclick="genResetLink(event)">${ic("link")}Generate Link</button>
+    </div>
+    <div id="reset-result" style="display:none;margin-top:12px" class="card">
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Send this link to the customer (Valid for 10 mins):</div>
+      <div style="display:flex;gap:8px">
+        <input class="in" id="reset-link-val" readonly style="font-family:monospace;font-size:14px">
+        <button class="btn k" onclick="copyResetLink()">${ic("copy")}Copy</button>
       </div>
     </div>
+  </div>
   </div>`;
 }
 function matchesV(){
@@ -498,10 +512,8 @@ function tkList(){
     if (t.st === "closed") {
         timerHtml = `<em style="color:var(--mu)">${rel(t.lastTs)}</em>`;
     } else if (t.lastSender === "user") {
-        // User replied last -> Timer runs
         timerHtml = `<em data-timer="${t.lastTs}" class="${Date.now()-t.lastTs>120000?'red':'green'}">${rel(t.lastTs)}</em>`;
     } else {
-        // Admin replied last -> Timer stops, show static time
         timerHtml = `<em style="color:var(--mu)">${ftm(t.lastTs)}</em>`;
     }
 
@@ -1005,11 +1017,12 @@ setInterval(()=>{
 },1000);
 setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
 // --- PASSWORD RESET GENERATOR LOGIC ---
-async function genResetLink() {
+async function genResetLink(event) {
   const email = document.getElementById("reset-email").value.trim();
   if(!email) return toast("Enter an email address", "circle-alert");
   
   const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = 'Generating...';
 
   try {
@@ -1027,7 +1040,7 @@ async function genResetLink() {
   } catch (e) {
     toast(e.message, "circle-alert");
   } finally {
-    btn.disabled = false; btn.innerHTML = '<i data-lucide="link"></i>Generate Link';
+    btn.disabled = false; btn.innerHTML = originalText;
     try{lucide.createIcons()}catch(e){}
   }
 }
@@ -1038,7 +1051,6 @@ function copyResetLink() {
   navigator.clipboard.writeText(val.value);
   toast("Link copied to clipboard!");
 }
-
 boot();
 </script>
 </body>
