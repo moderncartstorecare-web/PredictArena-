@@ -213,7 +213,12 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
   .c-ov{align-items:center}.c-sheet{border-radius:22px;padding:22px}.c-grab{display:none}
 }
 @media(max-width:380px){.c-tm small{display:none}.c-amt{font-size:33px}.c-cs{display:none}.c-vs{padding:12px}.c-av{width:42px;height:42px}}
-@media(max-width:560px){.c-ev{font-size:19px}.c-vs{grid-template-columns:1fr 1fr;gap:8px}.c-vsp{display:none}.c-tm.b{flex-direction:row;text-align:left}}
+@media(max-width:560px){
+  .c-ev{font-size:19px}
+  .c-vs{padding:10px 8px}
+  .c-vsp{display:inline-flex}
+  .c-tm.b{flex-direction:row-reverse;text-align:right}
+}
 </style>
 </head>
 <body>
@@ -1175,9 +1180,8 @@ function render() {
   
   // Trigger Live Ping on every render (route change)
   pingLive(false); 
-  
   if (!S.user) {
-    if (["terms","privacy","refund","about","support"].includes(S.pub)) r.innerHTML = legalPage(S.pub);
+    if (["terms","privacy","refund","about","support","contact"].includes(S.pub)) r.innerHTML = legalPage(S.pub);
     else if (S.pub == "auth") r.innerHTML = authV();
     else r.innerHTML = landing();
   } else {
@@ -1623,7 +1627,6 @@ document.addEventListener("click", async e => {
     case "support": 
       if (!S.user) { 
         toast("Please log in first to access Support.", "lock"); 
-        S.pub = "auth"; S.au = "in"; render(); 
         return; 
       }
       S.route = "support"; render(); loadTickets().then(() => render()); scrollTo(0,0); 
