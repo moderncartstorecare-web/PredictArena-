@@ -425,8 +425,31 @@ function dashV(){
     <div class="card"><h3>Quick actions</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button class="btn g" data-act="addm">${ic("plus")}Add match</button><button class="btn g" data-p="not">${ic("send")}Notify users</button>
       <button class="btn g" data-p="sup">${ic("life-buoy")}Open inbox</button><button class="btn ${ST.maintenance?"r":"g"}" data-p="set">${ic("wrench")}${ST.maintenance?"Maintenance ON":"Maintenance"}</button></div></div>
-    <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}</div>
-  </div></div>`;
+    <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}
+        </div>
+    </div>
+
+    <!-- PASSWORD RESET GENERATOR -->
+    <div style="margin-top:30px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><h1 style="font-size:18px;margin:0">Password Reset Generator</h1><small style="color:var(--mu)">Generate secure 10-minute links for users who forgot their passwords</small></div>
+      </div>
+      <div class="card" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:250px">
+          <label class="f">Customer Email Address</label>
+          <input class="in" id="reset-email" placeholder="e.g. customer@gmail.com">
+        </div>
+        <button class="btn" onclick="genResetLink()">${ic("link")}Generate Link</button>
+      </div>
+      <div id="reset-result" style="display:none;margin-top:12px" class="card">
+        <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Send this link to the customer (Valid for 10 mins):</div>
+        <div style="display:flex;gap:8px">
+          <input class="in" id="reset-link-val" readonly style="font-family:monospace;font-size:14px">
+          <button class="btn k" onclick="copyResetLink()">${ic("copy")}Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 function matchesV(){
   return `<div class="hd"><div><h1>Matches</h1><small>Create markets, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-act="addm">${ic("plus")}Add match</button></div>
@@ -981,7 +1004,42 @@ setInterval(()=>{
   });
 },1000);
 setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
- boot();
+// --- PASSWORD RESET GENERATOR LOGIC ---
+async function genResetLink() {
+  const email = document.getElementById("reset-email").value.trim();
+  if(!email) return toast("Enter an email address", "circle-alert");
+  
+  const btn = event.target.closest('button');
+  btn.disabled = true; btn.innerHTML = 'Generating...';
+
+  try {
+    const { data, error } = await db.rpc('generate_reset_token', { p_email: email });
+    if (error) throw error;
+    
+    if (!data.ok) {
+      toast(data.message, "circle-alert");
+    } else {
+      const link = window.location.origin + "/?reset=" + data.token;
+      document.getElementById("reset-result").style.display = "block";
+      document.getElementById("reset-link-val").value = link;
+      toast("Link generated successfully");
+    }
+  } catch (e) {
+    toast(e.message, "circle-alert");
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i data-lucide="link"></i>Generate Link';
+    try{lucide.createIcons()}catch(e){}
+  }
+}
+
+function copyResetLink() {
+  const val = document.getElementById("reset-link-val");
+  val.select(); val.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(val.value);
+  toast("Link copied to clipboard!");
+}
+
+boot();
 </script>
 </body>
 </html>
