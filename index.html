@@ -202,6 +202,8 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .c-bt{height:50px;border-radius:14px;font-weight:700;font-size:14.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ln2);background:var(--sf)}
 .c-bt.p{background:var(--grad);color:#fff;border:0;box-shadow:0 10px 22px -6px rgba(30,79,216,.5);font-weight:800}.c-bt:disabled{opacity:.7;cursor:wait}
 .c-spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.reset-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px}
+.reset-card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:30px;width:100%;max-width:400px;text-align:center;box-shadow:var(--sh)}
 @media(min-width:960px){
   .c-main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start;padding:24px 16px 40px}
   .c-col-l,.c-col-r{display:flex;flex-direction:column;gap:16px;order:0}
@@ -1904,6 +1906,28 @@ function initRealtimeSync() {
 }
 
 window.addEventListener("load", async () => {
+  // --- INTERCEPT PASSWORD RESET LINK ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const resetToken = urlParams.get('reset');
+  if (resetToken) {
+    document.getElementById("app").innerHTML = `
+      <div class="reset-wrap">
+        <div class="reset-card">
+          <div style="width:50px;height:50px;border-radius:12px;background:var(--acs);color:var(--ac);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">${ic("lock",24)}</div>
+          <h2 style="font-size:22px;margin-bottom:8px">Create New Password</h2>
+          <p class="mut s12" style="margin-bottom:20px">Please enter your new password below. This link is valid for 10 minutes.</p>
+          <div class="fld" style="text-align:left">
+            <label>New Password (min 6 chars)</label>
+            <input type="password" class="inp" id="new-pass" placeholder="Enter new password">
+          </div>
+          <div class="err" id="reset-err" style="text-align:left"></div>
+          <button class="btn p w" id="reset-btn" onclick="submitReset('${resetToken}')">Update Password</button>
+        </div>
+      </div>
+    `;
+    return; // Stop loading the rest of the app
+  }
+
   if (history.state && history.state.route) {
      S.route = history.state.route;
      if (history.state.mid) S.mid = history.state.mid;
@@ -2044,6 +2068,48 @@ window.addEventListener("load", async () => {
     render();
   }
 });
+
+async function submitReset(token) {
+  const pass = document.getElementById("new-pass").value;
+  const err = document.getElementById("reset-err");
+  const btn = document.getElementById("reset-btn");
+
+  if (pass.length < 6) {
+    err.textContent = "Password must be at least 6 characters.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="c-spin"></span> Updating...';
+  err.textContent = "";
+
+  try {
+    const { data, error } = await supabase.rpc('reset_password_with_token', {
+      p_token: token,
+      p_new_password: pass
+    });
+
+    if (error) throw error;
+
+    if (!data.ok) {
+      err.textContent = data.message; // "Link expired" or "Invalid link"
+      btn.disabled = false;
+      btn.textContent = "Update Password";
+      return;
+    }
+
+    // Success!
+    toast("Password updated successfully. Please log in.", "check");
+    setTimeout(() => {
+      window.location.href = window.location.origin; // Redirect to home
+    }, 2000);
+
+  } catch (e) {
+    err.textContent = e.message || "Failed to reset password.";
+    btn.disabled = false;
+    btn.textContent = "Update Password";
+  }
+}
 </script>
 </body>
 </html>
