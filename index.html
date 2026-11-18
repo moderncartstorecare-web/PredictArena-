@@ -1515,16 +1515,55 @@ document.addEventListener("click", async e => {
       if (S.au == "up" && !fn) { er.textContent = "Enter your full name."; return; }
       if (!/^\S+@\S+\.\S+$/.test(em)) { er.textContent = "Enter a valid email address."; return; }
       if (pw.length < 6) { er.textContent = "Password must be at least 6 characters."; return; }
-      if (window.CP_DB && CP_DB.ready) {
-        S.authBusy = true; render();
+      
+      if (window.CP_DB && CP_DB.authClient) {
+        S.authBusy = true; 
+        er.textContent = "";
+        render();
+        
         (async () => {
           try {
-            if (S.au == "up") { await CP_DB.signUp(em, pw, { display_name: fn || em.split("@")[0] }); toast("Account created.","check"); }
-            else { const s = await CP_DB.signIn(em, pw); CP_DB.setSession(s); }
-            enter({n:fn || em.split("@")[0], e:em});
-          } catch (err) { S.authBusy = false; render(); const er2 = $("er"); if (er2) er2.textContent = err.message || "Authentication failed."; }
+            if (S.au == "up") {
+              // Official Supabase Sign Up
+              const { data, error } = await CP_DB.authClient.auth.signUp({
+                email: em,
+                password: pw,
+                options: { data: { display_name: fn || em.split("@")[0] } }
+              });
+              
+              if (error) throw error;
+              
+              // If email confirmation is turned ON in Supabase, session will be null
+              if (data.session === null) {
+                toast("Account created! Please check your email to verify.", "check");
+                S.au = "in"; // Switch to login tab
+                S.authBusy = false;
+                render();
+              } else {
+                // If email confirmation is OFF, they are logged in instantly
+                enter({n: fn || em.split("@")[0], e: em});
+              }
+              
+            } else {
+              // Official Supabase Sign In
+              const { data, error } = await CP_DB.authClient.auth.signInWithPassword({
+                email: em,
+                password: pw
+              });
+              if (error) throw error;
+              toast("Login successful", "check");
+              // The onAuthStateChange listener will automatically call applySession and load the dashboard
+            }
+          } catch (err) {
+            S.authBusy = false;
+            render();
+            const er2 = $("er");
+            if (er2) er2.textContent = err.message || "Authentication failed.";
+          }
         })();
-      } else { enter({n:fn||em.split("@")[0], e:em}); }
+      } else {
+        toast("Supabase not configured correctly.", "x");
+      }
       break;
     }
     case "theme": S.theme = isDark() ? "light" : "dark"; applyTheme(); save(); closeSheet(); render(); break;
