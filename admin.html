@@ -132,6 +132,9 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
   .lv-table-wrap{width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;}
   .lv-table th, .lv-table td { padding: 10px 8px; white-space: nowrap; }
 }
+/* --- PASSWORD RESET --- */
+.pro-timer{display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:14px;font-weight:600;padding:4px 10px;border-radius:6px;background:var(--was);color:var(--wa);}
+.pro-timer.expired{background:var(--bads);color:var(--bad)}
 </style>
 </head>
 <body>
@@ -144,10 +147,8 @@ label.f{display:block;font-size:12px;color:var(--mu);font-weight:500;margin-bott
 var SUPABASE_URL="https://hmiyhdekyqpzkxqiukvb.supabase.co";
 var SUPABASE_ANON_KEY="sb_publishable_lexqjxd-jNUUvYVTnwawPw_EnBvlHjd";
 var ADMIN_EMAILS=["moderncartstore.care@gmail.com"];
-/* Admin password gate. Stored as a SHA-256 hash (not plain text). This is a convenience lock only:
-   the real protection is the Google admin check above plus your Supabase RLS policies. */
 var PASS_HASH="24246b86c42ba116e496847ec9878b4dacc443daf58057831cf1200fa089cd8b";
-var PASS_B64="VmlzaGFsQDEyMw=="; /* used only if the browser has no crypto.subtle (non-HTTPS) */
+var PASS_B64="VmlzaGFsQDEyMw==";
 
 var COLS={
   users:{id:"id",name:"full_name",email:"email",city:"city",wallet:"wallet_balance",points:"points",status:"status",kyc:"kyc_verified",created:"created_at"},
@@ -246,36 +247,25 @@ function chart(a,b){
   const n=a.length, mx=Math.max(10, ...a, ...b), w=700, h=190, pad=20;
   const getY = (val) => h - pad - ((val / mx) * (h - pad*3));
   const getX = (i) => pad + (i * ((w - pad*2) / (n-1)));
-  
   let pathA = `M ${getX(0)} ${getY(a[0])}`;
   let pathB = `M ${getX(0)} ${getY(b[0])}`;
-  
   for(let i=1; i<n; i++){
     const cpX = (getX(i-1) + getX(i)) / 2;
     pathA += ` C ${cpX} ${getY(a[i-1])}, ${cpX} ${getY(a[i])}, ${getX(i)} ${getY(a[i])}`;
     pathB += ` C ${cpX} ${getY(b[i-1])}, ${cpX} ${getY(b[i])}, ${getX(i)} ${getY(b[i])}`;
   }
-  
   const fillA = `${pathA} L ${getX(n-1)} ${h-pad} L ${getX(0)} ${h-pad} Z`;
   const fillB = `${pathB} L ${getX(n-1)} ${h-pad} L ${getX(0)} ${h-pad} Z`;
-
   let grid = '';
   for(let i=0; i<=4; i++){
     const y = pad + ((h - pad*2) / 4) * i;
     grid += `<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="var(--bd)" stroke-width="1" stroke-dasharray="4"/>`;
     grid += `<text x="${pad-8}" y="${y+4}" font-size="10" text-anchor="end" fill="var(--mu)">${Math.round(mx - (mx/4)*i)}</text>`;
   }
-
   let s = `<svg viewBox="0 0 ${w} ${h}" width="100%" style="overflow:visible">
     <defs>
-      <linearGradient id="gradA" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--pr)" stop-opacity="0.3"/>
-        <stop offset="100%" stop-color="var(--pr)" stop-opacity="0"/>
-      </linearGradient>
-      <linearGradient id="gradB" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--bad)" stop-opacity="0.2"/>
-        <stop offset="100%" stop-color="var(--bad)" stop-opacity="0"/>
-      </linearGradient>
+      <linearGradient id="gradA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--pr)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--pr)" stop-opacity="0"/></linearGradient>
+      <linearGradient id="gradB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--bad)" stop-opacity="0.2"/><stop offset="100%" stop-color="var(--bad)" stop-opacity="0"/></linearGradient>
     </defs>
     ${grid}
     <path d="${fillA}" fill="url(#gradA)" />
@@ -283,9 +273,9 @@ function chart(a,b){
     <path d="${fillB}" fill="url(#gradB)" />
     <path d="${pathB}" fill="none" stroke="var(--bad)" stroke-width="2" stroke-linecap="round" stroke-dasharray="4" />
   </svg>`;
-  
   return s;
 }
+
 /* =====================================================================
    DATA LOADING
    ===================================================================== */
@@ -343,7 +333,6 @@ async function tkSend(text,img){
   const r=await db.from("ticket_messages").insert({ticket_id:t.id,sender:"admin",message:body,is_read:false}).select();
   if(r.error){toast("Failed to send: "+r.error.message,"circle-alert");return}
   
-  // Update database status so it refreshes correctly
   await db.from("support_tickets").update({status:"pending"}).eq("id",t.id);
   t.st = "pending";
 
@@ -362,7 +351,7 @@ const chipM=s=>`<span class="chip ${{closed:"wa",settled:"ok",upcoming:""}[s]||"
 
 function feed(){const f=[];S.users.slice(0,40).forEach(u=>u.ts&&f.push({ts:u.ts,i:"user-plus",t:`${u.name} joined`}));S.wd.slice(0,40).forEach(w=>f.push({ts:w.ts,i:"landmark",t:`Withdrawal ${fm(w.amt)} ${w.st} · ${userName(w.uid)}`}));S.pay.slice(0,40).forEach(p=>f.push({ts:p.ts,i:"banknote",t:`Deposit ${fm(p.amt)} ${p.st} · ${userName(p.uid)}`}));S.tickets.slice(0,40).forEach(t=>f.push({ts:t.ts,i:"life-buoy",t:`Ticket "${t.sub}" · ${tkUser(t)}`}));S.act.forEach(a=>f.push({ts:a[2]||0,i:"activity",t:a[0]}));return f.filter(x=>x.ts).sort((a,b)=>b.ts-a.ts).slice(0,9)}
 
- let LIVE_FILTER = "live";
+let LIVE_FILTER = "live";
 let HISTORICAL_LIVE = [];
 
 function liveV() {
@@ -406,13 +395,10 @@ function liveV() {
     </div>
   </div>`;
 }
-const timerCss = `<style>.pro-timer{display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:14px;font-weight:600;padding:4px 10px;border-radius:6px;background:var(--was);color:var(--wa);}.pro-timer.expired{background:var(--bads);color:var(--bad)}</style>`;
 
 function resetV() {
-  // Start the timer if there's an active one stored in memory
   setTimeout(() => { startAdminTimer(); }, 100);
-  
-  return timerCss + `
+  return `
   <div class="hd">
     <div><h1>Password Reset Generator</h1><small>Generate secure 10-minute links for users</small></div>
   </div>
@@ -449,90 +435,8 @@ function resetV() {
   </div>`;
 }
 
-// Global timer variable to keep it running
-window.adminResetTimerInterval = null;
-
-function startAdminTimer() {
-  const timerEl = document.getElementById("admin-timer");
-  const boxEl = document.getElementById("admin-timer-box");
-  if (!timerEl || !window.adminResetExpires) return;
-  
-  clearInterval(window.adminResetTimerInterval);
-  
-  window.adminResetTimerInterval = setInterval(() => {
-    const now = Date.now();
-    const diff = window.adminResetExpires - now;
-    
-    if (diff <= 0) {
-      timerEl.textContent = "Expired";
-      timerEl.classList.add("expired");
-      clearInterval(window.adminResetTimerInterval);
-      return;
-    }
-    
-    const m = Math.floor(diff / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }, 1000);
-}
-
-async function checkResetStats() {
-  const email = document.getElementById("reset-email").value.trim();
-  const statsEl = document.getElementById("reset-stats");
-  if(!email || !db) { if(statsEl) statsEl.style.display="none"; return; }
-  
-  const { count } = await db.from('password_resets').select('*', { count: 'exact', head: true }).eq('email', email);
-  
-  if (count > 0) {
-    statsEl.innerHTML = `<span style="color:var(--pr);font-weight:600">${count} reset link(s)</span> previously generated for this email.`;
-    statsEl.style.display = "block";
-  } else {
-    statsEl.innerHTML = `<span style="color:var(--mu)">First time generating a reset link for this user.</span>`;
-    statsEl.style.display = "block";
-  }
-}
-
-async function genResetLink(event) {
-  const email = document.getElementById("reset-email").value.trim();
-  if(!email) return toast("Enter an email address", "circle-alert");
-  
-  const btn = event.target.closest('button');
-  const originalText = btn.innerHTML;
-  btn.disabled = true; btn.innerHTML = 'Generating...';
-
-  try {
-    const { data, error } = await db.rpc('generate_reset_token', { p_email: email });
-    if (error) throw error;
-    
-    if (!data.ok) {
-      toast(data.message, "circle-alert");
-    } else {
-      const link = window.location.origin + "/?reset=" + data.token;
-      document.getElementById("reset-result").style.display = "block";
-      document.getElementById("reset-link-val").value = link;
-      
-      // Set timer
-      window.adminResetExpires = new Date(data.expires_at).getTime();
-      document.getElementById("admin-timer").classList.remove("expired");
-      startAdminTimer();
-      
-      checkResetStats(); // Refresh count
-      toast("Link generated successfully");
-    }
-  } catch (e) {
-    toast(e.message, "circle-alert");
-  } finally {
-    btn.disabled = false; btn.innerHTML = originalText;
-    try{lucide.createIcons()}catch(e){}
-  }
-}
-
-function copyResetLink() {
-  const val = document.getElementById("reset-link-val");
-  val.select(); val.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(val.value);
-  toast("Link copied to clipboard!");
-}  const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
+function dashV(){
+  const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
   const aw=S.matches.filter(m=>m.st!=="settled"&&m.st==="closed"),liab=S.users.reduce((a,u)=>a+u.wal,0),pamt=pw.reduce((a,w)=>a+w.amt,0);
   const top=S.users.slice().sort((a,b)=>b.wal-a.wal).slice(0,5);
   return `<div class="hd"><div><h1>Dashboard</h1><small>Live overview of your CricPulse platform</small></div><div class="sp"></div>
@@ -567,9 +471,9 @@ function copyResetLink() {
     <div class="card"><h3>Recent activity</h3>${feed().map(a=>`<div class="ls"><div class="ico">${ic(a.i)}</div><div><b style="font-weight:500">${esc(a.t)}</b><small>${rel(a.ts)} ago</small></div></div>`).join("")||'<div class="emp">No activity yet.</div>'}
     </div>
   </div></div>
-
-  </div>`;
+  `;
 }
+
 function matchesV(){
   return `<div class="hd"><div><h1>Matches</h1><small>Create markets, close predictions and declare winners</small></div><div class="sp"></div><button class="btn" data-act="addm">${ic("plus")}Add match</button></div>
   <div class="card tw"><table><tr><th>Match</th><th>Closes</th><th>Participants</th><th>Pick split</th><th>Status</th><th></th></tr>${S.matches.map(m=>{
@@ -611,8 +515,6 @@ function tkList(){
   const q=TQ.toLowerCase(),l=S.tickets.filter(t=>(TKF==="all"||t.st===TKF)&&(!q||(tkUser(t)+t.sub+t.id).toLowerCase().includes(q))).sort((a,b)=>b.lastTs-a.lastTs);
   return l.length?l.map(t=>{
     const n=tkUser(t);
-    
-    // Determine if the timer should run (only if the USER sent the last message)
     let timerHtml = '';
     if (t.st === "closed") {
         timerHtml = `<em style="color:var(--mu)">${rel(t.lastTs)}</em>`;
@@ -621,7 +523,6 @@ function tkList(){
     } else {
         timerHtml = `<em style="color:var(--mu)">${ftm(t.lastTs)}</em>`;
     }
-
     return `<button class="ti${TKM===t.id?" on":""}${t.unread?" un":""}" data-act="tk" data-v="${esc(t.id)}">
       <span class="avt" style="background:${col(n)}">${ini(n)}</span>
       <span class="tb">
@@ -843,14 +744,6 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",async e=>{
   const t=e.target;
   if(t.dataset.sel==="month"){S.mi=+t.value;save();render()}
-  else if(t.dataset.sel==="live_filter"){
-    LIVE_FILTER = t.value;
-    if(LIVE_FILTER === "live") {
-      updateLiveUI(null, "FILTER");
-    } else {
-      fetchHistoricalLive(LIVE_FILTER);
-    }
-  }
   else if(t.dataset.sel==="tf"){TF=t.value;render()}
   else if(t.dataset.sel==="uf"){UF=t.value;render()}
   else if(t.dataset.leagues!==undefined){const l=$("lgl");if(l)l.innerHTML=(LEAGUES[t.value]||[]).map(x=>`<option value="${x}">`).join("")}
@@ -875,7 +768,7 @@ document.addEventListener("submit",async e=>{
     return}
   if(id==="lf"){doLogin();return}
   if(id==="mf"){
-  const dbId=$("mid_db").value,tv=$("mtime").value;
+    const dbId=$("mid_db").value,tv=$("mtime").value;
     const d={category:$("mc").value,league:$("ml").value.trim(),team_a:$("ma").value.trim(),team_b:$("mb").value.trim(),question:$("mq").value.trim(),closes_at:tv?new Date(tv).toISOString():new Date(Date.now()+864e5).toISOString(),odds_a:+$("moa").value||1.85,odds_b:+$("mob").value||2.1,entry_fee:+$("mfee").value||50,max_spots:+$("mspots").value||200};
     if(!dbId)d.crowd_a=50;
     const r=dbId?await db.from("matches").update(d).eq("id",dbId):await db.from("matches").insert(d);
@@ -965,7 +858,6 @@ function initRealtime(){
       updateLiveUI(payload.new, payload.eventType);
     }).subscribe();
 
-  // Initial fetch of live users
   db.from("live_sessions").select("*").then(r => {
     if (r.data) {
       r.data.forEach(u => LIVE_USERS[u.session_id] = u);
@@ -973,14 +865,14 @@ function initRealtime(){
     }
   });
 }
+
 function updateLiveUI(payload, type) {
   const now = Date.now();
   const validUsers = Object.values(LIVE_USERS).filter(u => {
     const lastActive = new Date(u.last_active).getTime();
-    return (now - lastActive < 120000); // Ignore users inactive for 2+ mins
+    return (now - lastActive < 120000);
   });
 
-  // Update Stats (Always run this so stats are accurate even if looking at history)
   const online = validUsers.filter(u => u.is_active && u.current_page !== "Left App").length;
   const predicting = validUsers.filter(u => u.current_page === "markets" || u.current_page === "picks" || u.current_page === "match").length;
   const wallet = validUsers.filter(u => u.current_page === "wallet" || u.current_page === "rewards").length;
@@ -991,10 +883,8 @@ function updateLiveUI(payload, type) {
   if(document.getElementById("lv-wallet")) document.getElementById("lv-wallet").textContent = wallet;
   if(document.getElementById("lv-support")) document.getElementById("lv-support").textContent = support;
 
-  // Only update tables if we are on the "Live" filter
   if (LIVE_FILTER !== "live") return;
 
-  // Update Table
   const tbody = document.getElementById("lv-tbody");
   if (tbody) {
     const sorted = validUsers.sort((a,b) => new Date(b.last_active) - new Date(a.last_active));
@@ -1017,7 +907,6 @@ function updateLiveUI(payload, type) {
     }
   }
 
-  // Update Event Stream
   if ((type === "INSERT" || type === "UPDATE") && payload) {
     const stream = document.getElementById("lv-stream");
     if (stream) {
@@ -1032,96 +921,47 @@ function updateLiveUI(payload, type) {
   }
 }
 
-// Fetch Historical Data for the dropdown menu
-async function fetchHistoricalLive(filter) {
-  let start = new Date(), end = new Date();
-  if (filter === "today") { start.setHours(0,0,0,0); }
-  else if (filter === "yesterday") { start.setDate(start.getDate()-1); start.setHours(0,0,0,0); end.setDate(end.getDate()-1); end.setHours(23,59,59,999); }
-  else if (filter === "week") { start.setDate(start.getDate()-7); }
-  else if (filter === "month") { start.setMonth(start.getMonth()-1); }
+window.adminResetTimerInterval = null;
 
-  const tbody = document.getElementById("lv-tbody");
-  if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="emp">Loading history...</td></tr>';
-  const stream = document.getElementById("lv-stream");
-  if(stream) stream.innerHTML = '<li><div></div><div class="emp" style="padding:0">Event stream is only available in Live mode.</div></li>';
-
-  const { data, error } = await db.from("live_sessions")
-    .select("*")
-    .gte("last_active", start.toISOString())
-    .lte("last_active", end.toISOString())
-    .order("last_active", { ascending: false })
-    .limit(100);
-
-  if (tbody) {
-    if (!error && data && data.length > 0) {
-      tbody.innerHTML = data.map(u => {
-        const isOnline = u.is_active && u.current_page !== "Left App";
-        const statusColor = isOnline ? "#10b981" : "#ef4444";
-        const statusText = isOnline ? "Active" : "Left/Browsing Away";
-        const timeStr = new Date(u.last_active).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"numeric",minute:"2-digit"});
-        return `<tr>
-          <td><b>${esc(u.user_name)}</b><br><small>${u.user_id ? esc(u.user_id.slice(0,8)) : 'guest'}</small></td>
-          <td><span class="chip">${esc(u.current_page)}</span></td>
-          <td><span class="lv-dot" style="background:${statusColor}"></span>${statusText}</td>
-          <td><small>${timeStr}</small></td>
-        </tr>`;
-      }).join("");
-    } else {
-      tbody.innerHTML = '<tr><td colspan="4" class="emp">No sessions found for this time period.</td></tr>';
+function startAdminTimer() {
+  const timerEl = document.getElementById("admin-timer");
+  if (!timerEl || !window.adminResetExpires) return;
+  
+  clearInterval(window.adminResetTimerInterval);
+  
+  window.adminResetTimerInterval = setInterval(() => {
+    const now = Date.now();
+    const diff = window.adminResetExpires - now;
+    
+    if (diff <= 0) {
+      timerEl.textContent = "Expired";
+      timerEl.classList.add("expired");
+      clearInterval(window.adminResetTimerInterval);
+      return;
     }
+    
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+async function checkResetStats() {
+  const email = document.getElementById("reset-email").value.trim();
+  const statsEl = document.getElementById("reset-stats");
+  if(!email || !db) { if(statsEl) statsEl.style.display="none"; return; }
+  
+  const { count } = await db.from('password_resets').select('*', { count: 'exact', head: true }).eq('email', email);
+  
+  if (count > 0) {
+    statsEl.innerHTML = `<span style="color:var(--pr);font-weight:600">${count} reset link(s)</span> previously generated for this email.`;
+    statsEl.style.display = "block";
+  } else {
+    statsEl.innerHTML = `<span style="color:var(--mu)">First time generating a reset link for this user.</span>`;
+    statsEl.style.display = "block";
   }
 }
 
-// Refresh times in UI every 5 seconds
-setInterval(() => {
-  if (S.page === "live" && LIVE_FILTER === "live" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
-}, 5000);
-
-// BULLETPROOF FALLBACK: Poll the database every 5 seconds if looking at Live Users
-setInterval(async () => {
-  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live" && db) {
-    try {
-      const { data } = await db.from("live_sessions")
-        .select("*")
-        .gte("last_active", new Date(Date.now() - 120000).toISOString()); // Only last 2 mins
-        
-      if (data) {
-        console.log("📥 Polled Live Users from DB:", data); // DEBUG LOG
-        LIVE_USERS = {}; // Clear local cache
-        data.forEach(u => LIVE_USERS[u.session_id] = u);
-        updateLiveUI(null, "POLL");
-      }
-    } catch(e) { console.error("Poll failed", e); }
-  }
-}, 5000);
-
-// Mobile fix: When you switch back to the Admin panel tab, re-fetch instantly
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live") {
-    if (db) {
-      db.from("live_sessions").select("*").then(r => {
-        if (r.data) {
-          LIVE_USERS = {};
-          r.data.forEach(u => LIVE_USERS[u.session_id] = u);
-          updateLiveUI(null, "INIT");
-        }
-      });
-    }
-  }
-});
-setInterval(()=>{
-  document.querySelectorAll('[data-timer]').forEach(el=>{
-    const ts=Number(el.dataset.timer);
-    if(!ts)return;
-    const s=Math.floor((Date.now()-ts)/1000);
-    if(s<60){el.textContent=s+"s"}
-    else{const m=Math.floor(s/60);const rs=s%60;el.textContent=m+"m "+rs+"s"}
-    if(Date.now()-ts>120000){el.classList.remove('green');el.classList.add('red')}
-    else{el.classList.remove('red');el.classList.add('green')}
-  });
-},1000);
-setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
-// --- PASSWORD RESET GENERATOR LOGIC ---
 async function genResetLink(event) {
   const email = document.getElementById("reset-email").value.trim();
   if(!email) return toast("Enter an email address", "circle-alert");
@@ -1140,6 +980,12 @@ async function genResetLink(event) {
       const link = window.location.origin + "/?reset=" + data.token;
       document.getElementById("reset-result").style.display = "block";
       document.getElementById("reset-link-val").value = link;
+      
+      window.adminResetExpires = new Date(data.expires_at).getTime();
+      document.getElementById("admin-timer").classList.remove("expired");
+      startAdminTimer();
+      
+      checkResetStats();
       toast("Link generated successfully");
     }
   } catch (e) {
@@ -1156,6 +1002,56 @@ function copyResetLink() {
   navigator.clipboard.writeText(val.value);
   toast("Link copied to clipboard!");
 }
+
+// Refresh times in UI every 5 seconds
+setInterval(() => {
+  if (S.page === "live" && LIVE_FILTER === "live" && document.getElementById("lv-tbody")) updateLiveUI(null, "TICK");
+}, 5000);
+
+setInterval(async () => {
+  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live" && db) {
+    try {
+      const { data } = await db.from("live_sessions")
+        .select("*")
+        .gte("last_active", new Date(Date.now() - 120000).toISOString());
+        
+      if (data) {
+        LIVE_USERS = {};
+        data.forEach(u => LIVE_USERS[u.session_id] = u);
+        updateLiveUI(null, "POLL");
+      }
+    } catch(e) { console.error("Poll failed", e); }
+  }
+}, 5000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && LOGIN && S.page === "live" && LIVE_FILTER === "live") {
+    if (db) {
+      db.from("live_sessions").select("*").then(r => {
+        if (r.data) {
+          LIVE_USERS = {};
+          r.data.forEach(u => LIVE_USERS[u.session_id] = u);
+          updateLiveUI(null, "INIT");
+        }
+      });
+    }
+  }
+});
+
+setInterval(()=>{
+  document.querySelectorAll('[data-timer]').forEach(el=>{
+    const ts=Number(el.dataset.timer);
+    if(!ts)return;
+    const s=Math.floor((Date.now()-ts)/1000);
+    if(s<60){el.textContent=s+"s"}
+    else{const m=Math.floor(s/60);const rs=s%60;el.textContent=m+"m "+rs+"s"}
+    if(Date.now()-ts>120000){el.classList.remove('green');el.classList.add('red')}
+    else{el.classList.remove('red');el.classList.add('green')}
+  });
+},1000);
+
+setInterval(()=>{if(LOGIN&&S.page==="sup"&&!document.hidden)updateList()},30000);
+
 boot();
 </script>
 </body>
