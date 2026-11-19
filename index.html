@@ -35,6 +35,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .inp{width:100%;height:44px;padding:0 12px;background:var(--sf);border:1px solid var(--ln2);border-radius:10px;font-size:16px}.inp:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
 textarea.inp{height:auto;min-height:80px;padding:10px 12px;resize:vertical}
 .fld{margin-bottom:12px}.fld label{display:block;font-size:12px;font-weight:500;color:var(--i2);margin-bottom:4px}.err{min-height:18px;color:var(--no);font-size:12px;margin-bottom:6px}
+.pw-wrap { position: relative; display: flex; align-items: center; }
+.pw-wrap .inp { width: 100%; padding-right: 40px; }
+.pw-toggle { position: absolute; right: 12px; background: none; border: none; color: var(--i3); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: color 0.2s, background 0.2s; }
+.pw-toggle:hover { color: var(--ink); background: var(--s2); }
 .pill{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:6px;font-size:11px;font-weight:600;background:var(--s2);color:var(--i2);white-space:nowrap}.pill.ok{background:var(--oks);color:var(--ok)}.pill.no{background:var(--nos);color:var(--no)}.pill.am{background:var(--ams);color:var(--am)}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:0 -14px 10px;padding:0 14px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
 .chip{flex:none;height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--ln2);background:var(--sf);color:var(--i2);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -486,7 +490,15 @@ function authV() {
   <div class="auth"><div class="card"><h2 style="font-size:22px;letter-spacing:-.02em">${up?"Create your account":"Welcome back"}</h2><p class="mut" style="margin-top:2px">Free to join. Real money rewards.</p><div class="tabs"><button class="${up?"":"on"}" data-a="auth" data-v="in">Log in</button><button class="${up?"on":""}" data-a="auth" data-v="up">Sign up</button></div>
   ${up ? '<div class="fld"><label for="an">Full name</label><input class="inp" id="an" autocomplete="name"></div>' : ""}
   <div class="fld"><label for="ae">Email</label><input class="inp" id="ae" type="email" autocomplete="email" inputmode="email"></div>
-  <div class="fld"><label for="ap">Password</label><input class="inp" id="ap" type="password" autocomplete="${up?"new-password":"current-password"}"></div>
+  <div class="fld">
+    <label for="ap">Password</label>
+    <div class="pw-wrap">
+      <input class="inp" id="ap" type="password" autocomplete="${up?"new-password":"current-password"}">
+      <button type="button" class="pw-toggle" onclick="togglePassword('ap', this)" aria-label="Toggle password visibility">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+  </div>
   <div class="err" id="er"></div>
   <button class="btn p w" data-a="subm" ${S.authBusy?"disabled":""}>${S.authBusy?"Please wait…":(up?"Create account":"Log in")}</button>
   <div class="divider">or</div>
@@ -1908,6 +1920,19 @@ function initRealtimeSync() {
       }
     }).subscribe();
 }
+
+window.togglePassword = function(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  
+  if (input.type === "password") {
+    input.type = "text";
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>`;
+  } else {
+    input.type = "password";
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+};
 
 window.addEventListener("load", async () => {
   // --- INTERCEPT PASSWORD RESET LINK ---
