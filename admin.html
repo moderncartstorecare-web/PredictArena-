@@ -333,13 +333,20 @@ async function tkSend(text,img){
   const r=await db.from("ticket_messages").insert({ticket_id:t.id,sender:"admin",message:body,is_read:false}).select();
   if(r.error){toast("Failed to send: "+r.error.message,"circle-alert");return}
   
+  // FIX: Mark all previous user messages as read in the database
+  await db.from("ticket_messages").update({is_read:true}).eq("ticket_id",t.id).eq("sender","user");
+  t.unread = 0; // Clear the local unread counter
+
+  // Update database status so it refreshes correctly
   await db.from("support_tickets").update({status:"pending"}).eq("id",t.id);
   t.st = "pending";
 
   const m=mapMsg(r.data&&r.data[0]?r.data[0]:{message:body,sender:"admin",created_at:new Date().toISOString()});
   if(!t.msgs)t.msgs=[];if(!t.msgs.some(x=>x.id&&x.id===m.id))t.msgs.push(m);
   t.lastTs=Date.now();t.lastSender="admin";
-  updateChat(true);updateList();
+  
+  updateChat(true);
+  render(); // Re-render the sidebar to instantly clear the red badge count
 }
 const tkNote=id=>{try{return localStorage.getItem("cp_note_"+id)||""}catch(e){return""}};
 
@@ -817,7 +824,15 @@ async function enter(session){
   const em=String(session.user.email||"").toLowerCase();
   if(ADMIN_EMAILS.length&&!ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(em)){DENY=em+" is not an admin account.";UNLOCK=true;LOGIN=0;BOOTED=0;try{await db.auth.signOut()}catch(e){}render();return}
   if(BOOTED&&LOGIN)return;
-  BOOTED=1;LOGIN=1;S.adm=session.user.email;cleanUrl();render();
+  BOOTED=1;LOGIN=1;S.adm=session.user.email;cleanUrl();
+  
+  // Show a professional loading screen instead of rendering empty 0s
+  document.getElementById("root").innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:var(--bg);color:var(--tx);font-weight:600;flex-direction:column;gap:16px;">
+    <div style="width:40px;height:40px;border-radius:50%;border:3px solid var(--bd);border-top-color:var(--pr);animation:sp 1s linear infinite;"></div>
+    <style>@keyframes sp { 100% { transform: rotate(360deg); } }</style>
+    Loading Dashboard...
+  </div>`;
+
   try{await loadAll();initRealtime();const t=TKM?TK(TKM):null;if(t)loadMsgs(t)}catch(e){console.error(e);toast("Loaded with some errors","circle-alert")}
 }
 async function boot(){
