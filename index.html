@@ -204,6 +204,10 @@ details p{color:var(--i2);font-size:13px;padding-bottom:10px}
 .c-spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 .reset-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px}
 .reset-card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:30px;width:100%;max-width:400px;text-align:center;box-shadow:var(--sh)}
+.pro-timer{display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:15px;font-weight:700;padding:6px 12px;border-radius:8px;background:var(--ams);color:var(--am);margin-top:8px;}
+.pro-timer.expired{background:var(--nos);color:var(--no)}
+.reset-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px}
+.reset-card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:30px;width:100%;max-width:400px;text-align:center;box-shadow:var(--sh)}
 @media(min-width:960px){
   .c-main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start;padding:24px 16px 40px}
   .c-col-l,.c-col-r{display:flex;flex-direction:column;gap:16px;order:0}
@@ -1910,21 +1914,76 @@ window.addEventListener("load", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const resetToken = urlParams.get('reset');
   if (resetToken) {
-    document.getElementById("app").innerHTML = `
-      <div class="reset-wrap">
-        <div class="reset-card">
-          <div style="width:50px;height:50px;border-radius:12px;background:var(--acs);color:var(--ac);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">${ic("lock",24)}</div>
-          <h2 style="font-size:22px;margin-bottom:8px">Create New Password</h2>
-          <p class="mut s12" style="margin-bottom:20px">Please enter your new password below. This link is valid for 10 minutes.</p>
-          <div class="fld" style="text-align:left">
-            <label>New Password (min 6 chars)</label>
-            <input type="password" class="inp" id="new-pass" placeholder="Enter new password">
+    document.getElementById("app").innerHTML = `<div class="reset-wrap"><div class="reset-card"><div class="c-spin" style="margin:0 auto"></div></div></div>`;
+    
+    // Verify token and get email/expiry
+    try {
+      const { data, error } = await supabase.rpc('verify_reset_token', { p_token: resetToken });
+      
+      if (error || !data || !data.ok) {
+        document.getElementById("app").innerHTML = `
+          <div class="reset-wrap">
+            <div class="reset-card">
+              <div style="width:50px;height:50px;border-radius:12px;background:var(--nos);color:var(--no);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">${ic("x",24)}</div>
+              <h2 style="font-size:22px;margin-bottom:8px">Link Invalid</h2>
+              <p class="mut s12" style="margin-bottom:20px">${data && data.message ? data.message : "This link is invalid or has expired."}</p>
+              <a href="/" class="btn p w">Go to Homepage</a>
+            </div>
           </div>
-          <div class="err" id="reset-err" style="text-align:left"></div>
-          <button class="btn p w" id="reset-btn" onclick="submitReset('${resetToken}')">Update Password</button>
+        `;
+        return;
+      }
+
+      // Token is valid! Show the form with email and timer
+      const expTime = new Date(data.expires_at).getTime();
+      
+      document.getElementById("app").innerHTML = `
+        <div class="reset-wrap">
+          <div class="reset-card">
+            <div style="width:50px;height:50px;border-radius:12px;background:var(--acs);color:var(--ac);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">${ic("lock",24)}</div>
+            <h2 style="font-size:22px;margin-bottom:8px">Create New Password</h2>
+            <p class="mut s12" style="margin-bottom:12px">You are resetting the password for:</p>
+            <div style="background:var(--s2);padding:10px;border-radius:8px;font-weight:600;font-size:14px;margin-bottom:16px;word-break:break-all">${esc(data.email)}</div>
+            
+            <div style="margin-bottom:20px">
+              <span class="pro-timer" id="user-timer">10:00</span>
+            </div>
+
+            <div class="fld" style="text-align:left">
+              <label>New Password (min 6 chars)</label>
+              <input type="password" class="inp" id="new-pass" placeholder="Enter new password">
+            </div>
+            <div class="err" id="reset-err" style="text-align:left"></div>
+            <button class="btn p w" id="reset-btn" onclick="submitReset('${resetToken}')">Update Password</button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+
+      // Start Timer
+      const timerEl = document.getElementById("user-timer");
+      const btn = document.getElementById("reset-btn");
+      const interval = setInterval(() => {
+        const now = Date.now();
+        const diff = expTime - now;
+        
+        if (diff <= 0) {
+          timerEl.textContent = "Expired";
+          timerEl.classList.add("expired");
+          btn.disabled = true;
+          btn.textContent = "Link Expired";
+          clearInterval(interval);
+          return;
+        }
+        
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }, 1000);
+
+    } catch(e) {
+      document.getElementById("app").innerHTML = `<div class="reset-wrap"><div class="reset-card"><p class="mut">Error verifying link. Please request a new one.</p></div></div>`;
+    }
+    
     return; // Stop loading the rest of the app
   }
 
