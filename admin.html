@@ -406,8 +406,133 @@ function liveV() {
     </div>
   </div>`;
 }
-function dashV(){
-  const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
+const timerCss = `<style>.pro-timer{display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:14px;font-weight:600;padding:4px 10px;border-radius:6px;background:var(--was);color:var(--wa);}.pro-timer.expired{background:var(--bads);color:var(--bad)}</style>`;
+
+function resetV() {
+  // Start the timer if there's an active one stored in memory
+  setTimeout(() => { startAdminTimer(); }, 100);
+  
+  return timerCss + `
+  <div class="hd">
+    <div><h1>Password Reset Generator</h1><small>Generate secure 10-minute links for users</small></div>
+  </div>
+  
+  <div class="cols">
+    <div class="card">
+      <h3>Generate New Link</h3>
+      <label class="f">Customer Email Address</label>
+      <input class="in" id="reset-email" list="email-list" placeholder="Type to search users..." autocomplete="off" oninput="checkResetStats()">
+      <datalist id="email-list">${S.users.map(u => `<option value="${esc(u.email)}">${esc(u.name)}</option>`).join("")}</datalist>
+      
+      <div id="reset-stats" style="display:none;margin-top:8px;font-size:12px;color:var(--mu)"></div>
+      
+      <button class="btn" style="margin-top:16px;width:100%" onclick="genResetLink(event)">${ic("link")}Generate Link</button>
+      
+      <div id="reset-result" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--bd)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:12px;color:var(--mu)">Send this link (Expires in 10 mins):</div>
+          <div id="admin-timer-box"><span class="pro-timer" id="admin-timer">10:00</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="in" id="reset-link-val" readonly style="font-family:monospace;font-size:14px">
+          <button class="btn k" onclick="copyResetLink()">${ic("copy")}Copy</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>How it works</h3>
+      <div class="ls"><div class="ico">${ic("1")}</div><div><b>Enter Email</b><small>Type the customer's email. We will show how many times they requested a reset.</small></div></div>
+      <div class="ls"><div class="ico">${ic("2")}</div><div><b>Generate Link</b><small>Click generate to create a secure 6-digit link valid for 10 minutes.</small></div></div>
+      <div class="ls"><div class="ico">${ic("3")}</div><div><b>Send to Customer</b><small>Copy the link and send it via Instagram or WhatsApp.</small></div></div>
+    </div>
+  </div>`;
+}
+
+// Global timer variable to keep it running
+window.adminResetTimerInterval = null;
+
+function startAdminTimer() {
+  const timerEl = document.getElementById("admin-timer");
+  const boxEl = document.getElementById("admin-timer-box");
+  if (!timerEl || !window.adminResetExpires) return;
+  
+  clearInterval(window.adminResetTimerInterval);
+  
+  window.adminResetTimerInterval = setInterval(() => {
+    const now = Date.now();
+    const diff = window.adminResetExpires - now;
+    
+    if (diff <= 0) {
+      timerEl.textContent = "Expired";
+      timerEl.classList.add("expired");
+      clearInterval(window.adminResetTimerInterval);
+      return;
+    }
+    
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+async function checkResetStats() {
+  const email = document.getElementById("reset-email").value.trim();
+  const statsEl = document.getElementById("reset-stats");
+  if(!email || !db) { if(statsEl) statsEl.style.display="none"; return; }
+  
+  const { count } = await db.from('password_resets').select('*', { count: 'exact', head: true }).eq('email', email);
+  
+  if (count > 0) {
+    statsEl.innerHTML = `<span style="color:var(--pr);font-weight:600">${count} reset link(s)</span> previously generated for this email.`;
+    statsEl.style.display = "block";
+  } else {
+    statsEl.innerHTML = `<span style="color:var(--mu)">First time generating a reset link for this user.</span>`;
+    statsEl.style.display = "block";
+  }
+}
+
+async function genResetLink(event) {
+  const email = document.getElementById("reset-email").value.trim();
+  if(!email) return toast("Enter an email address", "circle-alert");
+  
+  const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = 'Generating...';
+
+  try {
+    const { data, error } = await db.rpc('generate_reset_token', { p_email: email });
+    if (error) throw error;
+    
+    if (!data.ok) {
+      toast(data.message, "circle-alert");
+    } else {
+      const link = window.location.origin + "/?reset=" + data.token;
+      document.getElementById("reset-result").style.display = "block";
+      document.getElementById("reset-link-val").value = link;
+      
+      // Set timer
+      window.adminResetExpires = new Date(data.expires_at).getTime();
+      document.getElementById("admin-timer").classList.remove("expired");
+      startAdminTimer();
+      
+      checkResetStats(); // Refresh count
+      toast("Link generated successfully");
+    }
+  } catch (e) {
+    toast(e.message, "circle-alert");
+  } finally {
+    btn.disabled = false; btn.innerHTML = originalText;
+    try{lucide.createIcons()}catch(e){}
+  }
+}
+
+function copyResetLink() {
+  const val = document.getElementById("reset-link-val");
+  val.select(); val.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(val.value);
+  toast("Link copied to clipboard!");
+}  const d=MD(S.mi),prev=S.mi<MS.length-1?MD(S.mi+1):null,c=prev&&prev.net?Math.round((d.net-prev.net)/Math.abs(prev.net)*100):null,pw=pendW(),pp=pendP();
   const aw=S.matches.filter(m=>m.st!=="settled"&&m.st==="closed"),liab=S.users.reduce((a,u)=>a+u.wal,0),pamt=pw.reduce((a,w)=>a+w.amt,0);
   const top=S.users.slice().sort((a,b)=>b.wal-a.wal).slice(0,5);
   return `<div class="hd"><div><h1>Dashboard</h1><small>Live overview of your CricPulse platform</small></div><div class="sp"></div>
@@ -443,26 +568,6 @@ function dashV(){
     </div>
   </div></div>
 
-  <!-- PASSWORD RESET GENERATOR -->
-  <div style="margin-top:30px;margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div><h1 style="font-size:18px;margin:0">Password Reset Generator</h1><small style="color:var(--mu)">Generate secure 10-minute links for users who forgot their passwords</small></div>
-    </div>
-    <div class="card" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap">
-      <div style="flex:1;min-width:250px">
-        <label class="f">Customer Email Address</label>
-        <input class="in" id="reset-email" placeholder="e.g. customer@gmail.com">
-      </div>
-      <button class="btn" onclick="genResetLink(event)">${ic("link")}Generate Link</button>
-    </div>
-    <div id="reset-result" style="display:none;margin-top:12px" class="card">
-      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">Send this link to the customer (Valid for 10 mins):</div>
-      <div style="display:flex;gap:8px">
-        <input class="in" id="reset-link-val" readonly style="font-family:monospace;font-size:14px">
-        <button class="btn k" onclick="copyResetLink()">${ic("copy")}Copy</button>
-      </div>
-    </div>
-  </div>
   </div>`;
 }
 function matchesV(){
@@ -605,8 +710,8 @@ function setV(){
   </div></div>`;
 }
 
-const NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["deposits","banknote","Deposits"],["wd","landmark","Withdrawals"],["live","activity","Live Users"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
-const VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],deposits:["Deposits",depV],wd:["Withdrawals",wdV],live:["Live Users",liveV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
+const NV=[["dash","layout-dashboard","Dashboard"],["H","Operations"],["matches","trophy","Matches"],["users","users","Users"],["wallets","wallet","Wallets"],["deposits","banknote","Deposits"],["wd","landmark","Withdrawals"],["live","activity","Live Users"],["reset","key","Password Reset"],["H","Engagement"],["not","bell","Notifications"],["sup","life-buoy","Support"],["rew","gift","Rewards"],["H","System"],["set","settings","Settings"]];
+const VT={dash:["Dashboard",dashV],matches:["Matches",matchesV],users:["Users",usersV],wallets:["Wallets",walletsV],deposits:["Deposits",depV],wd:["Withdrawals",wdV],live:["Live Users",liveV],reset:["Password Reset",resetV],not:["Notifications",notV],sup:["Support",supV],rew:["Rewards",rewV],set:["Settings",setV]};
 function badge(k){const n=k==="wd"?pendW().length:k==="deposits"?pendP().length:k==="sup"?unreadT().length:0;return n?`<span class="cn">${n}</span>`:""}
 const nav=()=>NV.map(n=>n[0]==="H"?`<h6>${n[1]}</h6>`:`<button class="nv${S.page===n[0]?" on":""}" data-p="${n[0]}">${ic(n[1])}${n[2]}${badge(n[0])}</button>`).join("")+`<button class="nv" data-act="logout">${ic("log-out")}Logout</button>`;
 
