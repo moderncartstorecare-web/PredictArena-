@@ -166,8 +166,20 @@ var LEAGUES={
 var QUICK=["Hello! Thanks for contacting CricPulse support. How can I help you?","Please share your registered email and the transaction ID.","Payment verification can take up to 24 hours. We are checking this for you.","We have escalated this to our team and will update you shortly.","Your issue has been resolved. Please let us know if you need anything else."];
 
 var db=null;
-try{if(typeof supabase!=="undefined"){db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{detectSessionInUrl:true,persistSession:true}})}}catch(e){console.error("Supabase init failed",e);db=null}
-
+try{
+  if(typeof supabase!=="undefined"){
+    db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
+      auth:{
+        detectSessionInUrl:true,
+        persistSession:true,
+        storageKey: 'sb-cricpulse-admin-auth-token' // <--- THIS SEPARATES THE LOGINS
+      }
+    })
+  }
+}catch(e){
+  console.error("Supabase init failed",e);
+  db=null;
+}
 /* =====================================================================
    STATE + HELPERS
    ===================================================================== */
